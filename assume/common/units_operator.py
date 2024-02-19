@@ -110,7 +110,7 @@ class UnitsOperator(Role):
                     1,  # register after time was updated for the first time
                 )
 
-    async def add_unit(
+    def add_unit(
         self,
         unit: BaseUnit,
     ) -> None:
@@ -131,10 +131,10 @@ class UnitsOperator(Role):
                 "type": "store_units",
                 "data": self.units[unit.id].as_dict(),
             }
-            await self.context.send_acl_message(
+            self.context.schedule_instant_acl_message(
+                content=message,
                 receiver_id=db_aid,
                 receiver_addr=db_addr,
-                content=message,
                 acl_metadata={
                     "sender_addr": self.context.addr,
                     "sender_id": self.context.aid,

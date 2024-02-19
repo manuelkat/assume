@@ -477,7 +477,42 @@ class World:
             id, unit_type, unit_operator_id, unit_params, forecaster
         )
 
-        await self.unit_operators[unit_operator_id].add_unit(unit)
+        self.unit_operators[unit_operator_id].add_unit(unit)
+
+    async def async_add_unit(
+        self,
+        id: str,
+        unit_type: str,
+        unit_operator_id: str,
+        unit_params: dict,
+        forecaster: Forecaster,
+    ) -> None:
+        """
+        Asynchronously adds a unit to the simulation, checking if the unit operator exists, verifying the unit type,
+        and ensuring that the unit operator does not already have a unit with the same id. It then creates bidding
+        strategies for the unit and adds the unit within the associated unit operator.
+
+        Args:
+            id (str): The identifier for the unit.
+            unit_type (str): The type of unit to be added.
+            unit_operator_id (str): The identifier of the unit operator to which the unit will be added.
+            unit_params (dict): Parameters for configuring the unit.
+            forecaster (Forecaster): The forecaster used by the unit.
+        """
+
+        # check if unit operator exists
+        if unit_operator_id not in self.unit_operators.keys():
+            raise ValueError(f"invalid unit operator {unit_operator_id}")
+
+        # check if unit operator already has a unit with the same id
+        if self.unit_operators[unit_operator_id].units.get(id):
+            raise ValueError(f"Unit {id} already exists")
+
+        unit = self.create_unit(
+            id, unit_type, unit_operator_id, unit_params, forecaster
+        )
+
+        self.unit_operators[unit_operator_id].add_unit(unit)
 
     def add_market_operator(self, id: str) -> None:
         """
@@ -620,36 +655,3 @@ class World:
         self.markets = {}
         self.unit_operators = {}
         self.forecast_providers = {}
-
-    def add_unit(
-        self,
-        id: str,
-        unit_type: str,
-        unit_operator_id: str,
-        unit_params: dict,
-        forecaster: Forecaster,
-    ) -> None:
-        """
-        Add a unit to the World instance.
-
-        This method checks if the unit operator exists, verifies the unit type, and ensures that the unit operator
-        does not already have a unit with the same id. It then creates bidding strategies for the unit and creates
-        the unit within the associated unit operator.
-
-        Args:
-            id (str): The identifier for the unit.
-            unit_type (str): The type of the unit.
-            unit_operator_id (str): The identifier of the unit operator.
-            unit_params (dict): Parameters specific to the unit.
-            forecaster (Forecaster): The forecaster associated with the unit.
-        """
-
-        return self.loop.run_until_complete(
-            self.async_add_unit(
-                id=id,
-                unit_type=unit_type,
-                unit_operator_id=unit_operator_id,
-                unit_params=unit_params,
-                forecaster=forecaster,
-            )
-        )
