@@ -4,26 +4,19 @@ SPDX-FileCopyrightText: ASSUME Developers
 SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 
-# ASSUME: Agent-Based Electricity Markets Simulation Toolbox
+# SPARKLE - Simulation Platform for Agent-based Research on energy marKet dynamics for Lower Emissions
 
-![Lint Status](https://github.com/assume-framework/assume/actions/workflows/lint-pytest.yaml/badge.svg)
-[![Code Coverage](https://codecov.io/gh/assume-framework/assume/branch/main/graph/badge.svg?token=CZ4FO7P57H)](https://codecov.io/gh/assume-framework/assume)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.8088760.svg)](https://doi.org/10.5281/zenodo.8088760)
-[![REUSE status](https://api.reuse.software/badge/github.com/assume-framework/assume)](https://api.reuse.software/info/github.com/assume-framework/assume)
 
-[![](https://img.shields.io/pypi/v/assume-framework.svg)](https://pypi.org/pypi/assume-framework/)
-[![](https://img.shields.io/pypi/pyversions/assume-framework.svg)](https://pypi.org/pypi/assume-framework/)
-[![](https://img.shields.io/pypi/l/assume-framework.svg)](https://pypi.org/pypi/assume-framework/)
-[![](https://img.shields.io/pypi/status/assume-framework.svg)](https://pypi.org/pypi/assume-framework/)
-[![](https://img.shields.io/readthedocs/assume)](https://assume.readthedocs.io/)
+**SPARKLE** is an open-source toolbox for agent-based simulations of European electricity markets, with a primary focus on the German market setup. Developed as an open-source model, its primary objectives are to ensure usability and customizability for a wide range of users and use cases in the energy system modeling community.
 
-[![Try examples in Collab](https://colab.research.google.com/assets/colab-badge.svg)](https://github.com/assume-framework/assume/tree/main/examples/notebooks)
+## Relation to ASSUME
 
-**ASSUME** is an open-source toolbox for agent-based simulations of European electricity markets, with a primary focus on the German market setup. Developed as an open-source model, its primary objectives are to ensure usability and customizability for a wide range of users and use cases in the energy system modeling community.
+This is a fork of ASSUME, created to focus on the results of my PhD thesis. It is published under a different name, so that my thesis is not too tightly coupled to the ASSUME research project, as I do not receive funding from it.
 
-## Introduction
+I plan to add all features to the upstream assume project, where I am also one of the core maintainers and developers.
+After finishing my PhD, SPARKLE will not be maintained any longer, so you should surely just use the ASSUME Framework in the first place.
 
-A unique feature of the ASSUME toolbox is its integration of **Deep Reinforcement Learning** methods into the behavioral strategies of market agents. The model offers various predefined agent representations for both the demand and generation sides, which can be used as plug-and-play modules, simplifying the reinforcement of learning strategies. This setup enables research into new market designs and dynamics in energy markets.
+For convenience reasons, the package name and cli name stays `assume` to reduce the unneeded changes towards the maintained version.
 
 
 ## Documentation
@@ -33,32 +26,20 @@ A unique feature of the ASSUME toolbox is its integration of **Deep Reinforcemen
 
 ## Installation
 
-You can install ASSUME using pip. Choose the appropriate installation method based on your needs:
+You can install SPARKLE using pip. Choose the appropriate installation method based on your needs:
 
 ### Using pip
 
 To install the core package:
 
 ```bash
-pip install assume-framework
+pip install -e .
 ```
 
-To install with reinforcement learning capabilities:
+To install with additional capabilities:
 
 ```bash
-pip install assume-framework[learning]
-```
-
-We also include market clearing algorithms for complex bids. These clearing algorithms require pyomo and a solver (we use GLPK). To install the package with these capabilities, use:
-
-```bash
-pip install assume-framework[optimization]
-```
-
-To install with testing capabilities:
-
-```bash
-pip install assume-framework[test]
+pip install -e .[full]
 ```
 
 ### Timescale Database and Grafana Dashboards
@@ -70,8 +51,8 @@ Follow these steps:
 1. Clone the repository and navigate to its directory:
 
 ```bash
-git clone https://github.com/assume-framework/assume.git
-cd assume
+git clone https://github.com/maurerle/sparkle.git
+cd sparkle
 ```
 
 2. Start the database and Grafana using the following command:
@@ -92,39 +73,9 @@ If you intend to use the reinforcement learning capabilities of ASSUME and train
 
 To ease your way into ASSUME we provided some examples and tutorials. The former are helpful if you would like to get an impression of how ASSUME works and the latter introduce you into the development of ASSUME.
 
-### The Tutorials
+### Usage
 
-The tutorials work completly detached from your own machine on google colab. They provide code snippets and task that show you, how you can work with the software package one your own. We have two tutorials prepared, one for introducing a new unit and one for getting reinforcement learning ready on ASSUME.
-
-How to configure a new unit in ASSUME?
-**Coming Soon**
-
-How to introduce reinforcement learning to ASSUME?
-
-[![Open Learning Tutorial in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/assume-framework/assume/blob/main/examples/notebooks/04_reinforcement_learning_example.ipynb)
-
-
-
-### The Examples
-
-To explore the provided examples, follow these steps:
-
-1. Clone the repository and navigate to its directory:
-
-```bash
-git clone https://github.com/assume-framework/assume.git
-cd assume
-```
-
-2. Quick Start:
-
-There are three ways to run a simulation:
-
-- Local:
-
-```bash
-python examples/examples.py
-```
+There are two ways to run simulations using sparkle
 
 - Using the provided Docker setup:
 
@@ -137,62 +88,6 @@ assume -s example_01b -db "postgresql://assume:assume@localhost:5432/assume"
 ```
 
 For additional CLI options, run `assume -h`.
-
-## Development
-
-If you're contributing to the development of ASSUME, follow these steps:
-
-1. Install pre-commit:
-
-```bash
-pip install pre-commit
-pre-commit install
-```
-
-To run pre-commit checks directly, use:
-
-```bash
-pre-commit run --all-files
-```
-
-### Release
-
-To release a new version, increase the version in `pyproject.toml` and create a git tag of the release commit and release notes in GitHub.
-To push to PyPi run:
-
-```
-rm -r dist
-python -m build .
-twine upload --repository pypi dist/*
-```
-
-See also: https://twine.readthedocs.io/en/stable/index.html#using-twine
-
-## Creating Documentation
-
-First, create an environment that includes the documentation dependencies:
-
-```bash
-conda env create -f environment_docs.yaml
-```
-
-To generate or update the automatically created docs in `docs/source/assume*`, run:
-
-```bash
-sphinx-apidoc -o docs/source -Fa assume
-```
-
-To create and serve the documentation locally, use:
-
-```bash
-make -C docs html && python -m http.server --directory docs/build/html
-```
-
-## Contributors and Funding
-
-The project is developed by a collaborative team of researchers from INATECH at the University of Freiburg, IISM at Karlsruhe Institute of Technology, Fraunhofer Institute for Systems and Innovation Research, Fraunhofer Institution for Energy Infrastructures and Geothermal Energy, and FH Aachen - University of Applied Sciences. Each contributor brings valuable expertise in electricity market modeling, deep reinforcement learning, demand side flexibility, and infrastructure modeling.
-
-ASSUME is funded by the Federal Ministry for Economic Affairs and Climate Action (BMWK). We are grateful for their support in making this project possible.
 
 ## License
 
