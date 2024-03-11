@@ -525,7 +525,8 @@ class NaiveForecast(Forecaster):
             value = self.fuel_price
         elif "demand" in column:
             value = self.demand
-        elif column == "price_EOM":
+        # elif column == "price_EOM":
+        elif "price_" in column:
             value = self.price_forecast
         else:
             value = 0

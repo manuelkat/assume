@@ -130,12 +130,10 @@ class flexableEOMStorage(BaseStrategy):
 
             # if price is higher than average price, discharge
             # if price is lower than average price, charge
-            if price_forecast[start] >= average_price:
-                price = average_price / unit.efficiency_discharge
-                bid_quantity = max_power_discharge[start]
-            else:
-                price = average_price * unit.efficiency_charge
-                bid_quantity = max_power_charge[start]
+            price = (average_price + 0.1) / unit.efficiency_discharge
+            bid_quantity = max_power_discharge[start]
+            price_charge = (average_price - 0.1) * unit.efficiency_charge
+            bid_quantity_charge = max_power_charge[start]
 
             bids.append(
                 {
@@ -143,19 +141,19 @@ class flexableEOMStorage(BaseStrategy):
                     "end_time": end,
                     "only_hours": None,
                     # "price": average_price / unit.efficiency_discharge,
-                    "price": average_price,
-                    "volume": max_power_discharge[start],
+                    "price": max(average_price, 20),
+                    "volume": 3000,
                     "node": unit.node,
                 }
             )
+
             bids.append(
                 {
                     "start_time": start,
                     "end_time": end,
                     "only_hours": None,
-                    # "price": average_price * unit.efficiency_charge,
-                    "price": average_price,
-                    "volume": max_power_charge[start],
+                    "price": min(average_price, 10),
+                    "volume": -3000,
                     "node": unit.node,
                 }
             )
