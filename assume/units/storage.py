@@ -173,9 +173,9 @@ class Storage(SupportsMinMaxCharge):
         Returns:
             pd.Series: The volume of the unit within the given time range.
         """
-        time_delta = self.index.freq / timedelta(hours=1)
+        time_delta = self.freq / timedelta(hours=1)
 
-        for t in self.outputs["energy"][start : end - self.index.freq].index:
+        for t in self.outputs["energy"][start : end - self.freq].index:
             delta_soc = 0
             soc = self.outputs["soc"][t]
             if self.outputs["energy"][t] > self.max_power_discharge:
@@ -196,7 +196,7 @@ class Storage(SupportsMinMaxCharge):
                 if self.outputs["energy"][t] > max_soc_discharge:
                     self.outputs["energy"][t] = max_soc_discharge
 
-                time_delta = self.index.freq / timedelta(hours=1)
+                time_delta = self.freq / timedelta(hours=1)
                 delta_soc = (
                     -self.outputs["energy"][t]
                     * time_delta
@@ -211,7 +211,7 @@ class Storage(SupportsMinMaxCharge):
                 if self.outputs["energy"][t] < max_soc_charge:
                     self.outputs["energy"][t] = max_soc_charge
 
-                time_delta = self.index.freq / timedelta(hours=1)
+                time_delta = self.freq / timedelta(hours=1)
                 delta_soc = (
                     -self.outputs["energy"][t]
                     * time_delta
@@ -219,7 +219,7 @@ class Storage(SupportsMinMaxCharge):
                     / self.max_volume
                 )
 
-            self.outputs["soc"][t + self.index.freq] = soc + delta_soc
+            self.outputs["soc"][t + self.freq] = soc + delta_soc
 
         return self.outputs["energy"].loc[start:end]
 
@@ -241,7 +241,7 @@ class Storage(SupportsMinMaxCharge):
         for order in orderbook:
             start = order["start_time"]
             end = order["end_time"]
-            end_excl = end - self.index.freq
+            end_excl = end - self.freq
             if isinstance(order["accepted_volume"], dict):
                 added_volume = list(order["accepted_volume"].values())
             else:
@@ -261,7 +261,7 @@ class Storage(SupportsMinMaxCharge):
                 if current_power > max_soc_discharge:
                     self.outputs[product_type][start] = max_soc_discharge
 
-                time_delta = self.index.freq / timedelta(hours=1)
+                time_delta = self.freq / timedelta(hours=1)
                 delta_soc = (
                     -self.outputs["energy"][start]
                     * time_delta
@@ -276,7 +276,7 @@ class Storage(SupportsMinMaxCharge):
                 if current_power < max_soc_charge:
                     self.outputs[product_type][start] = max_soc_charge
 
-                time_delta = self.index.freq / timedelta(hours=1)
+                time_delta = self.freq / timedelta(hours=1)
                 delta_soc = (
                     -self.outputs["energy"][start]
                     * time_delta
@@ -284,7 +284,7 @@ class Storage(SupportsMinMaxCharge):
                     / self.max_volume
                 )
 
-            self.outputs["soc"][start + self.index.freq :] = soc + delta_soc
+            self.outputs["soc"][start + self.freq :] = soc + delta_soc
 
         self.bidding_strategies[marketconfig.market_id].calculate_reward(
             unit=self,
@@ -340,7 +340,7 @@ class Storage(SupportsMinMaxCharge):
         Returns:
             float: The maximum discharge power.
         """
-        duration = self.index.freq / timedelta(hours=1)
+        duration = self.freq / timedelta(hours=1)
         power = max(
             0,
             (
@@ -364,7 +364,7 @@ class Storage(SupportsMinMaxCharge):
         Returns:
             float: The maximum charge power.
         """
-        duration = self.index.freq / timedelta(hours=1)
+        duration = self.freq / timedelta(hours=1)
         power = min(
             0,
             (
@@ -389,7 +389,7 @@ class Storage(SupportsMinMaxCharge):
         Returns:
             tuple[pd.Series]: The minimum and maximum charge power levels of the storage unit in MW.
         """
-        end_excl = end - self.index.freq
+        end_excl = end - self.freq
 
         base_load = self.outputs["energy"][start:end_excl]
         capacity_pos = self.outputs["capacity_pos"][start:end_excl]
@@ -437,7 +437,7 @@ class Storage(SupportsMinMaxCharge):
         Returns:
             tuple[pd.Series]: The minimum and maximum discharge power levels of the storage unit in MW.
         """
-        end_excl = end - self.index.freq
+        end_excl = end - self.freq
 
         base_load = self.outputs["energy"][start:end_excl]
         capacity_pos = self.outputs["capacity_pos"][start:end_excl]
