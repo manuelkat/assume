@@ -348,8 +348,8 @@ def test_execute_dispatch(storage_unit):
     assert math.isclose(storage_unit.outputs["soc"][end], 1, abs_tol=0.001)
 
     # step into the next hour
-    start = start + storage_unit.index.freq
-    end = end + storage_unit.index.freq
+    start = start + storage_unit.freq
+    end = end + storage_unit.freq
     storage_unit.outputs["energy"][start] = -100
     dispatched_energy = storage_unit.execute_current_dispatch(start, end)
     assert dispatched_energy.iloc[0] == 0
@@ -424,8 +424,8 @@ def test_set_dispatch_plan(mock_market_config, storage_unit):
     assert math.isclose(storage_unit.outputs["soc"][end], 1, abs_tol=0.001)
 
     # step into the next hour
-    start = start + storage_unit.index.freq
-    end = end + storage_unit.index.freq
+    start = start + storage_unit.freq
+    end = end + storage_unit.freq
     product_tuples = [(start, end, None)]
 
     bids = strategy.calculate_bids(storage_unit, mc, product_tuples=product_tuples)

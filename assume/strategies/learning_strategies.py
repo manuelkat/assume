@@ -268,10 +268,10 @@ class RLStrategy(LearningStrategy):
         Returns:
             Observation (torch.Tensor): Observation.
         """
-        end_excl = end - unit.index.freq
+        end_excl = end - unit.freq
 
         # get the forecast length depending on the tme unit considered in the modelled unit
-        forecast_len = pd.Timedelta((self.foresight - 1) * unit.index.freq)
+        forecast_len = pd.Timedelta((self.foresight - 1) * unit.freq)
 
         # =============================================================================
         # 1.1 Get the Observations, which are the basis of the action decision
@@ -395,7 +395,7 @@ class RLStrategy(LearningStrategy):
         for order in orderbook:
             start = order["start_time"]
             end = order["end_time"]
-            end_excl = end - unit.index.freq
+            end_excl = end - unit.freq
 
             # depending on way the unit calculates marginal costs we take costs
             marginal_cost = unit.calculate_marginal_cost(
@@ -427,12 +427,12 @@ class RLStrategy(LearningStrategy):
         # upward and downward regulation events
         if (
             unit.outputs[product_type].loc[start] != 0
-            and unit.outputs[product_type].loc[start - unit.index.freq] == 0
+            and unit.outputs[product_type].loc[start - unit.freq] == 0
         ):
             costs += unit.hot_start_cost / 2
         elif (
             unit.outputs[product_type].loc[start] == 0
-            and unit.outputs[product_type].loc[start - unit.index.freq] != 0
+            and unit.outputs[product_type].loc[start - unit.freq] != 0
         ):
             costs += unit.hot_start_cost / 2
 
