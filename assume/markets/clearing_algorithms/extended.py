@@ -13,7 +13,7 @@ log = logging.getLogger(__name__)
 
 
 class NodalPricingInflexDemandRole(MarketRole):
-    required_fields = ["node_id"]
+    required_fields = ["node"]
 
     def __init__(self, marketconfig: MarketConfig):
         super().__init__(marketconfig)
@@ -36,7 +36,7 @@ class NodalPricingInflexDemandRole(MarketRole):
         meta = []
         orderbook.sort(key=market_getter)
         for product, product_orders in groupby(orderbook, market_getter):
-            # don't compare node_id too
+            # don't compare node too
             if product[0:3] not in market_products:
                 rejected_orders.extend(product_orders)
                 # log.debug(f'found unwanted bids for {product} should be {market_products}')
@@ -63,7 +63,7 @@ class NodalPricingInflexDemandRole(MarketRole):
             network.madd(
                 "Generator",
                 names,
-                bus=map(itemgetter("node_id"), sorted_supply_orders),
+                bus=map(itemgetter("node"), sorted_supply_orders),
                 p_nom=map(itemgetter("volume"), sorted_supply_orders),
                 marginal_cost=map(itemgetter("price"), sorted_supply_orders),
             )
@@ -78,7 +78,7 @@ class NodalPricingInflexDemandRole(MarketRole):
             network.madd(
                 "Load",
                 names,
-                bus=map(itemgetter("node_id"), sorted_demand_orders),
+                bus=map(itemgetter("node"), sorted_demand_orders),
                 p_set=map(lambda o: -o["volume"], sorted_demand_orders),
                 # XXX: does not respect cost of load
                 # marginal_cost=map(itemgetter("price"), sorted_demand_orders),
@@ -101,11 +101,11 @@ class NodalPricingInflexDemandRole(MarketRole):
                 nr = int(key.split("_")[-1]) - 1
 
                 def check_agent_id(o):
-                    return o["agent_id"] == agent_id and o["node_id"] == nr
+                    return o["agent_id"] == agent_id and o["node"] == nr
 
                 orders = list(filter(check_agent_id, sorted_demand_orders))
                 for o in orders:
-                    o["price"] = price_dict[str(o["node_id"])]["now"]
+                    o["price"] = price_dict[str(o["node"])]["now"]
                 accepted_orders.extend(orders)
                 # can only accept all orders
 
@@ -115,7 +115,7 @@ class NodalPricingInflexDemandRole(MarketRole):
                 nr = int(key.split("_")[-1]) - 1
 
                 def check_agent_id(o):
-                    return o["agent_id"] == agent_id and o["node_id"] == nr
+                    return o["agent_id"] == agent_id and o["node"] == nr
 
                 orders = list(filter(check_agent_id, sorted_supply_orders))
                 for o in orders:
@@ -135,7 +135,7 @@ class NodalPricingInflexDemandRole(MarketRole):
                     "supply_volume": network.generators.p_nom.sum(),
                     "demand_volume": network.loads.p_set.sum(),
                     "price": price,
-                    "node_id": 1,
+                    "node": 1,
                     "product_start": product[0],
                     "product_end": product[1],
                     "only_hours": product[2],

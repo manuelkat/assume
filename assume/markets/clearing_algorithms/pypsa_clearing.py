@@ -14,7 +14,7 @@ def nodal_pricing_pypsa_unflexible_demand(
 ):
     import pypsa
 
-    assert "node_id" in market_agent.marketconfig.additional_fields
+    assert "node" in market_agent.marketconfig.additional_fields
     n = pypsa.Network()
     for i in range(3):
         n.add("Bus", f"{i}")
@@ -28,7 +28,7 @@ def nodal_pricing_pypsa_unflexible_demand(
     meta = []
     market_agent.all_orders = sorted(market_agent.all_orders, key=market_getter)
     for product, product_orders in groupby(market_agent.all_orders, market_getter):
-        # don't compare node_id too
+        # don't compare node too
         if product[0:3] not in market_products:
             rejected_orders.extend(product_orders)
             # log.debug(f'found unwanted bids for {product} should be {market_products}')
@@ -55,7 +55,7 @@ def nodal_pricing_pypsa_unflexible_demand(
         network.madd(
             "Generator",
             names,
-            bus=map(itemgetter("node_id"), sorted_supply_orders),
+            bus=map(itemgetter("node"), sorted_supply_orders),
             p_nom=map(itemgetter("volume"), sorted_supply_orders),
             marginal_cost=map(itemgetter("price"), sorted_supply_orders),
         )
@@ -70,7 +70,7 @@ def nodal_pricing_pypsa_unflexible_demand(
         network.madd(
             "Load",
             names,
-            bus=map(itemgetter("node_id"), sorted_demand_orders),
+            bus=map(itemgetter("node"), sorted_demand_orders),
             p_set=map(lambda o: -o["volume"], sorted_demand_orders),
             # XXX: does not respect cost of load
             # marginal_cost=map(itemgetter("price"), sorted_demand_orders),
@@ -93,11 +93,11 @@ def nodal_pricing_pypsa_unflexible_demand(
             nr = int(key.split("_")[-1]) - 1
 
             def check_agent_id(o):
-                return o["agent_id"] == agent_id and o["node_id"] == nr
+                return o["agent_id"] == agent_id and o["node"] == nr
 
             orders = list(filter(check_agent_id, sorted_demand_orders))
             for o in orders:
-                o["price"] = price_dict[str(o["node_id"])]["now"]
+                o["price"] = price_dict[str(o["node"])]["now"]
             accepted_orders.extend(orders)
             # can only accept all orders
 
@@ -107,7 +107,7 @@ def nodal_pricing_pypsa_unflexible_demand(
             nr = int(key.split("_")[-1]) - 1
 
             def check_agent_id(o):
-                return o["agent_id"] == agent_id and o["node_id"] == nr
+                return o["agent_id"] == agent_id and o["node"] == nr
 
             orders = list(filter(check_agent_id, sorted_supply_orders))
             for o in orders:
@@ -127,7 +127,7 @@ def nodal_pricing_pypsa_unflexible_demand(
                 "supply_volume": network.generators.p_nom.sum(),
                 "demand_volume": network.loads.p_set.sum(),
                 "price": price,
-                "node_id": 1,
+                "node": 1,
                 "product_start": product[0],
                 "product_end": product[1],
                 "only_hours": product[2],
@@ -139,5 +139,5 @@ def nodal_pricing_pypsa_unflexible_demand(
 
 
 def nodal_pricing_pypsa(market_agent: MarketRole, market_products: list[MarketProduct]):
-    assert "node_id" in market_agent.marketconfig.additional_fields
+    assert "node" in market_agent.marketconfig.additional_fields
     raise NotImplementedError()

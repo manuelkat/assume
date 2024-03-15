@@ -123,7 +123,7 @@ def pay_as_bid_contract(market_agent: MarketRole, market_products: list[MarketPr
                 "price": sum(prices) / len(prices),
                 "max_price": max(prices),
                 "min_price": min(prices),
-                "node_id": None,
+                "node": None,
                 "product_start": product[0],
                 "product_end": product[1],
                 "only_hours": product[2],
