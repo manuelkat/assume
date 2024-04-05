@@ -5,12 +5,16 @@
 import importlib
 from pathlib import Path
 
+# must be installed for import path to work
 import calliope
 import pandas as pd
 import yaml
 
 from assume.common.forecasts import NaiveForecast
 from assume.world import World
+
+# model = calliope.Model("path/to/model.yaml", override_dict=override_dict)
+model = calliope.examples.urban_scale()
 
 
 def read_csv(base_path, filename):
@@ -24,18 +28,14 @@ def read_csv(base_path, filename):
     )["load"]
 
 
-_EXAMPLE_MODEL_DIR = Path(importlib.resources.files("calliope") / "example_models")
-
-path = _EXAMPLE_MODEL_DIR / "urban_scale" / "model.yaml"
-
-# model_data["data_sources"]
-
+input_path = Path(importlib.resources.files("calliope") / "example_models")
+name = "urban_scale"
+model_path = input_path / name
 # model = calliope.Model("path/to/model.yaml", override_dict=override_dict)
-
 
 model = calliope.examples.urban_scale()
 
-with open(path) as f:
+with open(model_path) as f:
     # TODO also load imported files in yaml
     model_data = yaml.safe_load(f)
     # TODO replace data_sources with actual data
@@ -62,11 +62,15 @@ def update_dict_keys(initial_dict: dict, override_dict: dict):
 async def load_calliope_async(
     world: World, name: str, input_path: Path, override_dict: dict = {}
 ):
-    path = input_path / name / "model.yaml"
-    with open(path) as f:
+    model_path = input_path / name
+    with open(model_path / "model.yaml") as f:
         model_data = yaml.safe_load(f)
-    model_data.update(override_dict)
-    model_data["config"]
+
+    for path in model_data["import"]:
+        with open(model_path / path) as f:
+            import_dict = yaml.safe_load(f)
+            update_dict_keys(model_data, import_dict)
+
     update_dict_keys(model_data, override_dict)
 
     if model_data["config"]["mode"] == "plan":
