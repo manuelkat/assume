@@ -74,7 +74,7 @@ class MarketMechanism:
 
         # simple check that 1 MW can be bid at least by  powerplants
         def requirement(unit: dict):
-            return unit.get("unit_type") != "power_plant" or abs(unit["max_power"]) > 0
+            return unit.get("unit_type") != "power_plant" or abs(unit["max_power"]) >= 0
 
         return all([requirement(info) for info in content["information"]])
 
@@ -493,19 +493,23 @@ class MarketRole(MarketMechanism, Role):
             rejected_orderbook,
             market_meta,
         ) = self.clear(self.all_orders, market_products)
+
         self.all_orders = []
+
         for order in rejected_orderbook:
-            if isinstance(order["volume"], dict):
-                order["accepted_volume"] = {
-                    start: 0.0 for start in order["volume"].keys()
-                }
-                order["accepted_price"] = {
-                    start: market_meta[i]["price"]
-                    for i, start in enumerate(order["volume"].keys())
-                }
-            else:
-                order["accepted_volume"] = 0.0
-                order["accepted_price"] = market_meta[0]["price"]
+            if "accepted_volume" not in order and "accepted_price" not in order:
+                if isinstance(order["volume"], dict):
+                    order["accepted_volume"] = {
+                        start: 0.0 for start in order["volume"].keys()
+                    }
+                    order["accepted_price"] = {
+                        start: market_meta[i]["price"]
+                        for i, start in enumerate(order["volume"].keys())
+                    }
+                else:
+                    order["accepted_volume"] = 0.0
+                    order["accepted_price"] = market_meta[0]["price"]
+
         self.open_auctions - set(market_products)
 
         accepted_orderbook.sort(key=itemgetter("agent_id"))
