@@ -628,9 +628,6 @@ class RLStrategyDA(RLStrategy):
         :rtype: Orderbook
         """
 
-        start = product_tuples[0][0]
-        # end_all = product_tuples[-1][1]
-        # previous_power = unit.get_output_before(start)
         min_power, max_power = unit.min_power, unit.max_power
 
         bids = []

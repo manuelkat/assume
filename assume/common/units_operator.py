@@ -335,9 +335,9 @@ class UnitsOperator(Role):
         start = timestamp2datetime(last + 1)
 
         market_dispatch = aggregate_step_amount(
-            self.valid_orders[product_type],
-            start,
-            now,
+            orderbook=self.valid_orders[product_type],
+            begin=timestamp2datetime(last),
+            end=now,
             groupby=["market_id", "unit_id"],
         )
 

@@ -386,26 +386,43 @@ class World:
         if self.unit_operators[unit_operator_id].units.get(id):
             raise ValueError(f"Unit {id} already exists")
 
-        bidding_strategies = {}
+        # Create a cache for strategy instances
+        strategy_cache = {}
+
+        # Initialize a dictionary to store the unit's bidding strategies
+        unit_bidding_strategies = {}
+
         for market_id, strategy in unit_params["bidding_strategies"].items():
             if not strategy:
                 continue
+
             bidding_params = unit_params.get("bidding_params", self.bidding_params)
+
             try:
-                bidding_strategies[market_id] = self.bidding_strategies[strategy](
-                    unit_id=id,
-                    **bidding_params,
-                )
+                # Check if the strategy instance is already in the cache
+                if strategy not in strategy_cache:
+                    strategy_instance = self.bidding_strategies[strategy](
+                        unit_id=id,
+                        **bidding_params,
+                    )
+                    strategy_cache[strategy] = strategy_instance
+                else:
+                    strategy_instance = strategy_cache[strategy]
+
+                unit_bidding_strategies[market_id] = strategy_instance
+
                 # TODO find better way to count learning agents
                 if self.learning_mode and issubclass(
                     self.bidding_strategies[strategy], LearningStrategy
                 ):
-                    self.learning_role.rl_strats[id] = bidding_strategies[market_id]
+                    self.learning_role.rl_strats[id] = unit_bidding_strategies[
+                        market_id
+                    ]
 
-                    # if we have learning strategy we need to assign the powerplant to one  unit_operator handling all leanring units
+                    # if we have learning strategy we need to assign the powerplant to one unit_operator handling all learning units
                     if unit_operator_id != "Operator-RL":
                         self.logger.debug(
-                            f"Your chosen unit-operator {unit_operator_id} for the learning unit {id} was overwritten with 'Operator-RL', since all learning units need to be handeled by one unit operator."
+                            f"Your chosen unit-operator {unit_operator_id} for the learning unit {id} was overwritten with 'Operator-RL', since all learning units need to be handled by one unit operator."
                         )
 
                         unit_operator_id = "Operator-RL"
@@ -416,9 +433,10 @@ class World:
                 )
                 return
 
-        unit_params["bidding_strategies"] = bidding_strategies
+        # Update unit_params with only the relevant strategies for the unit
+        unit_params["bidding_strategies"] = unit_bidding_strategies
 
-        # create unit within the unit operator its associated with
+        # create unit within the unit operator it's associated with
         unit = unit_class(
             id=id,
             unit_operator=unit_operator_id,
