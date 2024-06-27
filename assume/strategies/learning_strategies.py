@@ -12,6 +12,7 @@ import torch as th
 
 from assume.common.base import LearningStrategy, SupportsMinMax
 from assume.common.market_objects import MarketConfig, Orderbook, Product
+from assume.common.utils import get_products_index
 from assume.reinforcement_learning.learning_utils import Actor, NormalActionNoise
 
 logger = logging.getLogger(__name__)
@@ -46,7 +47,17 @@ class RLStrategy(LearningStrategy):
     """
 
     def __init__(self, *args, **kwargs):
-        super().__init__(obs_dim=50, act_dim=2, unique_obs_dim=2, *args, **kwargs)
+        obs_dim = kwargs.pop("obs_dim", 50)
+        act_dim = kwargs.pop("act_dim", 2)
+        unique_obs_dim = kwargs.pop("unique_obs_dim", 2)
+
+        super().__init__(
+            obs_dim=obs_dim,
+            act_dim=act_dim,
+            unique_obs_dim=unique_obs_dim,
+            *args,
+            **kwargs,
+        )
 
         self.unit_id = kwargs["unit_id"]
 
@@ -478,3 +489,319 @@ class RLStrategy(LearningStrategy):
             self.actor_target.load_state_dict(params["actor_target"])
             self.actor_target.eval()
             self.actor.optimizer.load_state_dict(params["actor_optimizer"])
+
+
+class RLStrategyDA(RLStrategy):
+    """
+    Reinforcement Learning Strategy, that lets agent learn to bid on an Energy Only Makret.
+
+    The agent submittes two price bids
+    - one for the infelxible (P_min) and one for the flexible part (P_max-P_min) of ist capacity.
+
+    This strategy utilizes a total of 50 observations, which are used to calculate the actions.
+    The actions are then transformed into bids. Actions are formulated as 2 values.
+    The unique observation space is 2 comprising of marginal cost and current capacity.
+
+    Attributes:
+        foresight (int): Number of time steps to look ahead. Defaults to 24.
+        max_bid_price (float): Maximum bid price. Defaults to 100.
+        max_demand (float): Maximum demand. Defaults to 10e3.
+        device (str): Device to run on. Defaults to "cpu".
+        float_type (str): Float type to use. Defaults to "float32".
+        learning_mode (bool): Whether to use learning mode. Defaults to False.
+        actor (torch.nn.Module): Actor network. Defaults to None.
+        order_types (list[str]): Order types to use. Defaults to ["SB"].
+        action_noise (NormalActionNoise): Action noise. Defaults to None.
+        collect_initial_experience_mode (bool): Whether to collect initial experience. Defaults to True.
+
+    Args:
+        *args: Variable length argument list.
+        **kwargs: Arbitrary keyword arguments.
+    """
+
+    def __init__(self, *args, **kwargs):
+        # Set act_dim to 1 before calling the parent class's constructor
+        kwargs["obs_dim"] = 14
+        kwargs["act_dim"] = 1
+        kwargs["unique_obs_dim"] = 2
+        kwargs["foresight"] = 6
+
+        super().__init__(*args, **kwargs)
+
+    def calculate_bids(
+        self,
+        unit: SupportsMinMax,
+        market_config: MarketConfig,
+        product_tuples: list[Product],
+        **kwargs,
+    ) -> Orderbook:
+        if market_config.market_mechanism == "redispatch":
+            return self.calculate_bids_redispatch(
+                unit, market_config, product_tuples, **kwargs
+            )
+        else:
+            return self.calculate_bids_DAM(
+                unit, market_config, product_tuples, **kwargs
+            )
+
+    def calculate_bids_DAM(
+        self,
+        unit: SupportsMinMax,
+        market_config: MarketConfig,
+        product_tuples: list[Product],
+        **kwargs,
+    ) -> Orderbook:
+        """
+        Calculates bids for a unit, based on the actions from the actors.
+
+        Args:
+            unit (SupportsMinMax): Unit to calculate bids for.
+            market_config (MarketConfig): Market configuration.
+            product_tuples (list[Product]): Product tuples.
+            **kwargs: Keyword arguments.
+
+        Returns:
+            Orderbook: Bids containing start time, end time, price, volume and bid type.
+
+        """
+
+        _, max_power = unit.calculate_min_max_power(
+            start=product_tuples[0][0], end=product_tuples[-1][1]
+        )
+
+        bids = []
+        for product in product_tuples:
+            start = product[0]
+            end = product[1]
+
+            next_observation = self.create_observation(
+                unit=unit,
+                market_id=market_config.market_id,
+                start=start,
+                end=end,
+            )
+
+            actions, noise = self.get_actions(next_observation)
+
+            bid_prices = actions * self.max_bid_price
+
+            bids.append(
+                {
+                    "start_time": start,
+                    "end_time": end,
+                    "only_hours": None,
+                    "price": bid_prices,
+                    "volume": max_power[start],
+                }
+            )
+
+            # store results in unit outputs as lists to be written to the buffer for learning
+            unit.outputs["rl_observations"].append(next_observation)
+            unit.outputs["rl_actions"].append(actions)
+
+            # store results in unit outputs as series to be written to the database by the unit operator
+            unit.outputs["actions"][start] = actions
+            unit.outputs["exploration_noise"][start] = noise
+
+        bids = self.remove_empty_bids(bids)
+
+        return bids
+
+    def calculate_bids_redispatch(
+        self,
+        unit: SupportsMinMax,
+        market_config: MarketConfig,
+        product_tuples: list[Product],
+        **kwargs,
+    ) -> Orderbook:
+        """
+        Takes information from a unit that the unit operator manages and
+        defines how it is dispatched to the market
+
+        :param unit: the unit to be dispatched
+        :type unit: SupportsMinMax
+        :param market_config: the market configuration
+        :type market_config: MarketConfig
+        :param product_tuples: list of all products the unit can offer
+        :type product_tuples: list[Product]
+        :return: the bids consisting of the start time, end time, only hours, price and volume.
+        :rtype: Orderbook
+        """
+
+        start = product_tuples[0][0]
+        # end_all = product_tuples[-1][1]
+        # previous_power = unit.get_output_before(start)
+        min_power, max_power = unit.min_power, unit.max_power
+
+        bids = []
+        for product in product_tuples:
+            start = product[0]
+            current_power = unit.outputs["energy"].at[start]
+            # marginal_cost = unit.calculate_marginal_cost(
+            #     start, previous_power
+            # )  # calculation of the marginal costs
+            bid_price = unit.outputs["actions"][start].item() * self.max_bid_price
+
+            bids.append(
+                {
+                    "start_time": product[0],
+                    "end_time": product[1],
+                    "only_hours": product[2],
+                    "price": bid_price,
+                    "volume": current_power,
+                    "max_power": max_power,
+                    "min_power": min_power,
+                    "node": unit.node,
+                }
+            )
+
+        return bids
+
+    def calculate_reward(
+        self,
+        unit,
+        marketconfig: MarketConfig,
+        orderbook: Orderbook,
+    ):
+        if marketconfig.market_mechanism == "redispatch":
+            return self.calculate_reward_redispatch(unit, marketconfig, orderbook)
+        else:
+            return self.calculate_reward_DAM(unit, marketconfig, orderbook)
+
+    def calculate_reward_DAM(
+        self,
+        unit,
+        marketconfig: MarketConfig,
+        orderbook: Orderbook,
+    ):
+        """
+        Calculates the reward for the unit.
+
+        Args:
+            unit (SupportsMinMax): Unit to calculate reward for.
+            marketconfig (MarketConfig): Market configuration.
+            orderbook (Orderbook): Orderbook.
+        """
+
+        # =============================================================================
+        # 4. Calculate Reward
+        # =============================================================================
+        # function is called after the market is cleared and we get the market feedback,
+        # so we can calculate the profit
+
+        product_type = marketconfig.product_type
+        products_index = get_products_index(orderbook)
+
+        max_power = (
+            unit.forecaster.get_availability(unit.id)[products_index] * unit.max_power
+        )
+
+        profit = pd.Series(0.0, index=products_index)
+        reward = pd.Series(0.0, index=products_index)
+        opportunity_cost = pd.Series(0.0, index=products_index)
+        costs = pd.Series(0.0, index=products_index)
+
+        # iterate over all orders in the orderbook, to calculate order specific profit
+        for order in orderbook:
+            start = order["start_time"]
+
+            marginal_cost = unit.calculate_marginal_cost(
+                start, unit.outputs[product_type].loc[start]
+            )
+            if isinstance(order["accepted_volume"], dict):
+                accepted_volume = order["accepted_volume"][start]
+            else:
+                accepted_volume = order["accepted_volume"]
+
+            if isinstance(order["accepted_price"], dict):
+                accepted_price = order["accepted_price"][start]
+            else:
+                accepted_price = order["accepted_price"]
+
+            price_difference = accepted_price - marginal_cost
+
+            # calculate opportunity cost
+            # as the loss of income we have because we are not running at full power
+            order_opportunity_cost = price_difference * (
+                max_power[start] - unit.outputs[product_type].loc[start]
+            )
+            # if our opportunity costs are negative, we did not miss an opportunity to earn money and we set them to 0
+            # don't consider opportunity_cost more than once! Always the same for one timestep and one market
+            opportunity_cost[start] = max(order_opportunity_cost, 0)
+            profit[start] += accepted_price * accepted_volume
+
+            op_time = unit.get_operation_time(start)
+
+            costs[start] += marginal_cost * accepted_volume
+
+            if unit.outputs[product_type].loc[start] != 0 and op_time < 0:
+                start_up_cost = unit.get_starting_costs(op_time)
+                costs[start] += start_up_cost
+
+            # ---------------------------
+            # 4.1 Calculate Reward
+            # The straight forward implemntation would be reward = profit, yet we would like to give the agent more guidance
+            # in the learning process, so we add a regret term to the reward, which is the opportunity cost
+            # define the reward and scale it
+
+        profit += -costs
+        scaling = 0.1 / unit.max_power
+        regret_scale = 0.2
+        reward = (profit - regret_scale * opportunity_cost) * scaling
+
+        # store results in unit outputs which are written to database by unit operator
+        unit.outputs["profit"].loc[products_index] = profit
+        unit.outputs["reward"].loc[products_index] = reward
+        unit.outputs["regret"].loc[products_index] = opportunity_cost
+        unit.outputs["total_costs"].loc[products_index] = costs
+
+        # unit.outputs["rl_rewards"].extend(unit.outputs["reward"].loc[products_index].values)
+
+    def calculate_reward_redispatch(
+        self,
+        unit,
+        marketconfig: MarketConfig,
+        orderbook: Orderbook,
+    ):
+        """
+        Calculate the reward for the unit based on the orderbook.
+        """
+        product_type = marketconfig.product_type
+        products_index = get_products_index(orderbook)
+
+        profit = pd.Series(0.0, index=products_index)
+        reward = pd.Series(0.0, index=products_index)
+        costs = pd.Series(0.0, index=products_index)
+
+        # iterate over all orders in the orderbook, to calculate order specific profit
+        for order in orderbook:
+            start = order["start_time"]
+
+            marginal_cost = unit.calculate_marginal_cost(
+                start, unit.outputs[product_type].loc[start]
+            )
+            if isinstance(order["accepted_volume"], dict):
+                accepted_volume = order["accepted_volume"][start]
+            else:
+                accepted_volume = order["accepted_volume"]
+
+            if isinstance(order["accepted_price"], dict):
+                accepted_price = order["accepted_price"][start]
+            else:
+                accepted_price = order["accepted_price"]
+
+            profit[start] += accepted_price * accepted_volume
+            costs[start] += marginal_cost * accepted_volume
+
+        profit += -costs
+        scaling = 0.1 / unit.max_power
+        reward = profit * scaling
+
+        # store results in unit outputs which are written to database by unit operator
+        unit.outputs["profit"].loc[products_index] += profit
+        unit.outputs["reward"].loc[products_index] += reward
+        unit.outputs["total_costs"].loc[products_index] += costs
+
+        unit.outputs["rl_rewards"].extend(
+            unit.outputs["reward"].loc[products_index].values
+        )

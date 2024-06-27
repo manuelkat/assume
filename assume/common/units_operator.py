@@ -340,6 +340,7 @@ class UnitsOperator(Role):
             now,
             groupby=["market_id", "unit_id"],
         )
+
         unit_dispatch_dfs = []
         for unit_id, unit in self.units.items():
             current_dispatch = unit.execute_current_dispatch(start, now)
@@ -348,7 +349,7 @@ class UnitsOperator(Role):
             data = pd.DataFrame(current_dispatch)
 
             # TODO: this needs to be fixed. For now it is consuming too much time and is deactivated
-            # unit.calculate_generation_cost(start, now, "energy")
+            unit.calculate_generation_cost(start, now, "energy")
             valid_outputs = ["soc", "cashflow", "marginal_costs", "total_costs"]
 
             for key in unit.outputs.keys():
@@ -358,6 +359,7 @@ class UnitsOperator(Role):
 
             data["unit"] = unit_id
             unit_dispatch_dfs.append(data)
+
         return market_dispatch, unit_dispatch_dfs
 
     def write_actual_dispatch(self, product_type: str) -> None:

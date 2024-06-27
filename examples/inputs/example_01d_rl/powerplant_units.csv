@@ -47,5 +47,5 @@ Unit 45,nuclear,naive_eom,naive_redispatch,uranium,0.0,1000.0,0,0.3,49,south,Ope
 Unit 46,nuclear,naive_eom,naive_redispatch,uranium,0.0,1000.0,0,0.3,50,north,Operator 1
 Unit 47,nuclear,naive_eom,naive_redispatch,uranium,0.0,1000.0,0,0.3,51,north,Operator 1
 Unit 48,nuclear,naive_eom,naive_redispatch,uranium,0.0,1000.0,0,0.3,52,north,Operator 1
-Unit 49,nuclear,naive_eom,naive_redispatch,uranium,0.0,1000.0,0,0.3,53,north,Operator 1
+Unit 49,nuclear,da_learning,da_learning,uranium,0.0,1000.0,0,0.3,53,north,Operator 1
 Unit 50,nuclear,naive_eom,naive_redispatch,uranium,0.0,1000.0,0,0.3,54,north,Operator 1

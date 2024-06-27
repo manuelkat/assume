@@ -67,6 +67,10 @@ availabe_examples = {
         "scenario": "example_02e",
         "study_case": "base",
     },
+    "small_with_rl_redispatch": {
+        "scenario": "example_01d_rl",
+        "study_case": "base",
+    },
 }
 
 # %%
@@ -76,7 +80,7 @@ if __name__ == "__main__":
     - local_db: without database and grafana
     - timescale: with database and grafana (note: you need docker installed)
     """
-    data_format = "local_db"  # "local_db" or "timescale"
+    data_format = "timescale"  # "local_db" or "timescale"
     example = "small"
 
     if data_format == "local_db":
