@@ -266,6 +266,8 @@ class BaseUnit:
                     float(order["accepted_price"][i] * order["accepted_volume"][i])
                     for i in order["accepted_volume"].keys()
                 ]
+                #TODO: this only works for pay-as-cleared auctions
+                self.outputs[f"{product_type}_price"].loc[start:end_excl] =order["accepted_price"]
                 self.outputs[f"{product_type}_cashflow"].loc[start:end_excl] += (
                     cashflow * self.index.freq.n
                 )
@@ -277,6 +279,7 @@ class BaseUnit:
                 self.outputs[f"{product_type}_cashflow"].loc[start:end_excl] += (
                     cashflow * hours
                 )
+                self.outputs[f"{product_type}_price"].loc[start:end_excl] =order["accepted_price"]
 
     def get_starting_costs(self, op_time: int) -> float:
         """

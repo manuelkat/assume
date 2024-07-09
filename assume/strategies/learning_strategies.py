@@ -46,7 +46,7 @@ class RLStrategy(LearningStrategy):
     """
 
     def __init__(self, *args, **kwargs):
-        super().__init__(obs_dim=50, act_dim=2, unique_obs_dim=2, *args, **kwargs)
+        super().__init__(obs_dim=26, act_dim=2, unique_obs_dim=2, *args, **kwargs)
 
         self.unit_id = kwargs["unit_id"]
 
@@ -69,7 +69,7 @@ class RLStrategy(LearningStrategy):
         self.float_type = th.float
 
         # for definition of observation space
-        self.foresight = kwargs.get("foresight", 24)
+        self.foresight = kwargs.get("foresight", 8)
 
         # define used order types
         self.order_types = kwargs.get("order_types", ["SB"])
@@ -265,16 +265,18 @@ class RLStrategy(LearningStrategy):
 
         Args:
             unit (SupportsMinMax): Unit to create observation for.
-            start (datetime.datetime): Start time.
-            end (datetime.datetime): End time.
+            start (datetime.datetime): Start time of the observation.
+            end (datetime.datetime): End time of the observation.
 
         Returns:
             Observation (torch.Tensor): Observation.
         """
         end_excl = end - unit.index.freq
+        start_excl = start - unit.index.freq
 
-        # get the forecast length depending on the tme unit considered in the modelled unit
+        # get the forecast length depending on the time unit considered in the modelled unit
         forecast_len = pd.Timedelta((self.foresight - 1) * unit.index.freq)
+        hindsight_len = pd.Timedelta((self.foresight - 1) * unit.index.freq)
 
         # =============================================================================
         # 1.1 Get the Observations, which are the basis of the action decision
@@ -297,16 +299,19 @@ class RLStrategy(LearningStrategy):
             end_excl + forecast_len
             > unit.forecaster[f"residual_load_{market_id}"].index[-1]
         ):
+            #forecast would exceed the simulation horizon
             scaled_res_load_forecast = (
                 unit.forecaster[f"residual_load_{market_id}"].loc[start:].values
                 / scaling_factor_res_load
             )
+
+            # we need to add the missing forecast values to have the same length again
             scaled_res_load_forecast = np.concatenate(
                 [
                     scaled_res_load_forecast,
                     unit.forecaster[f"residual_load_{market_id}"].iloc[
                         : self.foresight - len(scaled_res_load_forecast)
-                    ],
+                    ]/ scaling_factor_res_load,
                 ]
             )
 
@@ -319,16 +324,19 @@ class RLStrategy(LearningStrategy):
             )
 
         if end_excl + forecast_len > unit.forecaster[f"price_{market_id}"].index[-1]:
+            #forecast would exceed the simulation horizon
             scaled_price_forecast = (
                 unit.forecaster[f"price_{market_id}"].loc[start:].values
                 / scaling_factor_price
             )
+
+            # we need to add the missing forecast values to have the same length again
             scaled_price_forecast = np.concatenate(
                 [
                     scaled_price_forecast,
                     unit.forecaster[f"price_{market_id}"].iloc[
                         : self.foresight - len(scaled_price_forecast)
-                    ],
+                    ]/ scaling_factor_price,
                 ]
             )
 
@@ -336,6 +344,30 @@ class RLStrategy(LearningStrategy):
             scaled_price_forecast = (
                 unit.forecaster[f"price_{market_id}"]
                 .loc[start : end_excl + forecast_len]
+                .values
+                / scaling_factor_price
+            )
+
+        #check if we are at beginning of simulation, at which we do not have rela price realisations yet
+        if start_excl - hindsight_len < unit.outputs[f"energy_price"].index[0]:
+
+            scaled_price_hindsight = (
+                unit.outputs[f"energy_price"].loc[:start_excl].values
+                / scaling_factor_price
+            )
+
+            # we need to add the missing forecast values to have the same length again
+            scaled_price_hindsight = np.concatenate(
+                [
+                    np.zeros(self.foresight - len(scaled_price_hindsight)),
+                    scaled_price_hindsight
+                     
+                ]
+            )
+        else:
+            scaled_price_hindsight = (
+                unit.outputs[f"energy_price"]
+                .loc[start_excl - hindsight_len : start_excl]
                 .values
                 / scaling_factor_price
             )
@@ -353,6 +385,7 @@ class RLStrategy(LearningStrategy):
             [
                 scaled_res_load_forecast,
                 scaled_price_forecast,
+                scaled_price_hindsight,
                 np.array([scaled_total_capacity, scaled_marginal_cost]),
             ]
         )
