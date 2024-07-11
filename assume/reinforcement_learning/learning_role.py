@@ -278,7 +278,7 @@ class Learning(Role):
                     )
 
                     logger.info(
-                        f"New best policy saved, episode: {self.eval_episodes_done + 1}, {metric=}, value={value:.2f}"
+                        f"New best policy saved, evaluation episode: {self.eval_episodes_done + 1}, {metric=}, value={value:.2f}"
                     )
 
             # if we do not see any improvment in the last x evaluation runs we stop the training
