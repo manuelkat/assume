@@ -61,5 +61,11 @@ if __name__ == "__main__":
     world = World(addr=agent_address, distributed_role=False)
     try:
         world.loop.run_until_complete(worker(world, marketdesign, create_worker, i, n))
+    except OSError as e:
+        print(e)
+        print("mqtt might not yet be set up? waiting a few seconds")
+        import time
+
+        time.sleep(5)
     except Exception as e:
         print(e)
