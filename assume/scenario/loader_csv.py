@@ -3,7 +3,9 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 import copy
+import json
 import logging
+import os
 from collections import defaultdict
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -1019,6 +1021,13 @@ def run_learning(
             world.learning_role.rl_algorithm.save_params(
                 directory=f"{world.learning_role.trained_policies_save_path}/last_policies"
             )
+
+            # export buffer_obs.json in the last training episode to get observations later
+            export = inter_episodic_data["buffer"].observations.tolist()
+            path = f"{world.learning_role.trained_policies_save_path}/buffer_obs"
+            os.makedirs(path, exist_ok=True)
+            with open(os.path.join(path, "buffer_obs.json"), "w") as f:
+                json.dump(export, f)
 
         # container shutdown implicitly with new initialisation
     logger.info("################")
