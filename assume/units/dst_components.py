@@ -70,11 +70,11 @@ def create_heatpump(
 
         # Link power_in and operational_status
         @model_part.Constraint(time_steps)
-        def power_status_link_lower(b, t):
+        def min_power_constraint(b, t):
             return b.power_in[t] >= b.min_power * b.operational_status[t]
 
         @model_part.Constraint(time_steps)
-        def power_status_link_upper(b, t):
+        def max_power_constraint(b, t):
             return b.power_in[t] <= b.rated_power * b.operational_status[t]
 
     # Coefficient of performance (COP) constraint
@@ -191,11 +191,11 @@ def create_boiler(
 
         # Link power_in and operational_status
         @model_part.Constraint(time_steps)
-        def power_status_link_lower(b, t):
+        def min_power_constraint(b, t):
             return b.power_in[t] >= b.min_power * b.operational_status[t]
 
         @model_part.Constraint(time_steps)
-        def power_status_link_upper(b, t):
+        def max_power_constraint(b, t):
             return b.power_in[t] <= b.rated_power * b.operational_status[t]
 
     # Efficiency constraint based on fuel type
@@ -521,170 +521,234 @@ def create_generic_storage(
     return model_part
 
 
-def create_electrolyser(
-    model,
-    rated_power,
-    min_power,
-    ramp_up,
-    ramp_down,
-    min_operating_time,
-    min_down_time,
-    efficiency,
-    time_steps,
+def create_pv_plant(
+    model: pyo.ConcreteModel,
+    time_steps: list[int],
+    capacity: float,
+    availability_profile: pd.Series | None = None,
+    power_profile: pd.Series | None = None,
     **kwargs,
-):
+) -> pyo.Block:
+    """
+    Creates a Photovoltaic (PV) power plant unit within an energy system model.
+
+    Args:
+        model (pyo.ConcreteModel): A Pyomo ConcreteModel object representing the optimization model.
+        time_steps (list[int]): Time steps over which the model operates.
+        capacity (float): The maximum power output capacity of the PV unit (MW).
+        availability_profile (pd.Series | None, optional): Series indicating PV availability with time_steps as indices
+            and binary values (1 available, 0 unavailable). Defaults to None.
+        power_profile (pd.Series | None, optional): Series indicating a predefined power output profile.
+            If provided, the PV unit will follow this profile instead of optimizing power output. Defaults to None.
+        **kwargs: Additional keyword arguments for custom behavior or constraints.
+
+    Returns:
+        pyo.Block: A Pyomo block representing the PV plant with variables and constraints.
+
+    Constraints:
+        - power_profile_constraint: Ensures the PV follows a predefined power profile if provided.
+        - availability_pv_constraint: Ensures the PV operates only during available periods.
+        - max_power_pv_constraint: Ensures the power output of the PV unit does not exceed the maximum power limit.
+    """
+
+    # Set capacity as the maximum power output
+    max_power = capacity
+
+    # Raise error if both availability_profile and power_profile are provided
+    # or if neither is provided
+    if availability_profile is not None and power_profile is not None:
+        raise ValueError(
+            "Provide either `availability_profile` or `power_profile` for the PV plant, not both."
+        )
+    elif availability_profile is None and power_profile is None:
+        raise ValueError(
+            "Provide `availability_profile` or `power_profile` for the PV plant."
+        )
+
+    # Validate availability_profile if provided
+    if availability_profile is not None:
+        if not isinstance(availability_profile, pd.Series):
+            raise TypeError("`availability_profile` must be a pandas Series.")
+        if not all(t in availability_profile.index for t in time_steps):
+            raise ValueError(
+                "All `time_steps` must be present in `availability_profile` index."
+            )
+
+    # Validate power_profile if provided
+    if power_profile is not None:
+        if not isinstance(power_profile, pd.Series):
+            raise TypeError("`power_profile` must be a pandas Series.")
+        if not all(t in power_profile.index for t in time_steps):
+            raise ValueError(
+                "All `time_steps` must be present in `power_profile` index."
+            )
+
+    # Define block
+    model_part = pyo.Block()
+
+    # Define parameters
+    model_part.capacity = pyo.Param(initialize=capacity, within=pyo.NonNegativeReals)
+
+    # Define variables
+    model_part.power = pyo.Var(
+        time_steps,
+        within=pyo.NonNegativeReals,
+        bounds=(0, max_power),
+    )
+
+    # Define constraints
+
+    # Predefined power profile constraint
+    if power_profile is not None:
+
+        @model_part.Constraint(time_steps)
+        def power_profile_constraint(b, t):
+            """
+            Ensures the PV follows the predefined power profile.
+            """
+            return b.power[t] == power_profile[t]
+
+    # Availability profile constraints
+    if availability_profile is not None:
+
+        @model_part.Constraint(time_steps)
+        def availability_pv_constraint(b, t):
+            """
+            Ensures the PV operates only during available periods.
+            """
+            availability = availability_profile[t]
+            return b.power[t] <= availability * b.capacity
+
+    # Maximum power constraint (redundant due to variable bounds, included for clarity)
+    @model_part.Constraint(time_steps)
+    def max_power_pv_constraint(b, t):
+        """
+        Ensures the power output of the PV unit does not exceed the maximum power limit.
+        """
+        return b.power[t] <= b.capacity
+
+    return model_part
+
+
+def create_electrolyser(
+    model: pyo.ConcreteModel,
+    time_steps: list[int],
+    rated_power: float,
+    efficiency: float,
+    min_power: float = 0.0,
+    ramp_up: float | None = None,
+    ramp_down: float | None = None,
+    min_operating_steps: int = 0,
+    min_down_steps: int = 0,
+    **kwargs,
+) -> pyo.Block:
     """
     Represents an electrolyser unit used for hydrogen production through electrolysis.
 
     Args:
         model (pyomo.ConcreteModel): The Pyomo model where the electrolyser unit will be added.
-        id (str): Identifier for the electrolyser unit.
+        time_steps (list[int]): The list of time steps for the model.
         rated_power (float): The rated power capacity of the electrolyser (in MW).
-        min_power (float): The minimum power required for operation (in kW).
-        ramp_up (float): The maximum rate at which the electrolyser can increase its power output (in MW/hr).
-        ramp_down (float): The maximum rate at which the electrolyser can decrease its power output (in MW/hr).
-        min_operating_time (float): The minimum duration the electrolyser must operate continuously (in hours).
-        min_down_time (float): The minimum downtime required between operating cycles (in hours).
-        efficiency (float): The efficiency of the electrolysis process.
+        efficiency (float): The efficiency of the electrolysis process (0-1).
+        min_power (float): The minimum power required for operation (in MW).
+        ramp_up (float | None): The maximum rate at which the electrolyser can increase its power output (in MW/hr).
+        ramp_down (float | None): The maximum rate at which the electrolyser can decrease its power output (in MW/hr).
+        min_operating_steps (int): The minimum number of steps the electrolyser must operate continuously.
+        min_down_steps (int): The minimum number of downtime steps required between operating cycles.
 
-    Constraints:
-        power_upper_bound: Ensures the power input to the electrolyser does not exceed the rated power capacity.
-        power_lower_bound: Ensures the power input to the electrolyser does not fall below the minimum required power.
-        ramp_up_constraint: Limits the rate at which the power input to the electrolyser can increase.
-        ramp_down_constraint: Limits the rate at which the power input to the electrolyser can decrease.
-        min_operating_time_electrolyser_constraint: Ensures the electrolyser operates continuously for a minimum duration.
-        min_downtime_electrolyser_constraint: Ensures the electrolyser has a minimum downtime between operating cycles.
-        efficiency_constraint: Relates the power input to the hydrogen output based on the efficiency of the electrolysis process.
-        operating_cost_with_el_price: Calculates the operating cost of the electrolyser based on the electricity price.
-
+    Returns:
+        pyo.Block: The electrolyser block.
     """
+    # Set default ramp limits to rated_power if not provided
+    ramp_up = rated_power if ramp_up is None else ramp_up
+    ramp_down = rated_power if ramp_down is None else ramp_down
+
+    # Define block
     model_part = pyo.Block()
+
+    # Define parameters
     model_part.rated_power = pyo.Param(initialize=rated_power)
+    model_part.efficiency = pyo.Param(initialize=efficiency)
     model_part.min_power = pyo.Param(initialize=min_power)
     model_part.ramp_up = pyo.Param(initialize=ramp_up)
     model_part.ramp_down = pyo.Param(initialize=ramp_down)
-    model_part.min_operating_time = pyo.Param(initialize=min_operating_time)
-    model_part.min_down_time = pyo.Param(initialize=min_down_time)
-    model_part.efficiency = pyo.Param(initialize=efficiency)
+    model_part.min_operating_steps = pyo.Param(initialize=min_operating_steps)
+    model_part.min_down_steps = pyo.Param(initialize=min_down_steps)
 
-    # define variables
-    model_part.power_in = pyo.Var(time_steps, within=pyo.NonNegativeReals)
+    # Define variables
+    model_part.power_in = pyo.Var(
+        time_steps, within=pyo.NonNegativeReals, bounds=(0, rated_power)
+    )
     model_part.hydrogen_out = pyo.Var(time_steps, within=pyo.NonNegativeReals)
     model_part.electrolyser_operating_cost = pyo.Var(
         time_steps, within=pyo.NonNegativeReals
     )
 
-    # Power bounds constraints
+    # Define operational status variable if needed
+    if min_operating_steps > 0 or min_down_steps > 0 or min_power > 0:
+        model_part.operational_status = pyo.Var(time_steps, within=pyo.Binary)
+
+        # Link power_in and operational_status
+        @model_part.Constraint(time_steps)
+        def min_power_constraint(b, t):
+            return b.power_in[t] >= b.min_power * b.operational_status[t]
+
+        @model_part.Constraint(time_steps)
+        def max_power_constraint(b, t):
+            return b.power_in[t] <= b.rated_power * b.operational_status[t]
+
+    # Efficiency constraint
     @model_part.Constraint(time_steps)
-    def power_upper_bound(b, t):
-        """
-        Ensures that the power input to the electrolyser does not exceed its rated power capacity.
-
-        """
-        return b.power_in[t] <= b.rated_power
-
-    @model_part.Constraint(time_steps)
-    def power_lower_bound(b, t):
-        """
-        Ensures that the power input to the electrolyser does not fall below the minimum required power.
-
-        """
-        return b.power_in[t] >= b.min_power
+    def hydrogen_production_constraint(b, t):
+        return b.power_in[t] == b.hydrogen_out[t] / b.efficiency
 
     # Ramp-up constraint
     @model_part.Constraint(time_steps)
     def ramp_up_constraint(b, t):
-        """
-        Limits the rate at which the power input to the electrolyser can increase.
-
-        """
-        if t == 0:
+        if t == time_steps[0]:
             return pyo.Constraint.Skip
-        return b.power_in[t] - b.power_in[t - 1] <= b.ramp_up
+        return (
+            b.power_in[t] - b.power_in[time_steps[time_steps.index(t) - 1]] <= b.ramp_up
+        )
 
     # Ramp-down constraint
     @model_part.Constraint(time_steps)
     def ramp_down_constraint(b, t):
-        """
-        Limits the rate at which the power input to the electrolyser can decrease.
-
-        """
-        if t == 0:
+        if t == time_steps[0]:
             return pyo.Constraint.Skip
-        return b.power_in[t - 1] - b.power_in[t] <= b.ramp_down
+        return (
+            b.power_in[time_steps[time_steps.index(t) - 1]] - b.power_in[t]
+            <= b.ramp_down
+        )
 
-    @model_part.Constraint(time_steps)
-    def min_operating_time_electrolyser_constraint(b, t):
-        if t == 0:
-            return pyo.Constraint.Skip
+    # Minimum operating time constraint
+    if min_operating_steps > 0:
 
-        delta_t = t - (t - 1)
-        min_operating_time_units = int(min_operating_time / delta_t)
-
-        # Check for valid indexing
-        if t < min_operating_time_units:
-            if t - min_operating_time_units + 1 < 0:
-                raise ValueError(
-                    f"Invalid min_operating_time: {min_operating_time} exceeds available time steps. "
-                    "Ensure min_operating_time is compatible with the available time steps."
-                )
+        @model_part.Constraint(time_steps)
+        def min_operating_time_constraint(b, t):
+            if t < min_operating_steps - 1:
+                return pyo.Constraint.Skip
+            relevant_time_steps = range(t - min_operating_steps + 1, t + 1)
             return (
-                sum(
-                    b.power_in[i]
-                    for i in range(t - min_operating_time_units + 1, t + 1)
-                )
-                >= min_operating_time_units * b.power_in[t]
-            )
-        else:
-            return (
-                sum(
-                    b.power_in[i]
-                    for i in range(t - min_operating_time_units + 1, t + 1)
-                )
-                >= min_operating_time_units * b.power_in[t]
+                sum(b.operational_status[i] for i in relevant_time_steps)
+                >= min_operating_steps * b.operational_status[t]
             )
 
-    @model_part.Constraint(time_steps)
-    def min_downtime_electrolyser_constraint(b, t):
-        if t == 0:
-            return pyo.Constraint.Skip
+    # Minimum downtime constraint
+    if min_down_steps > 0:
 
-        delta_t = t - (t - 1)
-        min_downtime_units = int(min_down_time / delta_t)
+        @model_part.Constraint(time_steps)
+        def min_downtime_constraint(b, t):
+            if t < min_down_steps - 1:
+                return pyo.Constraint.Skip
+            relevant_time_steps = range(t - min_down_steps + 1, t + 1)
+            return sum(
+                1 - b.operational_status[i] for i in relevant_time_steps
+            ) >= min_down_steps * (1 - b.operational_status[t])
 
-        # Check for valid indexing
-        if t < min_downtime_units:
-            if t - min_downtime_units < 0:
-                raise ValueError(
-                    f"Invalid min_down_time: {min_down_time} exceeds available time steps. "
-                    "Ensure min_down_time is compatible with the available time steps."
-                )
-            return (
-                sum(b.power_in[t - i] for i in range(min_downtime_units))
-                >= min_downtime_units * b.power_in[t]
-            )
-
-        else:
-            return (
-                sum(b.hydrogen_out[t - i] for i in range(min_downtime_units))
-                >= min_downtime_units * b.power_in[t]
-            )
-
-    # Efficiency constraint
-    @model_part.Constraint(time_steps)
-    def power_in_equation(b, t):
-        """
-        Relates the power input to the hydrogen output based on the efficiency of the electrolysis process.
-
-        """
-        return b.power_in[t] == b.hydrogen_out[t] / b.efficiency
-
+    # Operating cost constraint
     @model_part.Constraint(time_steps)
     def operating_cost_with_el_price(b, t):
-        """
-        Calculates the operating cost of the electrolyser based on the electricity price.
-
-        """
         return (
             b.electrolyser_operating_cost[t]
             == b.power_in[t] * model.electricity_price[t]
@@ -694,87 +758,93 @@ def create_electrolyser(
 
 
 def create_dri_plant(
-    model,
-    specific_hydrogen_consumption,
-    specific_natural_gas_consumption,
-    specific_electricity_consumption,
-    specific_iron_ore_consumption,
-    rated_power,
-    min_power,
-    fuel_type,
-    ramp_up,
-    ramp_down,
-    min_operating_time,
-    min_down_time,
-    time_steps,
+    model: pyo.ConcreteModel,
+    time_steps: list[int],
+    specific_hydrogen_consumption: float,
+    specific_natural_gas_consumption: float,
+    specific_electricity_consumption: float,
+    specific_iron_ore_consumption: float,
+    rated_power: float,
+    min_power: float,
+    fuel_type: str,
+    ramp_up: float | None = None,
+    ramp_down: float | None = None,
+    min_operating_steps: int = 0,
+    min_down_steps: int = 0,
     **kwargs,
-):
+) -> pyo.Block:
     """
+    Represents a DRI (Direct Reduced Iron) plant.
+
     Args:
         model (pyomo.ConcreteModel): The Pyomo model where the DRI plant will be added.
-        id (str): Identifier for the DRI plant.
+        time_steps (list[int]): The list of time steps for the model.
         specific_hydrogen_consumption (float): The specific hydrogen consumption of the DRI plant (in MWh per ton of DRI).
         specific_natural_gas_consumption (float): The specific natural gas consumption of the DRI plant (in MWh per ton of DRI).
         specific_electricity_consumption (float): The specific electricity consumption of the DRI plant (in MWh per ton of DRI).
         specific_iron_ore_consumption (float): The specific iron ore consumption of the DRI plant (in ton per ton of DRI).
         rated_power (float): The rated power capacity of the DRI plant (in MW).
         min_power (float): The minimum power required for operation (in MW).
-        fuel_type (str): The type of fuel used by the DRI plant.
-        ramp_up (float): The maximum rate at which the DRI plant can increase its power output (in MW/hr).
-        ramp_down (float): The maximum rate at which the DRI plant can decrease its power output (in MW/hr).
-        min_operating_time (float): The minimum duration the DRI plant must operate continuously (in hours).
-        min_down_time (float): The minimum downtime required between operating cycles (in hours).
+        fuel_type (str): The type of fuel used by the DRI plant ("hydrogen", "natural_gas", "both").
+        ramp_up (float | None): The maximum rate at which the DRI plant can increase its power output (in MW/hr).
+        ramp_down (float | None): The maximum rate at which the DRI plant can decrease its power output (in MW/hr).
+        min_operating_steps (int): The minimum number of steps the DRI plant must operate continuously.
+        min_down_steps (int): The minimum number of downtime steps required between operating cycles.
 
-    Constraints:
-        dri_power_lower_bound: Ensures that the power input to the DRI plant does not fall below the minimum power requirement.
-        dri_power_upper_bound: Ensures that the power input to the DRI plant does not exceed the rated power capacity.
-        dri_output_constraint: Relates the DRI output to the fuel inputs based on the specific consumption rates.
-        dri_output_electricity_constraint: Relates the electricity input to the DRI output based on the specific electricity consumption.
-        iron_ore_constraint: Relates the iron ore input to the DRI output based on the specific iron ore consumption.
-        ramp_up_dri_constraint: Limits the rate at which the power input to the DRI plant can increase.
-        ramp_down_dri_constraint: Limits the rate at which the power input to the DRI plant can decrease.
-        min_operating_time_dri_constraint: Ensures that the DRI plant operates continuously for a minimum duration.
-        min_down_time_dri_constraint: Ensures that the DRI plant has a minimum downtime between operating cycles.
-        dri_operating_cost_constraint: Calculates the operating cost of the DRI plant based on inputs and prices.
+    Returns:
+        pyo.Block: The DRI plant block.
     """
+    # Set default ramp limits to rated_power if not provided
+    ramp_up = rated_power if ramp_up is None else ramp_up
+    ramp_down = rated_power if ramp_down is None else ramp_down
+
+    # Define block
     model_part = pyo.Block()
+
+    # Define parameters
     model_part.specific_hydrogen_consumption = pyo.Param(
         initialize=specific_hydrogen_consumption
     )
     model_part.specific_natural_gas_consumption = pyo.Param(
         initialize=specific_natural_gas_consumption
     )
-    model_part.specific_electricity_consumption_dri = pyo.Param(
+    model_part.specific_electricity_consumption = pyo.Param(
         initialize=specific_electricity_consumption
     )
     model_part.specific_iron_ore_consumption = pyo.Param(
         initialize=specific_iron_ore_consumption
     )
-    # Flexibility parameters
-    model_part.min_power_dri = pyo.Param(initialize=min_power)
-    model_part.rated_power_dri = pyo.Param(initialize=rated_power)
-    model_part.ramp_up_dri = pyo.Param(initialize=ramp_up)
-    model_part.ramp_down_dri = pyo.Param(initialize=ramp_down)
-    model_part.min_operating_time_dri = pyo.Param(initialize=min_operating_time)
-    model_part.min_down_time_dri = pyo.Param(initialize=min_down_time)
+    model_part.rated_power = pyo.Param(initialize=rated_power)
+    model_part.min_power = pyo.Param(initialize=min_power)
+    model_part.ramp_up = pyo.Param(initialize=ramp_up)
+    model_part.ramp_down = pyo.Param(initialize=ramp_down)
+    model_part.min_operating_steps = pyo.Param(initialize=min_operating_steps)
+    model_part.min_down_steps = pyo.Param(initialize=min_down_steps)
 
-    # define variables
+    # Define variables
+    model_part.power_dri = pyo.Var(
+        time_steps, within=pyo.NonNegativeReals, bounds=(0, rated_power)
+    )
     model_part.iron_ore_in = pyo.Var(time_steps, within=pyo.NonNegativeReals)
     model_part.natural_gas_in = pyo.Var(time_steps, within=pyo.NonNegativeReals)
-    model_part.dri_operating_cost = pyo.Var(time_steps, within=pyo.NonNegativeReals)
     model_part.hydrogen_in = pyo.Var(time_steps, within=pyo.NonNegativeReals)
     model_part.dri_output = pyo.Var(time_steps, within=pyo.NonNegativeReals)
-    model_part.power_dri = pyo.Var(time_steps, within=pyo.NonNegativeReals)
+    model_part.dri_operating_cost = pyo.Var(time_steps, within=pyo.NonNegativeReals)
 
-    # define constraints
-    @model_part.Constraint(time_steps)
-    def dri_power_lower_bound(b, t):
-        return b.power_dri[t] >= b.min_power_dri
+    # Define operational status variable if needed
+    if min_operating_steps > 0 or min_down_steps > 0 or min_power > 0:
+        model_part.operational_status = pyo.Var(time_steps, within=pyo.Binary)
 
-    @model_part.Constraint(time_steps)
-    def dri_power_upper_bound(b, t):
-        return b.power_dri[t] <= b.rated_power_dri
+        # Link power_dri and operational_status
+        @model_part.Constraint(time_steps)
+        def min_power_constraint(b, t):
+            return b.power_dri[t] >= b.min_power * b.operational_status[t]
 
+        @model_part.Constraint(time_steps)
+        def max_power_constraint(b, t):
+            return b.power_dri[t] <= b.rated_power * b.operational_status[t]
+
+    # Fuel consumption constraint
     @model_part.Constraint(time_steps)
     def dri_output_constraint(b, t):
         if fuel_type == "hydrogen":
@@ -789,96 +859,58 @@ def create_dri_plant(
                 b.hydrogen_in[t] / b.specific_hydrogen_consumption
             ) + (b.natural_gas_in[t] / b.specific_natural_gas_consumption)
 
+    # Electricity consumption constraint
     @model_part.Constraint(time_steps)
-    def dri_output_electricity_constraint(b, t):
-        return (
-            b.power_dri[t] == b.dri_output[t] * b.specific_electricity_consumption_dri
-        )
+    def electricity_consumption_constraint(b, t):
+        return b.power_dri[t] == b.dri_output[t] * b.specific_electricity_consumption
 
+    # Iron ore consumption constraint
     @model_part.Constraint(time_steps)
     def iron_ore_constraint(b, t):
         return b.iron_ore_in[t] == b.dri_output[t] * b.specific_iron_ore_consumption
 
-    # Flexibility constraints
+    # Ramp-up constraint
     @model_part.Constraint(time_steps)
-    def ramp_up_dri_constraint(b, t):
+    def ramp_up_constraint(b, t):
         if t == 0:
             return pyo.Constraint.Skip
-        else:
-            return b.power_dri[t] - b.power_dri[t - 1] <= b.ramp_up_dri
+        return b.power_dri[t] - b.power_dri[t - 1] <= b.ramp_up
 
+    # Ramp-down constraint
     @model_part.Constraint(time_steps)
-    def ramp_down_dri_constraint(b, t):
+    def ramp_down_constraint(b, t):
         if t == 0:
             return pyo.Constraint.Skip
-        else:
-            return b.power_dri[t - 1] - b.power_dri[t] <= b.ramp_down_dri
+        return b.power_dri[t - 1] - b.power_dri[t] <= b.ramp_down
 
-    @model_part.Constraint(time_steps)
-    def min_operating_time_dri_constraint(b, t):
-        if t == 0:
-            return pyo.Constraint.Skip
+    # Minimum operating time constraint
+    if min_operating_steps > 0:
 
-        # Calculate the time step duration dynamically
-        delta_t = t - (t - 1)
-        # Convert minimum operating time to the time unit of your choice
-        min_operating_time_units = int(min_operating_time / delta_t)
-
-        # Check for valid indexing
-        if t < min_operating_time_units:
-            if t - min_operating_time_units + 1 < 0:
-                raise ValueError(
-                    f"Invalid min_operating_time: {min_operating_time} exceeds available time steps. "
-                    "Ensure min_operating_time is compatible with the available time steps."
-                )
+        @model_part.Constraint(time_steps)
+        def min_operating_time_constraint(b, t):
+            if t < min_operating_steps - 1:
+                return pyo.Constraint.Skip
+            relevant_time_steps = range(t - min_operating_steps + 1, t + 1)
             return (
-                sum(
-                    b.power_dri[i]
-                    for i in range(t - min_operating_time_units + 1, t + 1)
-                )
-                >= min_operating_time_units * b.power_dri[t]
-            )
-        else:
-            return (
-                sum(
-                    b.power_dri[i]
-                    for i in range(t - min_operating_time_units + 1, t + 1)
-                )
-                >= min_operating_time_units * b.power_dri[t]
+                sum(b.operational_status[i] for i in relevant_time_steps)
+                >= min_operating_steps * b.operational_status[t]
             )
 
-    @model_part.Constraint(time_steps)
-    def min_down_time_dri_constraint(b, t):
-        if t == 0:
-            return pyo.Constraint.Skip
+    # Minimum downtime constraint
+    if min_down_steps > 0:
 
-        # Calculate the time step duration dynamically
-        delta_t = t - (t - 1)
-        # Convert minimum downtime to the time unit of your choice
-        min_downtime_units = int(min_down_time / delta_t)
+        @model_part.Constraint(time_steps)
+        def min_downtime_constraint(b, t):
+            if t < min_down_steps - 1:
+                return pyo.Constraint.Skip
+            relevant_time_steps = range(t - min_down_steps + 1, t + 1)
+            return sum(
+                1 - b.operational_status[i] for i in relevant_time_steps
+            ) >= min_down_steps * (1 - b.operational_status[t])
 
-        # Check for valid indexing
-        if t < min_downtime_units:
-            if t - min_downtime_units < 0:
-                raise ValueError(
-                    f"Invalid min_down_time: {min_down_time} exceeds available time steps. "
-                    "Ensure min_down_time is compatible with the available time steps."
-                )
-            return (
-                sum(b.power_dri[t - i] for i in range(min_downtime_units))
-                >= min_downtime_units * b.power_dri[t]
-            )
-
-        else:
-            return (
-                sum(b.dri_output[t - i] for i in range(min_downtime_units))
-                >= min_downtime_units * b.power_dri[t]
-            )
-
-    # Operational cost
+    # Operating cost constraint
     @model_part.Constraint(time_steps)
     def dri_operating_cost_constraint(b, t):
-        # This constraint defines the steel output based on inputs and efficiency
         return (
             b.dri_operating_cost[t]
             == b.natural_gas_in[t] * model.natural_gas_price[t]
@@ -889,242 +921,149 @@ def create_dri_plant(
     return model_part
 
 
-def create_electric_arc_furnance(
+def create_electric_arc_furnace(
     model: pyo.ConcreteModel,
+    time_steps: list[int],
     rated_power: float,
     min_power: float,
     specific_electricity_consumption: float,
     specific_dri_demand: float,
     specific_lime_demand: float,
-    ramp_up: float,
-    ramp_down: float,
-    min_operating_time: int,
-    min_down_time: int,
-    time_steps: list,
-    *args,
+    ramp_up: float | None = None,
+    ramp_down: float | None = None,
+    min_operating_steps: int = 0,
+    min_down_steps: int = 0,
     **kwargs,
-):
+) -> pyo.Block:
     """
     Adds the Electric Arc Furnace (EAF) to the Pyomo model.
 
-        Represents an Electric Arc Furnace (EAF) in a steel production process.
-
     Args:
-        rated_power: The rated power capacity of the electric arc furnace (in MW).
-        min_power: The minimum power requirement of the electric arc furnace (in MW).
-        specific_electricity_consumption: The specific electricity consumption of the electric arc furnace (in MWh per ton of steel produced).
-        specific_dri_demand: The specific demand for Direct Reduced Iron (DRI) in the electric arc furnace (in tons per ton of steel produced).
-        specific_lime_demand: The specific demand for lime in the electric arc furnace (in tons per ton of steel produced).
-        ramp_up: The ramp-up rate of the electric arc furnace (in MW per hour).
-        ramp_down: The ramp-down rate of the electric arc furnace (in MW per hour).
-        min_operating_time: The minimum operating time requirement for the electric arc furnace (in hours).
-        min_down_time: The minimum downtime requirement for the electric arc furnace (in hours).
-        time_steps (list): List of time steps for which the model will be defined.
+        model (pyomo.ConcreteModel): The Pyomo model where the EAF will be added.
+        time_steps (list[int]): The list of time steps for the model.
+        rated_power (float): The rated power capacity of the electric arc furnace (in MW).
+        min_power (float): The minimum power requirement of the electric arc furnace (in MW).
+        specific_electricity_consumption (float): The specific electricity consumption of the electric arc furnace (in MWh per ton of steel produced).
+        specific_dri_demand (float): The specific demand for Direct Reduced Iron (DRI) in the electric arc furnace (in tons per ton of steel produced).
+        specific_lime_demand (float): The specific demand for lime in the electric arc furnace (in tons per ton of steel produced).
+        ramp_up (float | None): The ramp-up rate of the electric arc furnace (in MW per hour).
+        ramp_down (float | None): The ramp-down rate of the electric arc furnace (in MW per hour).
+        min_operating_steps (int): The minimum number of steps the EAF must operate continuously.
+        min_down_steps (int): The minimum number of downtime steps required between operating cycles.
 
-    Constraints:
-        electricity_input_upper_bound: Limits the electricity input to the rated power capacity.
-        electricity_input_lower_bound: Ensures the electricity input does not fall below the minimum power requirement.
-        steel_output_dri_relation: Defines the steel output based on the DRI input and efficiency.
-        steel_output_power_relation: Defines the steel output based on the electricity input and efficiency.
-        eaf_lime_demand: Defines the lime demand based on the steel output and specific lime demand.
-        eaf_co2_emission: Defines the CO2 emissions based on the lime demand and CO2 factor.
-        ramp_up_eaf_constraint: Limits the rate at which the electricity input can increase.
-        ramp_down_eaf_constraint: Limits the rate at which the electricity input can decrease.
-        min_operating_time_eaf_constraint: Ensures the EAF operates continuously for a minimum duration.
-        min_down_time_eaf_constraint: Ensures the EAF has a minimum downtime between operating cycles.
-        eaf_operating_cost_cosntraint: Calculates the operating cost of the EAF based on inputs and prices.
+    Returns:
+        pyo.Block: The EAF block.
     """
+    # Set default ramp limits to rated_power if not provided
+    ramp_up = rated_power if ramp_up is None else ramp_up
+    ramp_down = rated_power if ramp_down is None else ramp_down
+
+    # Define block
     model_part = pyo.Block()
 
-    # create parameters
-    model_part.rated_power_eaf = pyo.Param(initialize=rated_power)
-    model_part.min_power_eaf = pyo.Param(initialize=min_power)
-    model_part.specific_electricity_consumption_eaf = pyo.Param(
+    # Define parameters
+    model_part.rated_power = pyo.Param(initialize=rated_power)
+    model_part.min_power = pyo.Param(initialize=min_power)
+    model_part.specific_electricity_consumption = pyo.Param(
         initialize=specific_electricity_consumption
     )
     model_part.specific_dri_demand = pyo.Param(initialize=specific_dri_demand)
     model_part.specific_lime_demand = pyo.Param(initialize=specific_lime_demand)
-    # Flexibility parameters
-    model_part.ramp_up_eaf = pyo.Param(initialize=ramp_up)
-    model_part.ramp_down_eaf = pyo.Param(initialize=ramp_down)
-    model_part.min_operating_time_eaf = pyo.Param(initialize=min_operating_time)
-    model_part.min_down_time_eaf = pyo.Param(initialize=min_down_time)
+    model_part.ramp_up = pyo.Param(initialize=ramp_up)
+    model_part.ramp_down = pyo.Param(initialize=ramp_down)
+    model_part.min_operating_steps = pyo.Param(initialize=min_operating_steps)
+    model_part.min_down_steps = pyo.Param(initialize=min_down_steps)
 
-    # define pyomo variables
-    model_part.power_eaf = pyo.Var(time_steps, within=pyo.NonNegativeReals)
+    # Define variables
+    model_part.power_eaf = pyo.Var(
+        time_steps, within=pyo.NonNegativeReals, bounds=(0, rated_power)
+    )
     model_part.dri_input = pyo.Var(time_steps, within=pyo.NonNegativeReals)
     model_part.steel_output = pyo.Var(time_steps, within=pyo.NonNegativeReals)
     model_part.eaf_operating_cost = pyo.Var(time_steps, within=pyo.NonNegativeReals)
     model_part.emission_eaf = pyo.Var(time_steps, within=pyo.NonNegativeReals)
     model_part.lime_demand = pyo.Var(time_steps, within=pyo.NonNegativeReals)
 
-    # Power bounds constraints
-    @model_part.Constraint(time_steps)
-    def electricity_input_upper_bound(b, t):
-        return b.power_eaf[t] <= b.rated_power_eaf
+    # Define operational status variable if needed
+    if min_operating_steps > 0 or min_down_steps > 0 or min_power > 0:
+        model_part.operational_status = pyo.Var(time_steps, within=pyo.Binary)
 
-    @model_part.Constraint(time_steps)
-    def electricity_input_lower_bound(b, t):
-        return b.power_eaf[t] >= b.min_power_eaf
+        # Link power_eaf and operational_status
+        @model_part.Constraint(time_steps)
+        def min_power_constraint(b, t):
+            return b.power_eaf[t] >= b.min_power * b.operational_status[t]
 
-    # This constraint defines the steel output based on inputs and efficiency
+        @model_part.Constraint(time_steps)
+        def max_power_constraint(b, t):
+            return b.power_eaf[t] <= b.rated_power * b.operational_status[t]
+
+    # Steel output based on DRI input
     @model_part.Constraint(time_steps)
     def steel_output_dri_relation(b, t):
         return b.steel_output[t] == b.dri_input[t] / b.specific_dri_demand
 
-    # This constraint defines the steel output based on inputs and efficiency
+    # Steel output based on power consumption
     @model_part.Constraint(time_steps)
     def steel_output_power_relation(b, t):
-        return (
-            b.power_eaf[t] == b.steel_output[t] * b.specific_electricity_consumption_eaf
-        )
+        return b.power_eaf[t] == b.steel_output[t] * b.specific_electricity_consumption
 
+    # Lime demand based on steel output
     @model_part.Constraint(time_steps)
     def eaf_lime_demand(b, t):
         return b.lime_demand[t] == b.steel_output[t] * b.specific_lime_demand
 
+    # CO2 emissions based on lime demand
     @model_part.Constraint(time_steps)
     def eaf_co2_emission(b, t):
         return b.emission_eaf[t] == b.lime_demand[t] * model.lime_co2_factor
 
-    # Flexibility constraints
+    # Ramp-up constraint
     @model_part.Constraint(time_steps)
     def ramp_up_eaf_constraint(b, t):
         if t == 0:
             return pyo.Constraint.Skip
-        return b.power_eaf[t] - b.power_eaf[t - 1] <= b.ramp_up_eaf
+        return b.power_eaf[t] - b.power_eaf[t - 1] <= b.ramp_up
 
+    # Ramp-down constraint
     @model_part.Constraint(time_steps)
     def ramp_down_eaf_constraint(b, t):
         if t == 0:
             return pyo.Constraint.Skip
-        return b.power_eaf[t - 1] - b.power_eaf[t] <= b.ramp_down_eaf
+        return b.power_eaf[t - 1] - b.power_eaf[t] <= b.ramp_down
 
+    # Minimum operating time constraint
+    if min_operating_steps > 0:
+
+        @model_part.Constraint(time_steps)
+        def min_operating_time_constraint(b, t):
+            if t < min_operating_steps - 1:
+                return pyo.Constraint.Skip
+            relevant_time_steps = range(t - min_operating_steps + 1, t + 1)
+            return (
+                sum(b.operational_status[i] for i in relevant_time_steps)
+                >= min_operating_steps * b.operational_status[t]
+            )
+
+    # Minimum downtime constraint
+    if min_down_steps > 0:
+
+        @model_part.Constraint(time_steps)
+        def min_down_time_constraint(b, t):
+            if t < min_down_steps - 1:
+                return pyo.Constraint.Skip
+            relevant_time_steps = range(t - min_down_steps + 1, t + 1)
+            return sum(
+                1 - b.operational_status[i] for i in relevant_time_steps
+            ) >= min_down_steps * (1 - b.operational_status[t])
+
+    # Operating cost constraint
     @model_part.Constraint(time_steps)
-    def min_operating_time_eaf_constraint(b, t):
-        if t == 0:
-            return pyo.Constraint.Skip  # No constraint for the first time step
-
-        # Calculate the time step duration dynamically
-        delta_t = t - (t - 1)
-        # Convert minimum operating time to the time unit of your choice
-        min_operating_time_units = int(min_operating_time / delta_t)
-
-        # Check for valid indexing
-        if t < min_operating_time_units:
-            if t - min_operating_time_units + 1 < 0:
-                raise ValueError(
-                    f"Invalid min_operating_time: {min_operating_time} exceeds available time steps. "
-                    "Ensure min_operating_time is compatible with the available time steps."
-                )
-            return (
-                sum(
-                    b.steel_output[i]
-                    for i in range(t - min_operating_time_units + 1, t + 1)
-                )
-                >= min_operating_time_units * b.steel_output[t]
-            )
-        else:
-            return (
-                sum(
-                    b.steel_output[i]
-                    for i in range(t - min_operating_time_units + 1, t + 1)
-                )
-                >= min_operating_time_units * b.steel_output[t]
-            )
-
-    @model_part.Constraint(time_steps)
-    def min_down_time_eaf_constraint(b, t):
-        if t == 0:
-            return pyo.Constraint.Skip  # No constraint for the first time step
-
-        # Calculate the time step duration dynamically
-        delta_t = t - (t - 1)
-        # Convert minimum downtime to the time unit of your choice
-        min_downtime_units = int(min_down_time / delta_t)
-
-        # Check for valid indexing
-        if t < min_downtime_units:
-            if t - min_downtime_units < 0:
-                raise ValueError(
-                    f"Invalid min_down_time: {min_down_time} exceeds available time steps. "
-                    "Ensure min_down_time is compatible with the available time steps."
-                )
-            return (
-                sum(b.steel_output[t - i] for i in range(min_downtime_units))
-                >= min_downtime_units * b.steel_output[t]
-            )
-        else:
-            return (
-                sum(b.steel_output[t - i] for i in range(min_downtime_units))
-                >= min_downtime_units * b.steel_output[t]
-            )
-
-    # Operational cost
-    @model_part.Constraint(time_steps)
-    def eaf_operating_cost_cosntraint(b, t):
-        # This constraint defines the steel output based on inputs and efficiency
+    def eaf_operating_cost_constraint(b, t):
         return (
             b.eaf_operating_cost[t]
             == b.power_eaf[t] * model.electricity_price[t]
             + b.emission_eaf[t] * model.co2_price
             + b.lime_demand[t] * model.lime_price
         )
-
-    return model_part
-
-
-def create_pv_plant(
-    model: pyo.ConcreteModel,
-    time_steps: list[int],
-    capacity: float,
-    availability_profile: pd.Series | None = None,
-    power_profile: pd.Series | None = None,
-    **kwargs,
-):
-    """
-    Represents a Photovoltaic (PV) power plant.
-
-    Args:
-        model: A Pyomo ConcreteModel object representing the optimization model.
-        max_power (float): The maximum power output of the PV unit.
-        time_steps (list): List of time steps for which the model will be defined.
-        availability (list): List of availability factors for each time step.
-        power_profile (str): Indicates whether the PV unit follows a predefined power profile.
-
-    Constraints:
-        max_power_pv_constraint: Ensures the power output of the PV unit does not exceed the maximum power limit.
-        min_power_pv_constraint: Ensures the power output of the PV unit does not fall below the minimum power requirement.
-        pv_self_consumption_and_sell_constraint: Ensures the power output of the PV unit is self consumed and sold to the market.
-        operating_revenue_pv_constraint: Calculates the revenue of the PV unit based on the electricity price.
-    """
-    model_part = pyo.Block()
-
-    # define parameters
-    model_part.capacity = pyo.Param(initialize=capacity)
-
-    # define variables
-    model_part.power = pyo.Var(
-        time_steps, within=pyo.NonNegativeReals, bounds=(0, capacity)
-    )
-
-    # define constraints
-    if power_profile is not None:
-
-        @model_part.Constraint(time_steps)
-        def power_profile_constraint(b, t):
-            """
-            Ensures the PV follows the predefined power profile.
-            """
-            return b.power[t] == power_profile[t]
-
-    if availability_profile is not None:
-
-        @model_part.Constraint(time_steps)
-        def power_pv_constraint(b, t):
-            """
-            Ensures the power output of the PV unit gets calculated from its availability.
-            """
-            return b.energy_out[t] == b.capacity * availability_profile[t]
 
     return model_part
