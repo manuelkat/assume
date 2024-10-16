@@ -2,671 +2,521 @@
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
+import pandas as pd
 import pyomo.environ as pyo
-from distutils.util import strtobool
 
 
 def create_heatpump(
-    model,
-    rated_power,
-    min_power,
-    cop,
-    ramp_up,
-    ramp_down,
-    min_operating_time,
-    min_down_time,
-    time_steps,
+    model: pyo.ConcreteModel,
+    time_steps: list[int],
+    rated_power: float,
+    cop: float,
+    min_power: float = 0.0,
+    ramp_up: float | None = None,
+    ramp_down: float | None = None,
+    min_operating_steps: int = 0,
+    min_down_steps: int = 0,
     **kwargs,
-):
+) -> pyo.Block:
+    """
+    Creates a generic heat pump unit within an energy system model.
+
+    Args:
+        model (ConcreteModel): A Pyomo ConcreteModel object representing the optimization model.
+        time_steps (List[int]): Time steps over which the model operates.
+        rated_power (float): Maximum power input to the heat pump.
+        cop (float): Coefficient of performance of the heat pump.
+        min_power (float, optional): Minimum power input to the heat pump. Defaults to 0.0.
+        ramp_up (Optional[float], optional): Maximum allowed increase in power per time step.
+            If None, allows full ramp-up to rated_power. Defaults to None.
+        ramp_down (Optional[float], optional): Maximum allowed decrease in power per time step.
+            If None, allows full ramp-down to rated_power. Defaults to None.
+        min_operating_steps (int, optional): Minimum number of consecutive time steps the heat pump must operate.
+            Defaults to 0.
+        min_down_steps (int, optional): Minimum number of consecutive time steps the heat pump must remain off.
+            Defaults to 0.
+        **kwargs: Additional keyword arguments for custom behavior or constraints.
+
+    Returns:
+        model_part (Block): A Pyomo block representing the heat pump with variables and constraints.
+    """
+
+    # Set default ramp limits to rated_power if not provided
+    ramp_up = rated_power if ramp_up is None else ramp_up
+    ramp_down = rated_power if ramp_down is None else ramp_down
+
+    # Define block
     model_part = pyo.Block()
+
+    # Define parameters
     model_part.rated_power = pyo.Param(initialize=rated_power)
     model_part.min_power = pyo.Param(initialize=min_power)
     model_part.cop = pyo.Param(initialize=cop)
     model_part.ramp_up = pyo.Param(initialize=ramp_up)
     model_part.ramp_down = pyo.Param(initialize=ramp_down)
-    model_part.min_operating_time = pyo.Param(initialize=min_operating_time)
-    model_part.min_down_time = pyo.Param(initialize=min_down_time)
+    model_part.min_operating_steps = pyo.Param(initialize=min_operating_steps)
+    model_part.min_down_steps = pyo.Param(initialize=min_down_steps)
 
-    model_part.power_in = pyo.Var(time_steps, within=pyo.NonNegativeReals)
+    # Define variables
+    model_part.power_in = pyo.Var(
+        time_steps, within=pyo.NonNegativeReals, bounds=(0, rated_power)
+    )
     model_part.heat_out = pyo.Var(time_steps, within=pyo.NonNegativeReals)
     model_part.operating_cost_hp = pyo.Var(time_steps, within=pyo.NonNegativeReals)
-    model_part.operational_status = pyo.Var(time_steps, within=pyo.Binary)
 
-    @model_part.Constraint(time_steps)
-    def power_bounds(b, t):
-        return pyo.inequality(b.min_power, b.power_in[t], b.rated_power)
+    # Define operational status variable if min operating time, downtime, or min_power is required
+    if min_operating_steps > 0 or min_down_steps > 0 or min_power > 0:
+        model_part.operational_status = pyo.Var(time_steps, within=pyo.Binary)
 
+        # Link power_in and operational_status
+        @model_part.Constraint(time_steps)
+        def power_status_link_lower(b, t):
+            return b.power_in[t] >= b.min_power * b.operational_status[t]
+
+        @model_part.Constraint(time_steps)
+        def power_status_link_upper(b, t):
+            return b.power_in[t] <= b.rated_power * b.operational_status[t]
+
+    # Coefficient of performance (COP) constraint
     @model_part.Constraint(time_steps)
     def cop_constraint(b, t):
         return b.heat_out[t] == b.power_in[t] * b.cop
 
+    # Ramp-up constraint
     @model_part.Constraint(time_steps)
     def ramp_up_constraint(b, t):
-        if t == 0:
+        if t == time_steps[0]:
             return pyo.Constraint.Skip
         return b.power_in[t] - b.power_in[t - 1] <= b.ramp_up
 
+    # Ramp-down constraint
     @model_part.Constraint(time_steps)
     def ramp_down_constraint(b, t):
-        if t == 0:
+        if t == time_steps[0]:
             return pyo.Constraint.Skip
         return b.power_in[t - 1] - b.power_in[t] <= b.ramp_down
 
-    @model_part.Constraint(time_steps)
-    def min_operating_time_constraint(b, t):
-        if t == 0:
-            return pyo.Constraint.Skip
+    # Minimum operating time constraint
+    if min_operating_steps > 0:
 
-        delta_t = t - (t - 1)
-        min_operating_time_units = int(min_operating_time / delta_t)
+        @model_part.Constraint(time_steps)
+        def min_operating_time_constraint(b, t):
+            if t < min_operating_steps - 1:
+                return pyo.Constraint.Skip
 
-        if t < min_operating_time_units:
+            relevant_time_steps = range(t - min_operating_steps + 1, t + 1)
             return (
-                sum(b.operational_status[i] for i in range(t + 1))
-                >= min_operating_time_units * b.operational_status[t]
-            )
-        else:
-            return (
-                sum(
-                    b.operational_status[i]
-                    for i in range(t - min_operating_time_units + 1, t + 1)
-                )
-                >= min_operating_time_units * b.operational_status[t]
+                sum(b.operational_status[i] for i in relevant_time_steps)
+                >= min_operating_steps * b.operational_status[t]
             )
 
-    @model_part.Constraint(time_steps)
-    def min_downtime_constraint(b, t):
-        if t == 0:
-            return pyo.Constraint.Skip
+    # Minimum downtime constraint
+    if min_down_steps > 0:
 
-        delta_t = t - (t - 1)
-        min_downtime_units = int(min_down_time / delta_t)
+        @model_part.Constraint(time_steps)
+        def min_downtime_constraint(b, t):
+            if t < min_down_steps - 1:
+                return pyo.Constraint.Skip
 
-        if t < min_downtime_units:
+            relevant_time_steps = range(t - min_down_steps + 1, t + 1)
             return sum(
-                b.operational_status[i] for i in range(t + 1)
-            ) <= 1 - min_downtime_units * (1 - b.operational_status[t])
-        else:
-            return sum(
-                b.operational_status[i]
-                for i in range(t - min_downtime_units + 1, t + 1)
-            ) <= 1 - min_downtime_units * (1 - b.operational_status[t])
-
-    @model_part.Constraint(time_steps)
-    def operating_cost_constraint(b, t):
-        return b.operating_cost_hp[t] == model.energy_hp_from_grid[t] * model.electricity_price[t]
+                1 - b.operational_status[i] for i in relevant_time_steps
+            ) >= min_down_steps * (1 - b.operational_status[t])
 
     return model_part
 
 
 def create_boiler(
-    model,
-    rated_power,
-    min_power,
-    efficiency,
-    ramp_up,
-    ramp_down,
-    min_operating_time,
-    min_down_time,
-    fuel_type,  # 'electric', 'natural_gas
-    time_steps,
+    model: pyo.ConcreteModel,
+    time_steps: list[int],
+    rated_power: float,
+    efficiency: float = 1.0,
+    min_power: float = 0.0,
+    ramp_up: float | None = None,
+    ramp_down: float | None = None,
+    min_operating_steps: int = 0,
+    min_down_steps: int = 0,
+    fuel_type: str = "electric",  # 'electric' or 'natural_gas'
     **kwargs,
-):
+) -> pyo.Block:
+    """
+    Creates a generic boiler unit within an energy system model.
+
+    Args:
+        model (ConcreteModel): A Pyomo ConcreteModel object representing the optimization model.
+        time_steps (List[int]): Time steps over which the model operates.
+        rated_power (float): Maximum power input to the boiler.
+        efficiency (float, optional): Efficiency of the boiler. Defaults to 1.0.
+        min_power (float, optional): Minimum power input to the boiler. Defaults to 0.0.
+        ramp_up (Optional[float], optional): Maximum allowed increase in power per time step.
+            If None, allows full ramp-up to rated_power. Defaults to None.
+        ramp_down (Optional[float], optional): Maximum allowed decrease in power per time step.
+            If None, allows full ramp-down to rated_power. Defaults to None.
+        min_operating_steps (int, optional): Minimum number of consecutive time steps the boiler must operate.
+            Defaults to 0.
+        min_down_steps (int, optional): Minimum number of consecutive time steps the boiler must remain off.
+            Defaults to 0.
+        fuel_type (str, optional): Type of fuel used by the boiler ('electric' or 'natural_gas'). Defaults to 'electric'.
+        **kwargs: Additional keyword arguments for custom behavior or constraints.
+
+    Returns:
+        model_part (Block): A Pyomo block representing the boiler with variables and constraints.
+    """
+
+    # Set default ramp limits to rated_power if not provided
+    ramp_up = rated_power if ramp_up is None else ramp_up
+    ramp_down = rated_power if ramp_down is None else ramp_down
+
+    # Define block
     model_part = pyo.Block()
+
+    # Define parameters
     model_part.rated_power = pyo.Param(initialize=rated_power)
     model_part.min_power = pyo.Param(initialize=min_power)
     model_part.efficiency = pyo.Param(initialize=efficiency)
     model_part.ramp_up = pyo.Param(initialize=ramp_up)
     model_part.ramp_down = pyo.Param(initialize=ramp_down)
-    model_part.min_operating_time = pyo.Param(initialize=min_operating_time)
-    model_part.min_down_time = pyo.Param(initialize=min_down_time)
 
-    model_part.natural_gas_in = pyo.Var(time_steps, within=pyo.NonNegativeReals)
-    model_part.power_in = pyo.Var(time_steps, within=pyo.NonNegativeReals)
+    # Define variables
+    model_part.power_in = pyo.Var(
+        time_steps, within=pyo.NonNegativeReals, bounds=(0, rated_power)
+    )
+    if fuel_type == "natural_gas":
+        model_part.natural_gas_in = pyo.Var(time_steps, within=pyo.NonNegativeReals)
     model_part.heat_out = pyo.Var(time_steps, within=pyo.NonNegativeReals)
-    model_part.operating_cost_boiler = pyo.Var(time_steps, within=pyo.NonNegativeReals)
-    model_part.operational_status = pyo.Var(time_steps, within=pyo.Binary)
 
-    @model_part.Constraint(time_steps)
-    def power_bounds(b, t):
-        return pyo.inequality(b.min_power, b.power_in[t], b.rated_power)
+    # Define operational status variable if min operating time, downtime, or min_power is required
+    if min_operating_steps > 0 or min_down_steps > 0 or min_power > 0:
+        model_part.operational_status = pyo.Var(time_steps, within=pyo.Binary)
 
+        # Link power_in and operational_status
+        @model_part.Constraint(time_steps)
+        def power_status_link_lower(b, t):
+            return b.power_in[t] >= b.min_power * b.operational_status[t]
+
+        @model_part.Constraint(time_steps)
+        def power_status_link_upper(b, t):
+            return b.power_in[t] <= b.rated_power * b.operational_status[t]
+
+    # Efficiency constraint based on fuel type
     @model_part.Constraint(time_steps)
     def efficiency_constraint(b, t):
         if fuel_type == "electric":
             return b.heat_out[t] == b.power_in[t] * b.efficiency
         elif fuel_type == "natural_gas":
-            # Assuming an equal split for simplicity
             return b.heat_out[t] == b.natural_gas_in[t] * b.efficiency
+        else:
+            raise ValueError(
+                "Unsupported fuel_type. Choose 'electric' or 'natural_gas'."
+            )
 
+    # Ramp-up constraint
     @model_part.Constraint(time_steps)
     def ramp_up_constraint(b, t):
-        if t == 0:
+        if t == time_steps[0]:
             return pyo.Constraint.Skip
-        return b.heat_out[t] - b.heat_out[t - 1] <= b.ramp_up
+        return b.power_in[t] - b.power_in[t - 1] <= b.ramp_up
 
+    # Ramp-down constraint
     @model_part.Constraint(time_steps)
     def ramp_down_constraint(b, t):
-        if t == 0:
+        if t == time_steps[0]:
             return pyo.Constraint.Skip
-        return b.heat_out[t - 1] - b.heat_out[t] <= b.ramp_down
+        return b.power_in[t - 1] - b.power_in[t] <= b.ramp_down
 
-    @model_part.Constraint(time_steps)
-    def min_operating_time_constraint(b, t):
-        if t == 0:
-            return pyo.Constraint.Skip
+    # Minimum operating time constraint
+    if min_operating_steps > 0:
 
-        delta_t = t - (t - 1)
-        min_operating_time_units = int(min_operating_time / delta_t)
+        @model_part.Constraint(time_steps)
+        def min_operating_time_constraint(b, t):
+            if t < min_operating_steps - 1:
+                return pyo.Constraint.Skip
 
-        if t < min_operating_time_units:
+            relevant_time_steps = range(t - min_operating_steps + 1, t + 1)
             return (
-                sum(b.operational_status[i] for i in range(t + 1))
-                >= min_operating_time_units * b.operational_status[t]
-            )
-        else:
-            return (
-                sum(
-                    b.operational_status[i]
-                    for i in range(t - min_operating_time_units + 1, t + 1)
-                )
-                >= min_operating_time_units * b.operational_status[t]
+                sum(b.operational_status[i] for i in relevant_time_steps)
+                >= min_operating_steps * b.operational_status[t]
             )
 
-    @model_part.Constraint(time_steps)
-    def min_downtime_constraint(b, t):
-        if t == 0:
-            return pyo.Constraint.Skip
+    # Minimum downtime constraint
+    if min_down_steps > 0:
 
-        delta_t = t - (t - 1)
-        min_downtime_units = int(min_down_time / delta_t)
+        @model_part.Constraint(time_steps)
+        def min_downtime_constraint(b, t):
+            if t < min_down_steps - 1:
+                return pyo.Constraint.Skip
 
-        if t < min_downtime_units:
+            relevant_time_steps = range(t - min_down_steps + 1, t + 1)
             return sum(
-                b.operational_status[i] for i in range(t + 1)
-            ) <= 1 - min_downtime_units * (1 - b.operational_status[t])
-        else:
-            return sum(
-                b.operational_status[i]
-                for i in range(t - min_downtime_units + 1, t + 1)
-            ) <= 1 - min_downtime_units * (1 - b.operational_status[t])
-
-    @model_part.Constraint(time_steps)
-    def operating_cost_constraint(b, t):
-        if fuel_type == "electric":
-            return (
-                b.operating_cost_boiler[t] == model.energy_boiler_from_grid[t] * model.electricity_price[t]
-            )
-        elif fuel_type == "natural_gas":
-            return (
-                b.operating_cost_boiler[t] == b.power_in[t] * model.natural_gas_price[t]
-            )
-
-    return model_part
-
-
-def create_thermal_storage(
-    model,
-    max_capacity,
-    min_capacity,
-    initial_soc,
-    storage_loss_rate,
-    charge_loss_rate,
-    discharge_loss_rate,
-    time_steps,
-    **kwargs,
-):
-    """
-    Represents a Direct Reduced Iron (DRI) storage unit.
-
-    Args:
-        model: A Pyomo ConcreteModel object representing the optimization model.
-        id: A unique identifier for the thermal storage unit.
-        max_capacity: The maximum capacity of the thermal storage unit.
-        min_capacity: The minimum capacity of the thermal storage unit.
-        initial_soc: The initial state of charge (SOC) of the thermal storage unit.
-        storage_loss_rate: The rate of thermal loss due to storage over time.
-        charge_loss_rate: The rate of thermal loss during charging.
-        discharge_loss_rate: The rate of thermal loss during discharging.
-
-    Constraints:
-        storage_min_capacity_dri_constraint: Ensures the SOC of the thermal storage unit stays above the minimum capacity.
-        storage_max_capacity_dri_constraint: Ensures the SOC of the thermal storage unit stays below the maximum capacity.
-        energy_in_max_capacity_dri_constraint: Limits the charging of the thermal storage unit to its maximum capacity.
-        energy_out_max_capacity_dri_constraint: Limits the discharging of the thermal storage unit to its maximum capacity.
-        energy_in_uniformity_dri_constraint: Ensures uniformity in charging the thermal storage unit.
-        energy_out_uniformity_dri_constraint: Ensures uniformity in discharging the thermal storage unit.
-        storage_capacity_change_dri_constraint: Defines the change in SOC of the thermal storage unit over time.
-    """
-    model_part = pyo.Block()
-    model_part.max_thermal_capacity = pyo.Param(initialize=max_capacity)
-    model_part.min_thermal_capacity = pyo.Param(initialize=min_capacity)
-    model_part.initial_soc_thermal = pyo.Param(initialize=initial_soc)
-    model_part.storage_loss_rate_thermal = pyo.Param(initialize=storage_loss_rate)
-    model_part.charge_loss_rate_thermal = pyo.Param(initialize=charge_loss_rate)
-    model_part.discharge_loss_rate_thermal = pyo.Param(initialize=discharge_loss_rate)
-
-    # define variables
-    model_part.soc_thermal = pyo.Var(time_steps, within=pyo.NonNegativeReals)
-    model_part.uniformity_indicator_thermal = pyo.Var(time_steps, within=pyo.Binary)
-
-    # Define the variables for power and hydrogen
-    model_part.charge_thermal = pyo.Var(time_steps, within=pyo.NonNegativeReals)
-    model_part.discharge_thermal = pyo.Var(time_steps, within=pyo.NonNegativeReals)
-
-    # define constraints
-
-    @model_part.Constraint(time_steps)
-    def storage_min_capacity_thermal_constraint(b, t):
-        """
-        Ensures the SOC of the thermal storage unit stays above the minimum capacity.
-        """
-        return b.soc_thermal[t] >= b.min_thermal_capacity
-
-    @model_part.Constraint(time_steps)
-    def storage_max_capacity_thermal_constraint(b, t):
-        """
-        Ensures the SOC of the thermal storage unit stays below the maximum capacity.
-        """
-        return b.soc_thermal[t] <= b.max_thermal_capacity
-
-    @model_part.Constraint(time_steps)
-    def energy_in_max_capacity_thermal_constraint(b, t):
-        """
-        Limits the charging of the thermal storage unit to its maximum capacity.
-        """
-        return b.charge_thermal[t] <= b.max_thermal_capacity
-
-    @model_part.Constraint(time_steps)
-    def energy_out_max_capacity_thermal_constraint(b, t):
-        """
-        Limits the discharging of the thermal storage unit to its maximum capacity.
-        """
-        return b.discharge_thermal[t] <= b.max_thermal_capacity
-
-    @model_part.Constraint(time_steps)
-    def energy_in_uniformity_thermal_constraint(b, t):
-        """
-        Ensures uniformity in charging the thermal storage unit.
-        """
-        return (
-            b.charge_thermal[t]
-            <= b.max_thermal_capacity * b.uniformity_indicator_thermal[t]
-        )
-
-    @model_part.Constraint(time_steps)
-    def energy_out_uniformity_thermal_constraint(b, t):
-        """
-        Ensures uniformity in discharging the thermal storage unit.
-        """
-        return b.discharge_thermal[t] <= b.max_thermal_capacity * (
-            1 - b.uniformity_indicator_thermal[t]
-        )
-
-    @model_part.Constraint(time_steps)
-    def storage_capacity_change_thermal_constraint(b, t):
-        """
-        Defines the change in SOC of the thermal storage unit over time.
-        """
-        return b.soc_thermal[t] == (
-            (
-                (b.soc_thermal[t - 1] if t > 0 else b.initial_soc_thermal)
-                * (1 - b.storage_loss_rate_thermal)
-            )
-            + ((1 - b.charge_loss_rate_thermal) * b.charge_thermal[t])
-            - ((1 + b.discharge_loss_rate_thermal) * b.discharge_thermal[t])
-        )
+                1 - b.operational_status[i] for i in relevant_time_steps
+            ) >= min_down_steps * (1 - b.operational_status[t])
 
     return model_part
 
 
 def create_ev(
-    model,
-    max_capacity,
-    min_capacity,
-    max_charging_rate,
-    initial_soc,
-    ramp_up,
-    ramp_down,
-    availability_df,
-    charging_profile,
-    time_steps,
+    model: pyo.ConcreteModel,
+    time_steps: list[int],
+    max_capacity: float,
+    min_capacity: float,
+    max_power_charge: float,
+    max_power_discharge: float | None = None,
+    efficiency_charge: float = 1.0,
+    efficiency_discharge: float = 1.0,
+    initial_soc: float = 1.0,
+    ramp_up: float | None = None,
+    ramp_down: float | None = None,
+    availability_profile: pd.Series | None = None,
+    charging_profile: pd.Series | None = None,
     **kwargs,
-):
+) -> pyo.Block:
     """
-    Represents an Electric Vehicle (EV) unit.
+    Creates an Electric Vehicle (EV) unit by extending a generic storage model with EV-specific constraints.
 
     Args:
-        model: A Pyomo ConcreteModel object representing the optimization model.
-        max_capacity: The maximum capacity of the EV battery.
-        min_capacity: The minimum capacity of the EV battery.
-        max_charging_rate: The maximum charging rate of the ev.
-        initial_soc: The initial state of charge (SOC) of the EV battery.
-        ramp_up: The ramp-up rate for charging.
-        ramp_down: The ramp-down rate for charging.
-        availability_periods: A dictionary with time steps as keys and 1/0 values indicating availability.
-        charging_profile: A predefined charging profile (optional).
-        time_steps: The time steps in the optimization model.
-        index: The pd.DatetimeIndex corresponding to the time steps.
+        model (pyo.ConcreteModel): A Pyomo ConcreteModel object representing the optimization model.
+        time_steps (list[int]): Time steps in the optimization model.
+        max_capacity (float): The maximum capacity of the EV battery (MWh).
+        min_capacity (float): The minimum capacity of the EV battery (MWh).
+        max_power_charge (float): The maximum charging power of the EV (MW).
+        max_power_discharge (float | None, optional): The maximum discharging power of the EV (MW).
+            If None, defaults to `max_power_charge`. Defaults to None.
+        efficiency_charge (float, optional): Charging efficiency of the EV. Defaults to 1.0.
+        efficiency_discharge (float, optional): Discharging efficiency of the EV. Defaults to 1.0.
+        initial_soc (float, optional): Initial state of charge (SOC) as a fraction of `max_capacity`. Defaults to 1.0.
+        ramp_up (float | None, optional): Maximum increase in charging power per time step (MW).
+            If None, no ramp-up constraint is applied. Defaults to None.
+        ramp_down (float | None, optional): Maximum decrease in charging power per time step (MW).
+            If None, no ramp-down constraint is applied. Defaults to None.
+        availability_profile (pd.Series | None, optional): Series indicating EV availability with time_steps as indices
+            and binary values (1 available, 0 unavailable). Defaults to None.
+        charging_profile (pd.Series | None, optional): Series indicating predefined charging profile.
+            If given, the EV will follow this profile instead of optimizing charging. Defaults to None.
+        **kwargs: Additional keyword arguments for custom behavior or constraints.
+
+    Returns:
+        pyo.Block: A Pyomo block representing the EV unit with variables and constraints.
+
+    Constraints:
+        - Ensures SOC stays between `min_capacity` and `max_capacity`.
+        - Limits charging and discharging power to specified maxima.
+        - Tracks SOC changes over time based on charging, discharging, and storage loss.
+        - Limits ramp-up and ramp-down rates if specified.
+        - Enforces charging profiles if specified.
+        - Respects EV availability periods if specified.
     """
-    model_part = pyo.Block()
-    # define parameters
-    model_part.max_ev_battery_capacity = pyo.Param(initialize=max_capacity)
-    model_part.min_ev_battery_capacity = pyo.Param(initialize=min_capacity)
-    model_part.max_charging_rate = pyo.Param(initialize=max_charging_rate)
-    model_part.initial_ev_battery_soc = pyo.Param(initialize=initial_soc)
-    model_part.ramp_up_ev = pyo.Param(initialize=ramp_up)
-    model_part.ramp_down_ev = pyo.Param(initialize=ramp_down)
-    if bool(strtobool(charging_profile)) and "load_profile" in kwargs:
-        model_part.load_profile_ev = pyo.Param(
-            time_steps,
-            initialize=kwargs["load_profile"]
-        )
 
-    # define variables
-    model_part.ev_battery_soc = pyo.Var(time_steps, within=pyo.NonNegativeReals)
-    model_part.charge_ev = pyo.Var(time_steps, within=pyo.NonNegativeReals)
-    model_part.operating_cost_ev = pyo.Var(time_steps, within=pyo.NonNegativeReals)
+    # Set default power limits to max_power_charge if not provided
+    max_power_discharge = (
+        max_power_charge if max_power_discharge is None else max_power_discharge
+    )
 
-    # define constraints
-    if bool(strtobool(charging_profile)):
+    # Initialize the generic storage with EV-specific parameters
+    model_part = create_generic_storage(
+        model=model,
+        time_steps=time_steps,
+        max_capacity=max_capacity,
+        min_capacity=min_capacity,
+        max_power_charge=max_power_charge,
+        max_power_discharge=max_power_discharge,
+        efficiency_charge=efficiency_charge,
+        efficiency_discharge=efficiency_discharge,
+        initial_soc=initial_soc,
+        ramp_up=ramp_up,
+        ramp_down=ramp_down,
+        **kwargs,
+    )
+
+    # Apply availability profile constraints if provided
+    if availability_profile is not None:
+        # Ensure that availability_profile is indexed by time_steps
+        if not isinstance(availability_profile, pd.Series):
+            raise TypeError("`availability_profile` must be a pandas Series.")
+        if not all(t in availability_profile.index for t in time_steps):
+            raise ValueError(
+                "All `time_steps` must be present in `availability_profile` index."
+            )
+
+        @model_part.Constraint(time_steps)
+        def discharge_availability_constraint(b, t):
+            """
+            Ensures the EV is only discharged during available periods.
+            """
+            availability = availability_profile[t]
+            return b.discharge[t] <= availability * b.max_power_discharge
+
+        @model_part.Constraint(time_steps)
+        def charge_availability_constraint(b, t):
+            """
+            Ensures the EV is only charged during available periods.
+            """
+            availability = availability_profile[t]
+            return b.charge[t] <= availability * b.max_power_charge
+
+    # Apply predefined charging profile constraints if provided
+    if charging_profile is not None:
+        # Ensure that charging_profile is indexed by time_steps
+        if not isinstance(charging_profile, pd.Series):
+            raise TypeError("`charging_profile` must be a pandas Series.")
+        if not all(t in charging_profile.index for t in time_steps):
+            raise ValueError(
+                "All `time_steps` must be present in `charging_profile` index."
+            )
 
         @model_part.Constraint(time_steps)
         def charging_profile_constraint(b, t):
             """
-            Ensures the EV follows the predefined charging profile.
+            Enforces the predefined charging profile.
             """
-            return b.charge_ev[t] == model_part.load_profile_ev[t] * availability_df.iloc[t]
-    else:
-
-        @model_part.Constraint(time_steps)
-        def ramp_up_constraint(b, t):
-            """
-            Limits the ramp-up rate of the EV charging.
-            """
-            if t == 0:
-                return pyo.Constraint.Skip
-            return b.charge_ev[t] - b.charge_ev[t - 1] <= b.ramp_up_ev
-
-        @model_part.Constraint(time_steps)
-        def max_charging_rate_constraint(b, t):
-            """
-            Limits the charging rate of the EV charging.
-            """
-            return b.charge_ev[t] <= b.max_charging_rate
-
-        @model_part.Constraint(time_steps)
-        def ramp_down_constraint(b, t):
-            """
-            Limits the ramp-down rate of the EV charging.
-            """
-            if t == 0:
-                return pyo.Constraint.Skip
-            return b.charge_ev[t - 1] - b.charge_ev[t] <= b.ramp_down_ev
-
-        @model_part.Constraint(time_steps)
-        def availability_ev_constraint(b, t):
-            """
-            Ensures the EV is only charged within the availability periods.
-            """
-            return b.charge_ev[t] <= availability_df.iloc[t] * b.ramp_up_ev
-
-    @model_part.Constraint(time_steps)
-    def ev_battery_soc_limit_upper(b, t):
-        """
-        Ensures the SOC of the EV stays below the maximum capacity.
-        """
-        return b.ev_battery_soc[t] <= b.max_ev_battery_capacity
-
-    @model_part.Constraint(time_steps)
-    def ev_battery_soc_limit_lower(b, t):
-        """
-        Ensures the SOC of the EV stays above the minimum capacity.
-        """
-        return b.ev_battery_soc[t] >= b.min_ev_battery_capacity
-
-    @model_part.Constraint(time_steps)
-    def ev_battery_soc_change_constraint(b, t):
-        """
-        Defines the change in SOC of the EV over time.
-        """
-        return b.ev_battery_soc[t] == (
-            (b.ev_battery_soc[t - 1] if (t > 0 and availability_df.iloc[t] == 1) else b.initial_ev_battery_soc)
-            + b.charge_ev[t]
-        )
-
-    @model_part.Constraint(time_steps)
-    def operating_cost_ev_constraint(b, t):
-        """
-        Calculates the operating cost of the ev based on the electricity price.
-
-        """
-        return b.operating_cost_ev[t] == model.charge_ev_from_grid[t] * model.electricity_price[t]
+            return b.charge[t] == charging_profile[t]
 
     return model_part
 
 
-def create_storage(
-    model,
-    max_capacity,
-    min_capacity,
-    initial_soc,
-    storage_loss_rate,
-    charge_loss_rate,
-    discharge_loss_rate,
-    time_steps,
+def create_generic_storage(
+    model: pyo.ConcreteModel,
+    time_steps: list[int],
+    max_capacity: float,
+    min_capacity: float = 0.0,
+    max_power_charge: float | None = None,
+    max_power_discharge: float | None = None,
+    efficiency_charge: float = 1.0,
+    efficiency_discharge: float = 1.0,
+    initial_soc: float = 1.0,
+    ramp_up: float | None = None,
+    ramp_down: float | None = None,
+    storage_loss_rate: float = 0.0,
     **kwargs,
-):
+) -> pyo.Block:
     """
-    Represents a generic energy storage unit.
+    Creates a generic storage unit (e.g., battery) within an energy system model.
 
     Args:
-        model: A Pyomo ConcreteModel object representing the optimization model.
-        id (str): A unique identifier for the storage unit.
-        max_capacity (float): The maximum storage capacity of the unit.
-        min_capacity (float): The minimum storage capacity of the unit.
-        initial_soc (float): The initial state of charge (SOC) of the storage unit.
-        storage_loss_rate (float): The rate of energy loss due to storage inefficiency.
-        charge_loss_rate (float): The rate of energy loss during charging.
-        discharge_loss_rate (float): The rate of energy loss during discharging.
-        **kwargs: Additional keyword arguments.
+        model (pyo.ConcreteModel): A Pyomo ConcreteModel object representing the optimization model.
+        time_steps (list[int]): Time steps over which the model operates.
+        max_capacity (float): Maximum energy storage capacity of the storage unit.
+        min_capacity (float, optional): Minimum allowable state of charge (SOC). Defaults to 0.0.
+        max_power_charge (float | None, optional): Maximum charging power of the storage unit.
+            If None, defaults to max_capacity. Defaults to None.
+        max_power_discharge (float | None, optional): Maximum discharging power of the storage unit.
+            If None, defaults to max_capacity. Defaults to None.
+        efficiency_charge (float, optional): Efficiency of the charging process. Defaults to 1.0.
+        efficiency_discharge (float, optional): Efficiency of the discharging process. Defaults to 1.0.
+        initial_soc (float, optional): Initial state of charge as a fraction of max_capacity.
+            Defaults to 1.0.
+        ramp_up (float | None, optional): Maximum increase in charging/discharging power per time step.
+            If None, no ramp-up constraint is applied. Defaults to None.
+        ramp_down (float | None, optional): Maximum decrease in charging/discharging power per time step.
+            If None, no ramp-down constraint is applied. Defaults to None.
+        storage_loss_rate (float, optional): Fraction of energy lost per time step due to storage inefficiencies.
+            Defaults to 0.0.
+        **kwargs: Additional keyword arguments for custom behavior or constraints.
+
+    Returns:
+        pyo.Block: A Pyomo block representing the storage system with variables and constraints.
 
     Constraints:
-        storage_min_capacity_constraint: Ensures the SOC of the storage unit stays above the minimum capacity.
-        storage_max_capacity_constraint: Ensures the SOC of the storage unit stays below the maximum capacity.
-        energy_in_max_capacity_constraint: Limits the charging of the storage unit to its maximum capacity.
-        energy_out_max_capacity_constraint: Limits the discharging of the storage unit to its maximum capacity.
-        energy_in_uniformity_constraint: Ensures uniformity in charging the storage unit.
-        energy_out_uniformity_constraint: Ensures uniformity in discharging the storage unit.
-        storage_capacity_change_constraint: Defines the change in SOC of the storage unit over time.
+        - Ensures SOC stays between min_capacity and max_capacity.
+        - Limits charging and discharging power to specified maxima.
+        - Tracks SOC changes over time based on charging, discharging, and storage loss.
     """
+
+    # Set default power limits to max_capacity if not provided
+    max_power_charge = max_capacity if max_power_charge is None else max_power_charge
+    max_power_discharge = (
+        max_capacity if max_power_discharge is None else max_power_discharge
+    )
+
+    # Define block
     model_part = pyo.Block()
-    # define parameters
+
+    # Define parameters
     model_part.max_capacity = pyo.Param(initialize=max_capacity)
     model_part.min_capacity = pyo.Param(initialize=min_capacity)
-    model_part.initial_soc = pyo.Param(initialize=initial_soc)
+    model_part.max_power_charge = pyo.Param(initialize=max_power_charge)
+    model_part.max_power_discharge = pyo.Param(initialize=max_power_discharge)
+    model_part.efficiency_charge = pyo.Param(initialize=efficiency_charge)
+    model_part.efficiency_discharge = pyo.Param(initialize=efficiency_discharge)
+    model_part.initial_soc = pyo.Param(initialize=initial_soc * max_capacity)
+    model_part.ramp_up = pyo.Param(initialize=ramp_up)
+    model_part.ramp_down = pyo.Param(initialize=ramp_down)
     model_part.storage_loss_rate = pyo.Param(initialize=storage_loss_rate)
-    model_part.charge_loss_rate = pyo.Param(initialize=charge_loss_rate)
-    model_part.discharge_loss_rate = pyo.Param(initialize=discharge_loss_rate)
 
-    # define variables
-    model_part.soc = pyo.Var(time_steps, within=pyo.NonNegativeReals)
-    model_part.uniformity_indicator = pyo.Var(time_steps, within=pyo.Binary)
-    model_part.charge = pyo.Var(time_steps, within=pyo.NonNegativeReals)
-    model_part.discharge = pyo.Var(time_steps, within=pyo.NonNegativeReals)
+    # Define variables
+    model_part.soc = pyo.Var(
+        time_steps,
+        within=pyo.NonNegativeReals,
+        bounds=(min_capacity, max_capacity),
+        doc="State of Charge at each time step",
+    )
+    model_part.charge = pyo.Var(
+        time_steps,
+        within=pyo.NonNegativeReals,
+        bounds=(0, max_power_charge),
+        doc="Charging power at each time step",
+    )
+    model_part.discharge = pyo.Var(
+        time_steps,
+        within=pyo.NonNegativeReals,
+        bounds=(0, max_power_discharge),
+        doc="Discharging power at each time step",
+    )
 
-    # define constraints
-    """
-    Ensures the SOC of the storage unit stays above the minimum capacity.
-    """
-
+    # Define SOC dynamics with energy loss and efficiency
     @model_part.Constraint(time_steps)
-    def storage_min_capacity_constraint(b, t):
-        return b.soc[t] >= b.min_capacity
-
-    """
-    Ensures the SOC of the storage unit stays below the maximum capacity.
-    """
-
-    @model_part.Constraint(time_steps)
-    def storage_max_capacity_constraint(b, t):
-        return b.soc[t] <= b.max_capacity
-
-    """
-    Limits the charging of the storage unit to its maximum capacity.
-    """
-
-    @model_part.Constraint(time_steps)
-    def energy_in_max_capacity_constraint(b, t):
-        return b.charge[t] <= b.max_capacity
-
-    """
-    Limits the discharging of the storage unit to its maximum capacity.
-    """
-
-    @model_part.Constraint(time_steps)
-    def energy_out_max_capacity_constraint(b, t):
-        return b.discharge[t] <= b.max_capacity
-
-    """
-    Ensures uniformity in charging the storage unit.
-    """
-
-    @model_part.Constraint(time_steps)
-    def energy_in_uniformity_constraint(b, t):
-        return b.charge[t] <= b.max_capacity * b.uniformity_indicator[t]
-
-    """
-    Ensures uniformity in discharging the storage unit.
-    """
-
-    @model_part.Constraint(time_steps)
-    def energy_out_uniformity_constraint(b, t):
-        return b.discharge[t] <= b.max_capacity * (1 - b.uniformity_indicator[t])
-
-    """
-    Defines the change in SOC of the storage unit over time.
-    """
-
-    @model_part.Constraint(time_steps)
-    def storage_capacity_change_constraint(b, t):
+    def soc_balance_rule(b, t):
+        if t == time_steps[0]:
+            prev_soc = b.initial_soc
+        else:
+            prev_soc = b.soc[t - 1]
         return b.soc[t] == (
-            ((b.soc[t - 1] if t > 0 else b.initial_soc) * (1 - b.storage_loss_rate))
-            + ((1 - b.charge_loss_rate) * b.charge[t])
-            - ((1 + b.discharge_loss_rate) * b.discharge[t])
+            prev_soc
+            + b.efficiency_charge * b.charge[t]
+            - (1 / b.efficiency_discharge) * b.discharge[t]
+            - b.storage_loss_rate * prev_soc
         )
 
-    return model_part
+    # Apply ramp-up constraints if ramp_up is specified
+    if ramp_up is not None:
 
+        @model_part.Constraint(time_steps)
+        def charge_ramp_up_constraint(b, t):
+            """
+            Limits the ramp-up rate of EV charging.
+            """
+            if t == time_steps[0]:
+                return pyo.Constraint.Skip
+            return b.charge[t] - b.charge[t - 1] <= ramp_up
 
-def create_dri_storage(
-    model,
-    max_capacity,
-    min_capacity,
-    initial_soc,
-    storage_loss_rate,
-    charge_loss_rate,
-    discharge_loss_rate,
-    time_steps,
-    **kwargs,
-):
-    """
-    Represents a Direct Reduced Iron (DRI) storage unit.
+        @model_part.Constraint(time_steps)
+        def discharge_ramp_up_constraint(b, t):
+            """
+            Limits the ramp-up rate of EV discharging.
+            """
+            if t == time_steps[0]:
+                return pyo.Constraint.Skip
+            return b.discharge[t] - b.discharge[t - 1] <= ramp_up
 
-    Args:
-        model: A Pyomo ConcreteModel object representing the optimization model.
-        id: A unique identifier for the DRI storage unit.
-        max_capacity: The maximum capacity of the DRI storage unit.
-        min_capacity: The minimum capacity of the DRI storage unit.
-        initial_soc: The initial state of charge (SOC) of the DRI storage unit.
-        storage_loss_rate: The rate of DRI loss due to storage over time.
-        charge_loss_rate: The rate of DRI loss during charging.
-        discharge_loss_rate: The rate of DRI loss during discharging.
+    # Apply ramp-down constraints if ramp_down is specified
+    if ramp_down is not None:
 
-    Constraints:
-        storage_min_capacity_dri_constraint: Ensures the SOC of the DRI storage unit stays above the minimum capacity.
-        storage_max_capacity_dri_constraint: Ensures the SOC of the DRI storage unit stays below the maximum capacity.
-        energy_in_max_capacity_dri_constraint: Limits the charging of the DRI storage unit to its maximum capacity.
-        energy_out_max_capacity_dri_constraint: Limits the discharging of the DRI storage unit to its maximum capacity.
-        energy_in_uniformity_dri_constraint: Ensures uniformity in charging the DRI storage unit.
-        energy_out_uniformity_dri_constraint: Ensures uniformity in discharging the DRI storage unit.
-        storage_capacity_change_dri_constraint: Defines the change in SOC of the DRI storage unit over time.
-    """
-    model_part = pyo.Block()
-    model_part.max_capacity_dri = pyo.Param(initialize=max_capacity)
-    model_part.min_capacity_dri = pyo.Param(initialize=min_capacity)
-    model_part.initial_soc_dri = pyo.Param(initialize=initial_soc)
-    model_part.storage_loss_rate_dri = pyo.Param(initialize=storage_loss_rate)
-    model_part.charge_loss_rate_dri = pyo.Param(initialize=charge_loss_rate)
-    model_part.discharge_loss_rate_dri = pyo.Param(initialize=discharge_loss_rate)
+        @model_part.Constraint(time_steps)
+        def charge_ramp_down_constraint(b, t):
+            """
+            Limits the ramp-down rate of EV charging.
+            """
+            if t == time_steps[0]:
+                return pyo.Constraint.Skip
+            return b.charge[t - 1] - b.charge[t] <= ramp_down
 
-    # define variables
-    model_part.soc_dri = pyo.Var(time_steps, within=pyo.NonNegativeReals)
-    model_part.uniformity_indicator_dri = pyo.Var(time_steps, within=pyo.Binary)
-
-    # Define the variables for power and hydrogen
-    model_part.charge_dri = pyo.Var(time_steps, within=pyo.NonNegativeReals)
-    model_part.discharge_dri = pyo.Var(time_steps, within=pyo.NonNegativeReals)
-
-    # define constraints
-
-    @model_part.Constraint(time_steps)
-    def storage_min_capacity_dri_constraint(b, t):
-        """
-        Ensures the SOC of the DRI storage unit stays above the minimum capacity.
-        """
-        return b.soc_dri[t] >= b.min_capacity_dri
-
-    @model_part.Constraint(time_steps)
-    def storage_max_capacity_dri_constraint(b, t):
-        """
-        Ensures the SOC of the DRI storage unit stays below the maximum capacity.
-        """
-        return b.soc_dri[t] <= b.max_capacity_dri
-
-    @model_part.Constraint(time_steps)
-    def energy_in_max_capacity_dri_constraint(b, t):
-        """
-        Limits the charging of the DRI storage unit to its maximum capacity.
-        """
-        return b.charge_dri[t] <= b.max_capacity_dri
-
-    @model_part.Constraint(time_steps)
-    def energy_out_max_capacity_dri_constraint(b, t):
-        """
-        Limits the discharging of the DRI storage unit to its maximum capacity.
-        """
-        return b.discharge_dri[t] <= b.max_capacity_dri
-
-    @model_part.Constraint(time_steps)
-    def energy_in_uniformity_dri_constraint(b, t):
-        """
-        Ensures uniformity in charging the DRI storage unit.
-        """
-        return b.charge_dri[t] <= b.max_capacity_dri * b.uniformity_indicator_dri[t]
-
-    @model_part.Constraint(time_steps)
-    def energy_out_uniformity_dri_constraint(b, t):
-        """
-        Ensures uniformity in discharging the DRI storage unit.
-        """
-        return b.discharge_dri[t] <= b.max_capacity_dri * (
-            1 - b.uniformity_indicator_dri[t]
-        )
-
-    @model_part.Constraint(time_steps)
-    def storage_capacity_change_dri_constraint(b, t):
-        """
-        Defines the change in SOC of the DRI storage unit over time.
-        """
-        return b.soc_dri[t] == (
-            (
-                (b.soc_dri[t - 1] if t > 0 else b.initial_soc_dri)
-                * (1 - b.storage_loss_rate_dri)
-            )
-            + ((1 - b.charge_loss_rate_dri) * b.charge_dri[t])
-            - ((1 + b.discharge_loss_rate_dri) * b.discharge_dri[t])
-        )
+        @model_part.Constraint(time_steps)
+        def discharge_ramp_down_constraint(b, t):
+            """
+            Limits the ramp-down rate of EV discharging.
+            """
+            if t == time_steps[0]:
+                return pyo.Constraint.Skip
+            return b.discharge[t - 1] - b.discharge[t] <= ramp_down
 
     return model_part
 
@@ -843,7 +693,7 @@ def create_electrolyser(
     return model_part
 
 
-def create_driplant(
+def create_dri_plant(
     model,
     specific_hydrogen_consumption,
     specific_natural_gas_consumption,
@@ -1224,411 +1074,57 @@ def create_electric_arc_furnance(
     return model_part
 
 
-def create_hydrogen_storage(
-    model,
-    max_capacity,
-    min_capacity,
-    initial_soc,
-    storage_loss_rate,
-    charge_loss_rate,
-    discharge_loss_rate,
-    time_steps,
-    **kwargs,
-):
-    """
-    Represents a generic energy storage unit.
-
-    Args:
-        model: A Pyomo ConcreteModel object representing the optimization model.
-        id (str): A unique identifier for the storage unit.
-        max_capacity (float): The maximum storage capacity of the unit.
-        min_capacity (float): The minimum storage capacity of the unit.
-        initial_soc (float): The initial state of charge (SOC) of the storage unit.
-        storage_loss_rate (float): The rate of energy loss due to storage inefficiency.
-        charge_loss_rate (float): The rate of energy loss during charging.
-        discharge_loss_rate (float): The rate of energy loss during discharging.
-        **kwargs: Additional keyword arguments.
-
-    Constraints:
-        storage_min_capacity_constraint: Ensures the SOC of the storage unit stays above the minimum capacity.
-        storage_max_capacity_constraint: Ensures the SOC of the storage unit stays below the maximum capacity.
-        energy_in_max_capacity_constraint: Limits the charging of the storage unit to its maximum capacity.
-        energy_out_max_capacity_constraint: Limits the discharging of the storage unit to its maximum capacity.
-        energy_in_uniformity_constraint: Ensures uniformity in charging the storage unit.
-        energy_out_uniformity_constraint: Ensures uniformity in discharging the storage unit.
-        storage_capacity_change_constraint: Defines the change in SOC of the storage unit over time.
-    """
-    model_part = pyo.Block()
-    # define parameters
-    model_part.max_capacity = pyo.Param(initialize=max_capacity)
-    model_part.min_capacity = pyo.Param(initialize=min_capacity)
-    model_part.initial_soc = pyo.Param(initialize=initial_soc)
-    model_part.storage_loss_rate = pyo.Param(initialize=storage_loss_rate)
-    model_part.charge_loss_rate = pyo.Param(initialize=charge_loss_rate)
-    model_part.discharge_loss_rate = pyo.Param(initialize=discharge_loss_rate)
-
-    # define variables
-    model_part.soc = pyo.Var(time_steps, within=pyo.NonNegativeReals)
-    model_part.uniformity_indicator = pyo.Var(time_steps, within=pyo.Binary)
-    model_part.charge = pyo.Var(time_steps, within=pyo.NonNegativeReals)
-    model_part.discharge = pyo.Var(time_steps, within=pyo.NonNegativeReals)
-
-    # define constraints
-    """
-    Ensures the SOC of the storage unit stays above the minimum capacity.
-    """
-
-    @model_part.Constraint(time_steps)
-    def storage_min_capacity_constraint(b, t):
-        return b.soc[t] >= b.min_capacity
-
-    """
-    Ensures the SOC of the storage unit stays below the maximum capacity.
-    """
-
-    @model_part.Constraint(time_steps)
-    def storage_max_capacity_constraint(b, t):
-        return b.soc[t] <= b.max_capacity
-
-    """
-    Limits the charging of the storage unit to its maximum capacity.
-    """
-
-    @model_part.Constraint(time_steps)
-    def energy_in_max_capacity_constraint(b, t):
-        return b.charge[t] <= b.max_capacity
-
-    """
-    Limits the discharging of the storage unit to its maximum capacity.
-    """
-
-    @model_part.Constraint(time_steps)
-    def energy_out_max_capacity_constraint(b, t):
-        return b.discharge[t] <= b.max_capacity
-
-    """
-    Ensures uniformity in charging the storage unit.
-    """
-
-    @model_part.Constraint(time_steps)
-    def energy_in_uniformity_constraint(b, t):
-        return b.charge[t] <= b.max_capacity * b.uniformity_indicator[t]
-
-    """
-    Ensures uniformity in discharging the storage unit.
-    """
-
-    @model_part.Constraint(time_steps)
-    def energy_out_uniformity_constraint(b, t):
-        return b.discharge[t] <= b.max_capacity * (1 - b.uniformity_indicator[t])
-
-    """
-    Defines the change in SOC of the storage unit over time.
-    """
-
-    @model_part.Constraint(time_steps)
-    def storage_capacity_change_constraint(b, t):
-        return b.soc[t] == (
-            ((b.soc[t - 1] if t > 0 else b.initial_soc) * (1 - b.storage_loss_rate))
-            + ((1 - b.charge_loss_rate) * b.charge[t])
-            - ((1 + b.discharge_loss_rate) * b.discharge[t])
-        )
-
-    return model_part
-
-
-def create_dristorage(
-    model,
-    max_capacity,
-    min_capacity,
-    initial_soc,
-    storage_loss_rate,
-    charge_loss_rate,
-    discharge_loss_rate,
-    time_steps,
-    **kwargs,
-):
-    """
-    Represents a Direct Reduced Iron (DRI) storage unit.
-
-    Args:
-        model: A Pyomo ConcreteModel object representing the optimization model.
-        id: A unique identifier for the DRI storage unit.
-        max_capacity: The maximum capacity of the DRI storage unit.
-        min_capacity: The minimum capacity of the DRI storage unit.
-        initial_soc: The initial state of charge (SOC) of the DRI storage unit.
-        storage_loss_rate: The rate of DRI loss due to storage over time.
-        charge_loss_rate: The rate of DRI loss during charging.
-        discharge_loss_rate: The rate of DRI loss during discharging.
-
-    Constraints:
-        storage_min_capacity_dri_constraint: Ensures the SOC of the DRI storage unit stays above the minimum capacity.
-        storage_max_capacity_dri_constraint: Ensures the SOC of the DRI storage unit stays below the maximum capacity.
-        energy_in_max_capacity_dri_constraint: Limits the charging of the DRI storage unit to its maximum capacity.
-        energy_out_max_capacity_dri_constraint: Limits the discharging of the DRI storage unit to its maximum capacity.
-        energy_in_uniformity_dri_constraint: Ensures uniformity in charging the DRI storage unit.
-        energy_out_uniformity_dri_constraint: Ensures uniformity in discharging the DRI storage unit.
-        storage_capacity_change_dri_constraint: Defines the change in SOC of the DRI storage unit over time.
-    """
-    model_part = pyo.Block()
-    model_part.max_capacity_dri = pyo.Param(initialize=max_capacity)
-    model_part.min_capacity_dri = pyo.Param(initialize=min_capacity)
-    model_part.initial_soc_dri = pyo.Param(initialize=initial_soc)
-    model_part.storage_loss_rate_dri = pyo.Param(initialize=storage_loss_rate)
-    model_part.charge_loss_rate_dri = pyo.Param(initialize=charge_loss_rate)
-    model_part.discharge_loss_rate_dri = pyo.Param(initialize=discharge_loss_rate)
-
-    # define variables
-    model_part.soc_dri = pyo.Var(time_steps, within=pyo.NonNegativeReals)
-    model_part.uniformity_indicator_dri = pyo.Var(time_steps, within=pyo.Binary)
-
-    # Define the variables for power and hydrogen
-    model_part.charge_dri = pyo.Var(time_steps, within=pyo.NonNegativeReals)
-    model_part.discharge_dri = pyo.Var(time_steps, within=pyo.NonNegativeReals)
-
-    # define constraints
-
-    @model_part.Constraint(time_steps)
-    def storage_min_capacity_dri_constraint(b, t):
-        """
-        Ensures the SOC of the DRI storage unit stays above the minimum capacity.
-        """
-        return b.soc_dri[t] >= b.min_capacity_dri
-
-    @model_part.Constraint(time_steps)
-    def storage_max_capacity_dri_constraint(b, t):
-        """
-        Ensures the SOC of the DRI storage unit stays below the maximum capacity.
-        """
-        return b.soc_dri[t] <= b.max_capacity_dri
-
-    @model_part.Constraint(time_steps)
-    def energy_in_max_capacity_dri_constraint(b, t):
-        """
-        Limits the charging of the DRI storage unit to its maximum capacity.
-        """
-        return b.charge_dri[t] <= b.max_capacity_dri
-
-    @model_part.Constraint(time_steps)
-    def energy_out_max_capacity_dri_constraint(b, t):
-        """
-        Limits the discharging of the DRI storage unit to its maximum capacity.
-        """
-        return b.discharge_dri[t] <= b.max_capacity_dri
-
-    @model_part.Constraint(time_steps)
-    def energy_in_uniformity_dri_constraint(b, t):
-        """
-        Ensures uniformity in charging the DRI storage unit.
-        """
-        return b.charge_dri[t] <= b.max_capacity_dri * b.uniformity_indicator_dri[t]
-
-    @model_part.Constraint(time_steps)
-    def energy_out_uniformity_dri_constraint(b, t):
-        """
-        Ensures uniformity in discharging the DRI storage unit.
-        """
-        return b.discharge_dri[t] <= b.max_capacity_dri * (
-            1 - b.uniformity_indicator_dri[t]
-        )
-
-    @model_part.Constraint(time_steps)
-    def storage_capacity_change_dri_constraint(b, t):
-        """
-        Defines the change in SOC of the DRI storage unit over time.
-        """
-        return b.soc_dri[t] == (
-            (
-                (b.soc_dri[t - 1] if t > 0 else b.initial_soc_dri)
-                * (1 - b.storage_loss_rate_dri)
-            )
-            + ((1 - b.charge_loss_rate_dri) * b.charge_dri[t])
-            - ((1 + b.discharge_loss_rate_dri) * b.discharge_dri[t])
-        )
-
-    return model_part
-
 def create_pv_plant(
-    model,
-    max_power,
-    min_power,
-    time_steps,
-    availability,
-    power_profile,
-    **kwargs
+    model: pyo.ConcreteModel,
+    time_steps: list[int],
+    capacity: float,
+    availability_profile: pd.Series | None = None,
+    power_profile: pd.Series | None = None,
+    **kwargs,
 ):
     """
-        Represents a Photovoltaic (PV) power plant.
+    Represents a Photovoltaic (PV) power plant.
 
-        Args:
-            model: A Pyomo ConcreteModel object representing the optimization model.
-            id (str): A unique identifier for the PV unit.
-            max_power (float): The maximum power output of the PV unit.
-            min_power (float): The minimum power output of the PV unit.
-            time_steps (list): List of time steps for which the model will be defined.
-            availability (list): List of availability factors for each time step.
-            power_profile (str): Indicates whether the PV unit follows a predefined power profile.
+    Args:
+        model: A Pyomo ConcreteModel object representing the optimization model.
+        max_power (float): The maximum power output of the PV unit.
+        time_steps (list): List of time steps for which the model will be defined.
+        availability (list): List of availability factors for each time step.
+        power_profile (str): Indicates whether the PV unit follows a predefined power profile.
 
-        Constraints:
-            max_power_pv_constraint: Ensures the power output of the PV unit does not exceed the maximum power limit.
-            min_power_pv_constraint: Ensures the power output of the PV unit does not fall below the minimum power requirement.
-            pv_self_consumption_and_sell_constraint: Ensures the power output of the PV unit is self consumed and sold to the market.
-            operating_revenue_pv_constraint: Calculates the revenue of the PV unit based on the electricity price.
+    Constraints:
+        max_power_pv_constraint: Ensures the power output of the PV unit does not exceed the maximum power limit.
+        min_power_pv_constraint: Ensures the power output of the PV unit does not fall below the minimum power requirement.
+        pv_self_consumption_and_sell_constraint: Ensures the power output of the PV unit is self consumed and sold to the market.
+        operating_revenue_pv_constraint: Calculates the revenue of the PV unit based on the electricity price.
     """
-    #define parameters
     model_part = pyo.Block()
-    model_part.max_power = pyo.Param(initialize=max_power)
-    model_part.min_power = pyo.Param(initialize=min_power)
 
-    #define variables
-    model_part.energy_out = pyo.Var(time_steps, within=pyo.NonNegativeReals)
-    model_part.operating_revenue_pv = pyo.Var(time_steps, within=pyo.NonNegativeReals)
+    # define parameters
+    model_part.capacity = pyo.Param(initialize=capacity)
+
+    # define variables
+    model_part.power = pyo.Var(
+        time_steps, within=pyo.NonNegativeReals, bounds=(0, capacity)
+    )
 
     # define constraints
-    if bool(strtobool(power_profile)):
+    if power_profile is not None:
+
         @model_part.Constraint(time_steps)
         def power_profile_constraint(b, t):
             """
             Ensures the PV follows the predefined power profile.
             """
-            return b.energy_out[t] == model.pv_power_profile[t]
-    else:
+            return b.power[t] == power_profile[t]
+
+    if availability_profile is not None:
+
         @model_part.Constraint(time_steps)
         def power_pv_constraint(b, t):
             """
             Ensures the power output of the PV unit gets calculated from its availability.
             """
-            return b.energy_out[t] == b.max_power * availability.iloc[t]
-
-    @model_part.Constraint(time_steps)
-    def min_power_pv_constraint(b, t):
-        """
-        Ensures the power output of the PV unit does not fall below the minimum power requirement.
-        """
-        return b.energy_out[t] >= b.min_power
-
-    @model_part.Constraint(time_steps)
-    def operating_revenue_pv_constraint(b, t):
-        """
-        Calculates the revenue of the PV unit based on the electricity price.
-        """
-        return b.operating_revenue_pv[t] == model.energy_sell_pv[t] * model.electricity_price[t]
+            return b.energy_out[t] == b.capacity * availability_profile[t]
 
     return model_part
-
-
-def create_battery_storage(
-        model,
-        max_capacity,
-        min_capacity,
-        initial_soc,
-        charge_loss_rate,
-        discharge_loss_rate,
-        max_charging_rate,
-        max_discharging_rate,
-        charging_profile,
-        sells_energy_to_market,
-        time_steps,
-        **kwargs,
-):
-    """
-        Represents battery storage.
-
-        Args:
-            model: A Pyomo ConcreteModel object representing the optimization model.
-            id (str): A unique identifier for the storage unit.
-            max_capacity (float): The maximum storage capacity of the unit.
-            min_capacity (float): The minimum storage capacity of the unit.
-            initial_soc (float): The initial state of charge (SOC) of the storage unit.
-            charge_loss_rate (float): The rate of energy loss during charging.
-            discharge_loss_rate (float): The rate of energy loss during discharging.
-            max_charging_rate (float): The maximum rate at which the battery can be charged (in MW).
-            max_discharging_rate (float): The maximum rate at which the battery can be discharged (in MW).
-            charging_profile (str): Indicates whether the battery follows a predefined charging profile.
-            sells_energy_to_market (str): Indicates whether the battery can sell energy to the market.
-            time_steps (list): List of time steps for which the model will be defined.
-            **kwargs: Additional keyword arguments.
-
-        Constraints:
-            operating_cost_battery_constraint: Calculates the operating (charging) cost of the battery based on the electricity price.
-            battery_self_consumption_and_sell_constraint: Ensures the power output of the battery unit is self consumed and sold to the market.
-            operating_revenue_battery_constraint: Calculates the revenue of the battery unit based on the electricity price.
-            battery_no_energy_sell_constraint: Ensures that no energy gets sold to the market if not wanted.
-            charging_profile_constraint: Ensures the battery storage follows the predefined charging profile.
-            discharging_profile_constraint: Ensures the battery storage follows the predefined charging profile.
-            charging_rate_limit: Limits the charging rate of the battery to its maximum charging rate.
-            discharging_rate_limit: Limits the charging rate of the battery to its maximum discharging rate.
-    """
-    model_part = create_storage(
-        model,
-        max_capacity,
-        min_capacity,
-        initial_soc,
-        0,
-        charge_loss_rate,
-        discharge_loss_rate,
-        time_steps,
-        **kwargs
-    )
-
-    model_part.max_battery_charging_rate = pyo.Param(initialize=max_charging_rate)
-    model_part.max_battery_discharging_rate = pyo.Param(initialize=max_discharging_rate)
-    model_part.operating_cost_battery = pyo.Var(time_steps, within=pyo.NonNegativeReals)
-    model_part.operating_revenue_battery = pyo.Var(time_steps, within=pyo.NonNegativeReals)
-
-    @model_part.Constraint(time_steps)
-    def operating_cost_battery_constraint(b, t):
-        """
-        Calculates the operating cost of the battery based on the electricity price.
-
-        """
-        return b.operating_cost_battery[t] == model.charge_battery_from_grid[t] * model.electricity_price[t]
-
-    if bool(strtobool(sells_energy_to_market)):
-        @model_part.Constraint(time_steps)
-        def operating_revenue_battery_constraint(b, t):
-            """
-            Calculates the revenue of the battery unit based on the electricity price.
-            """
-            return b.operating_revenue_battery[t] == model.discharge_battery_sell[t] * model.electricity_price[t]
-    else:
-        @model_part.Constraint(time_steps)
-        def operating_revenue_battery_constraint(b, t):
-            """
-            Ensures that no profit will be made.
-            """
-            return b.operating_revenue_battery[t] == 0
-
-    if bool(strtobool(charging_profile)):
-        @model_part.Constraint(time_steps)
-        def charging_profile_constraint(b, t):
-            """
-            Ensures the battery storage follows the predefined charging profile.
-            """
-            battery_load = model.battery_load_profile[t]
-            return b.charge[t] == (battery_load if battery_load >= 0 else 0)
-
-        @model_part.Constraint(time_steps)
-        def discharging_profile_constraint(b, t):
-            """
-            Ensures the battery storage follows the predefined charging profile.
-            """
-            battery_load = model.battery_load_profile[t]
-            return b.discharge[t] == (abs(battery_load) if battery_load < 0 else 0)
-    else:
-        @model_part.Constraint(time_steps)
-        def charging_rate_limit(b, t):
-            """
-            Limits the charging rate of the battery to its maximum charging rate.
-            """
-            return b.charge[t] <= b.max_battery_charging_rate
-
-        @model_part.Constraint(time_steps)
-        def discharging_rate_limit(b, t):
-            """
-            Limits the charging rate of the battery to its maximum discharging rate.
-            """
-            return b.discharge[t] <= b.max_battery_discharging_rate
-
-    return model_part
-

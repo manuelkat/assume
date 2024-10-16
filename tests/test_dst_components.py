@@ -11,16 +11,13 @@ import pytest
 from assume.units.building import Building
 from assume.units.dst_components import (
     create_boiler,
-    create_driplant,
-    create_dristorage,
+    create_dri_plant,
     create_electric_arc_furnance,
     create_electrolyser,
     create_ev,
+    create_generic_storage,
     create_heatpump,
-    create_hydrogen_storage,
-    create_thermal_storage,
     create_pv_plant,
-    create_battery_storage
 )
 
 
@@ -155,7 +152,7 @@ def thermal_storage_model(thermal_storage_config):
     time_steps = thermal_storage_config["time_steps"]
     model.time_steps = pyo.Set(initialize=time_steps)
     model.electricity_price = pyo.Param(model.time_steps, initialize=1, mutable=True)
-    model_part = create_thermal_storage(model, **thermal_storage_config)
+    model_part = create_generic_storage(model, **thermal_storage_config)
     model.thermal_storage = model_part
 
     # Objective for testing
@@ -210,16 +207,16 @@ def ev_config():
         "time_steps": range(10),  # Time steps for the model
         "charging_profile": "Yes",  # Charging profile available
         "load_profile": [
-            0.,
-            0.,
-            20.,
-            20.,
-            0.,
-            30.,
-            30.,
-            0.,
-            0.,
-            0.,
+            0.0,
+            0.0,
+            20.0,
+            20.0,
+            0.0,
+            30.0,
+            30.0,
+            0.0,
+            0.0,
+            0.0,
         ],  # Charging profile in kWh for each time step
     }
 
@@ -244,7 +241,7 @@ def ev_model(ev_config):
             bidding_strategies={},
             index=time_steps_time,
             components={},
-            objective="minimize_expenses"
+            objective="minimize_expenses",
         )  # Temporary Building instance
         availability_df = building.create_availability_df(
             ev_config["availability_periods"]
@@ -293,7 +290,9 @@ def test_ev_constraints(ev_model, ev_config):
     # Check specific value of SOC at certain time steps
     assert pyo.value(instance.ev.ev_battery_soc[3]) == 70  # Expected SOC at t=3
     assert pyo.value(instance.ev.ev_battery_soc[5]) == 100  # Expected SOC at t=5
-    assert pyo.value(instance.ev.ev_battery_soc[6]) == 50  # Expected SOC at t=6 (init SOC)
+    assert (
+        pyo.value(instance.ev.ev_battery_soc[6]) == 50
+    )  # Expected SOC at t=6 (init SOC)
 
 
 @pytest.fixture
@@ -399,7 +398,7 @@ def driplant_model(driplant_config):
     model.electricity_price = pyo.Param(model.time_steps, initialize=1, mutable=True)
     model.natural_gas_price = pyo.Param(model.time_steps, initialize=3, mutable=True)
     model.iron_ore_price = 4
-    model_part = create_driplant(model, time_steps=model.time_steps, **driplant_config)
+    model_part = create_dri_plant(model, time_steps=model.time_steps, **driplant_config)
     model.driplant = model_part
     # Objective function to minimize operating cost (Just for testing purpose)
     model.total_cost = pyo.Objective(
@@ -546,7 +545,7 @@ def h2storage_model(h2storage_config):
     time_steps = range(10)
     model.time_steps = pyo.Set(initialize=time_steps)
     model.electricity_price = pyo.Param(model.time_steps, initialize=1, mutable=True)
-    model_part = create_hydrogen_storage(
+    model_part = create_generic_storage(
         model, time_steps=model.time_steps, **h2storage_config
     )
     model.hydrogen_storage = model_part
@@ -621,7 +620,7 @@ def dristorage_model(dristorage_config):
     time_steps = range(10)
     model.time_steps = pyo.Set(initialize=time_steps)
     model.iron_ore_price = pyo.Param(model.time_steps, initialize=1, mutable=True)
-    model_part = create_dristorage(
+    model_part = create_generic_storage(
         model, time_steps=model.time_steps, **dristorage_config
     )
     model.dristorage = model_part
@@ -684,18 +683,20 @@ def pv_config_availability():
     return {
         "max_power": 3.5,
         "min_power": 0,
-        "availability": pd.Series([
-            0,
-            0,
-            0,
-            0,
-            0.2,
-            0.3,
-            0.5,
-            0.8,
-            0.3,
-            0,
-        ]),
+        "availability": pd.Series(
+            [
+                0,
+                0,
+                0,
+                0,
+                0.2,
+                0.3,
+                0.5,
+                0.8,
+                0.3,
+                0,
+            ]
+        ),
         "power_profile": "No",
         "time_steps": range(10),
     }
@@ -713,9 +714,7 @@ def pv_model_availability(pv_config_availability):
     model.pv = model_part
     # Objective for testing
     model.total_cost = pyo.Objective(
-        expr=sum(
-            model.pv.energy_out[t] for t in model.time_steps
-        ),
+        expr=sum(model.pv.energy_out[t] for t in model.time_steps),
         sense=pyo.minimize,
     )
     return model
@@ -742,18 +741,20 @@ def pv_config_power_profile():
         "max_power": 3.5,
         "min_power": 0,
         "power_profile": "Yes",
-        "availability": pd.Series([
-            0,
-            0,
-            0,
-            0,
-            0.2,
-            0.3,
-            0.5,
-            0.8,
-            0.3,
-            0,
-        ]),
+        "availability": pd.Series(
+            [
+                0,
+                0,
+                0,
+                0,
+                0.2,
+                0.3,
+                0.5,
+                0.8,
+                0.3,
+                0,
+            ]
+        ),
         "time_steps": range(10),
     }
 
@@ -773,9 +774,7 @@ def pv_model_power_profile(pv_config_power_profile):
     model.pv = model_part
     # Objective for testing
     model.total_cost = pyo.Objective(
-        expr=sum(
-            model.pv.energy_out[t] for t in model.time_steps
-        ),
+        expr=sum(model.pv.energy_out[t] for t in model.time_steps),
         sense=pyo.minimize,
     )
     return model
@@ -805,7 +804,7 @@ def battery_config():
         "max_charging_rate": 20,  # Maximum charge rate in kW
         "max_discharging_rate": 20,  # Maximum discharge rate in kW
         "charge_loss_rate": 0,  # Charging efficiency
-        "discharge_loss_rate": 0, # Discharging efficiency
+        "discharge_loss_rate": 0,  # Discharging efficiency
         "initial_soc": 0,  # Initial SOC in kWh
         "sells_energy_to_market": "Yes",
         "time_steps": range(10),
@@ -826,13 +825,14 @@ def battery_model(battery_config):
     model.discharge_battery_sell = pyo.Var(model.time_steps, initialize=1)
 
     # Create EV component in the Pyomo model
-    model_part = create_battery_storage(model, **battery_config)
+    model_part = create_generic_storage(model, **battery_config)
     model.battery = model_part
 
     # Objective for testing (simple minimization of total cost)
     model.total_cost = pyo.Objective(
         expr=sum(
-            model.battery.charge[t] * model.electricity_price[t] for t in model.time_steps
+            model.battery.charge[t] * model.electricity_price[t]
+            for t in model.time_steps
         ),
         sense=pyo.minimize,
     )
@@ -847,7 +847,9 @@ def test_battery_constraints(battery_model):
     # Check SOC and availability constraints
     for t in instance.time_steps:
         soc = pyo.value(instance.battery.soc[t])
-        assert instance.battery.min_capacity <= soc <= instance.battery.max_capacity, f"SOC out of bounds at time {t}"
+        assert (
+            instance.battery.min_capacity <= soc <= instance.battery.max_capacity
+        ), f"SOC out of bounds at time {t}"
 
     assert pyo.value(instance.battery.soc[2]) == 20  # Expected SOC at t=2
     assert pyo.value(instance.battery.soc[3]) == 40  # Expected SOC at t=5
