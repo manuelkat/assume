@@ -12,7 +12,7 @@ from assume.units.building import Building
 from assume.units.dst_components import (
     create_boiler,
     create_dri_plant,
-    create_electric_arc_furnance,
+    create_electric_arc_furnace,
     create_electrolyser,
     create_ev,
     create_generic_storage,
@@ -476,7 +476,7 @@ def eaf_model(eaf_config):
     model.lime_co2_factor = 0.03
     model.co2_price = 30
     model.lime_price = 20
-    model_part = create_electric_arc_furnance(
+    model_part = create_electric_arc_furnace(
         model, time_steps=model.time_steps, **eaf_config
     )
     model.eaf = model_part

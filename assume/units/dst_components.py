@@ -9,7 +9,7 @@ import pyomo.environ as pyo
 def create_heatpump(
     model: pyo.ConcreteModel,
     time_steps: list[int],
-    rated_power: float,
+    max_power: float,
     cop: float,
     min_power: float = 0.0,
     ramp_up: float | None = None,
@@ -24,13 +24,13 @@ def create_heatpump(
     Args:
         model (ConcreteModel): A Pyomo ConcreteModel object representing the optimization model.
         time_steps (List[int]): Time steps over which the model operates.
-        rated_power (float): Maximum power input to the heat pump.
+        max_power (float): Maximum power input to the heat pump.
         cop (float): Coefficient of performance of the heat pump.
         min_power (float, optional): Minimum power input to the heat pump. Defaults to 0.0.
         ramp_up (Optional[float], optional): Maximum allowed increase in power per time step.
-            If None, allows full ramp-up to rated_power. Defaults to None.
+            If None, allows full ramp-up to max_power. Defaults to None.
         ramp_down (Optional[float], optional): Maximum allowed decrease in power per time step.
-            If None, allows full ramp-down to rated_power. Defaults to None.
+            If None, allows full ramp-down to max_power. Defaults to None.
         min_operating_steps (int, optional): Minimum number of consecutive time steps the heat pump must operate.
             Defaults to 0.
         min_down_steps (int, optional): Minimum number of consecutive time steps the heat pump must remain off.
@@ -41,15 +41,15 @@ def create_heatpump(
         model_part (Block): A Pyomo block representing the heat pump with variables and constraints.
     """
 
-    # Set default ramp limits to rated_power if not provided
-    ramp_up = rated_power if ramp_up is None else ramp_up
-    ramp_down = rated_power if ramp_down is None else ramp_down
+    # Set default ramp limits to max_power if not provided
+    ramp_up = max_power if ramp_up is None else ramp_up
+    ramp_down = max_power if ramp_down is None else ramp_down
 
     # Define block
     model_part = pyo.Block()
 
     # Define parameters
-    model_part.rated_power = pyo.Param(initialize=rated_power)
+    model_part.max_power = pyo.Param(initialize=max_power)
     model_part.min_power = pyo.Param(initialize=min_power)
     model_part.cop = pyo.Param(initialize=cop)
     model_part.ramp_up = pyo.Param(initialize=ramp_up)
@@ -59,7 +59,7 @@ def create_heatpump(
 
     # Define variables
     model_part.power_in = pyo.Var(
-        time_steps, within=pyo.NonNegativeReals, bounds=(0, rated_power)
+        time_steps, within=pyo.NonNegativeReals, bounds=(0, max_power)
     )
     model_part.heat_out = pyo.Var(time_steps, within=pyo.NonNegativeReals)
     model_part.operating_cost_hp = pyo.Var(time_steps, within=pyo.NonNegativeReals)
@@ -75,7 +75,7 @@ def create_heatpump(
 
         @model_part.Constraint(time_steps)
         def max_power_constraint(b, t):
-            return b.power_in[t] <= b.rated_power * b.operational_status[t]
+            return b.power_in[t] <= b.max_power * b.operational_status[t]
 
     # Coefficient of performance (COP) constraint
     @model_part.Constraint(time_steps)
@@ -129,7 +129,7 @@ def create_heatpump(
 def create_boiler(
     model: pyo.ConcreteModel,
     time_steps: list[int],
-    rated_power: float,
+    max_power: float,
     efficiency: float = 1.0,
     min_power: float = 0.0,
     ramp_up: float | None = None,
@@ -145,13 +145,13 @@ def create_boiler(
     Args:
         model (ConcreteModel): A Pyomo ConcreteModel object representing the optimization model.
         time_steps (List[int]): Time steps over which the model operates.
-        rated_power (float): Maximum power input to the boiler.
+        max_power (float): Maximum power input to the boiler.
         efficiency (float, optional): Efficiency of the boiler. Defaults to 1.0.
         min_power (float, optional): Minimum power input to the boiler. Defaults to 0.0.
         ramp_up (Optional[float], optional): Maximum allowed increase in power per time step.
-            If None, allows full ramp-up to rated_power. Defaults to None.
+            If None, allows full ramp-up to max_power. Defaults to None.
         ramp_down (Optional[float], optional): Maximum allowed decrease in power per time step.
-            If None, allows full ramp-down to rated_power. Defaults to None.
+            If None, allows full ramp-down to max_power. Defaults to None.
         min_operating_steps (int, optional): Minimum number of consecutive time steps the boiler must operate.
             Defaults to 0.
         min_down_steps (int, optional): Minimum number of consecutive time steps the boiler must remain off.
@@ -163,30 +163,36 @@ def create_boiler(
         model_part (Block): A Pyomo block representing the boiler with variables and constraints.
     """
 
-    # Set default ramp limits to rated_power if not provided
-    ramp_up = rated_power if ramp_up is None else ramp_up
-    ramp_down = rated_power if ramp_down is None else ramp_down
+    # Set default ramp limits to max_power if not provided
+    ramp_up = max_power if ramp_up is None else ramp_up
+    ramp_down = max_power if ramp_down is None else ramp_down
 
     # Define block
     model_part = pyo.Block()
 
     # Define parameters
-    model_part.rated_power = pyo.Param(initialize=rated_power)
+    model_part.max_power = pyo.Param(initialize=max_power)
     model_part.min_power = pyo.Param(initialize=min_power)
     model_part.efficiency = pyo.Param(initialize=efficiency)
     model_part.ramp_up = pyo.Param(initialize=ramp_up)
     model_part.ramp_down = pyo.Param(initialize=ramp_down)
 
     # Define variables
-    model_part.power_in = pyo.Var(
-        time_steps, within=pyo.NonNegativeReals, bounds=(0, rated_power)
-    )
-    if fuel_type == "natural_gas":
+    if fuel_type == "electric":
+        model_part.power_in = pyo.Var(
+            time_steps, within=pyo.NonNegativeReals, bounds=(0, max_power)
+        )
+    elif fuel_type == "natural_gas":
         model_part.natural_gas_in = pyo.Var(time_steps, within=pyo.NonNegativeReals)
+
     model_part.heat_out = pyo.Var(time_steps, within=pyo.NonNegativeReals)
 
     # Define operational status variable if min operating time, downtime, or min_power is required
     if min_operating_steps > 0 or min_down_steps > 0 or min_power > 0:
+        if fuel_type != "electric":
+            raise ValueError(
+                "Operational status constraints are only supported for electric boilers."
+            )
         model_part.operational_status = pyo.Var(time_steps, within=pyo.Binary)
 
         # Link power_in and operational_status
@@ -196,7 +202,7 @@ def create_boiler(
 
         @model_part.Constraint(time_steps)
         def max_power_constraint(b, t):
-            return b.power_in[t] <= b.rated_power * b.operational_status[t]
+            return b.power_in[t] <= b.max_power * b.operational_status[t]
 
     # Efficiency constraint based on fuel type
     @model_part.Constraint(time_steps)
@@ -260,13 +266,13 @@ def create_ev(
     max_capacity: float,
     min_capacity: float,
     max_power_charge: float,
-    max_power_discharge: float | None = None,
+    availability_profile: pd.Series,
+    max_power_discharge: float = 0,
     efficiency_charge: float = 1.0,
     efficiency_discharge: float = 1.0,
     initial_soc: float = 1.0,
     ramp_up: float | None = None,
     ramp_down: float | None = None,
-    availability_profile: pd.Series | None = None,
     charging_profile: pd.Series | None = None,
     **kwargs,
 ) -> pyo.Block:
@@ -276,20 +282,19 @@ def create_ev(
     Args:
         model (pyo.ConcreteModel): A Pyomo ConcreteModel object representing the optimization model.
         time_steps (list[int]): Time steps in the optimization model.
-        max_capacity (float): The maximum capacity of the EV battery (MWh).
-        min_capacity (float): The minimum capacity of the EV battery (MWh).
-        max_power_charge (float): The maximum charging power of the EV (MW).
-        max_power_discharge (float | None, optional): The maximum discharging power of the EV (MW).
-            If None, defaults to `max_power_charge`. Defaults to None.
+        max_capacity (float): The maximum capacity of the EV battery.
+        min_capacity (float): The minimum capacity of the EV battery.
+        max_power_charge (float): The maximum charging power of the EV.
+        availability_profile (pd.Series): Series indicating EV availability with time_steps as indices
+            and binary values (1 available, 0 unavailable).
+        max_power_discharge (float, optional): The maximum discharging power of the EV. Defaults to 0.
         efficiency_charge (float, optional): Charging efficiency of the EV. Defaults to 1.0.
         efficiency_discharge (float, optional): Discharging efficiency of the EV. Defaults to 1.0.
         initial_soc (float, optional): Initial state of charge (SOC) as a fraction of `max_capacity`. Defaults to 1.0.
-        ramp_up (float | None, optional): Maximum increase in charging power per time step (MW).
+        ramp_up (float | None, optional): Maximum increase in charging power per time step.
             If None, no ramp-up constraint is applied. Defaults to None.
-        ramp_down (float | None, optional): Maximum decrease in charging power per time step (MW).
+        ramp_down (float | None, optional): Maximum decrease in charging power per time step.
             If None, no ramp-down constraint is applied. Defaults to None.
-        availability_profile (pd.Series | None, optional): Series indicating EV availability with time_steps as indices
-            and binary values (1 available, 0 unavailable). Defaults to None.
         charging_profile (pd.Series | None, optional): Series indicating predefined charging profile.
             If given, the EV will follow this profile instead of optimizing charging. Defaults to None.
         **kwargs: Additional keyword arguments for custom behavior or constraints.
@@ -305,11 +310,6 @@ def create_ev(
         - Enforces charging profiles if specified.
         - Respects EV availability periods if specified.
     """
-
-    # Set default power limits to max_power_charge if not provided
-    max_power_discharge = (
-        max_power_charge if max_power_discharge is None else max_power_discharge
-    )
 
     # Initialize the generic storage with EV-specific parameters
     model_part = create_generic_storage(
@@ -524,7 +524,7 @@ def create_generic_storage(
 def create_pv_plant(
     model: pyo.ConcreteModel,
     time_steps: list[int],
-    capacity: float,
+    max_power: float,
     availability_profile: pd.Series | None = None,
     power_profile: pd.Series | None = None,
     **kwargs,
@@ -535,7 +535,7 @@ def create_pv_plant(
     Args:
         model (pyo.ConcreteModel): A Pyomo ConcreteModel object representing the optimization model.
         time_steps (list[int]): Time steps over which the model operates.
-        capacity (float): The maximum power output capacity of the PV unit (MW).
+        max_power (float): The maximum power output of the PV unit.
         availability_profile (pd.Series | None, optional): Series indicating PV availability with time_steps as indices
             and binary values (1 available, 0 unavailable). Defaults to None.
         power_profile (pd.Series | None, optional): Series indicating a predefined power output profile.
@@ -550,9 +550,6 @@ def create_pv_plant(
         - availability_pv_constraint: Ensures the PV operates only during available periods.
         - max_power_pv_constraint: Ensures the power output of the PV unit does not exceed the maximum power limit.
     """
-
-    # Set capacity as the maximum power output
-    max_power = capacity
 
     # Raise error if both availability_profile and power_profile are provided
     # or if neither is provided
@@ -587,7 +584,7 @@ def create_pv_plant(
     model_part = pyo.Block()
 
     # Define parameters
-    model_part.capacity = pyo.Param(initialize=capacity, within=pyo.NonNegativeReals)
+    model_part.max_power = pyo.Param(initialize=max_power, within=pyo.NonNegativeReals)
 
     # Define variables
     model_part.power = pyo.Var(
@@ -617,7 +614,7 @@ def create_pv_plant(
             Ensures the PV operates only during available periods.
             """
             availability = availability_profile[t]
-            return b.power[t] <= availability * b.capacity
+            return b.power[t] <= availability * b.max_power
 
     # Maximum power constraint (redundant due to variable bounds, included for clarity)
     @model_part.Constraint(time_steps)
@@ -625,7 +622,7 @@ def create_pv_plant(
         """
         Ensures the power output of the PV unit does not exceed the maximum power limit.
         """
-        return b.power[t] <= b.capacity
+        return b.power[t] <= b.max_power
 
     return model_part
 
@@ -633,7 +630,7 @@ def create_pv_plant(
 def create_electrolyser(
     model: pyo.ConcreteModel,
     time_steps: list[int],
-    rated_power: float,
+    max_power: float,
     efficiency: float,
     min_power: float = 0.0,
     ramp_up: float | None = None,
@@ -648,7 +645,7 @@ def create_electrolyser(
     Args:
         model (pyomo.ConcreteModel): The Pyomo model where the electrolyser unit will be added.
         time_steps (list[int]): The list of time steps for the model.
-        rated_power (float): The rated power capacity of the electrolyser (in MW).
+        max_power (float): The rated power capacity of the electrolyser (in MW).
         efficiency (float): The efficiency of the electrolysis process (0-1).
         min_power (float): The minimum power required for operation (in MW).
         ramp_up (float | None): The maximum rate at which the electrolyser can increase its power output (in MW/hr).
@@ -659,15 +656,15 @@ def create_electrolyser(
     Returns:
         pyo.Block: The electrolyser block.
     """
-    # Set default ramp limits to rated_power if not provided
-    ramp_up = rated_power if ramp_up is None else ramp_up
-    ramp_down = rated_power if ramp_down is None else ramp_down
+    # Set default ramp limits to max_power if not provided
+    ramp_up = max_power if ramp_up is None else ramp_up
+    ramp_down = max_power if ramp_down is None else ramp_down
 
     # Define block
     model_part = pyo.Block()
 
     # Define parameters
-    model_part.rated_power = pyo.Param(initialize=rated_power)
+    model_part.max_power = pyo.Param(initialize=max_power)
     model_part.efficiency = pyo.Param(initialize=efficiency)
     model_part.min_power = pyo.Param(initialize=min_power)
     model_part.ramp_up = pyo.Param(initialize=ramp_up)
@@ -677,7 +674,7 @@ def create_electrolyser(
 
     # Define variables
     model_part.power_in = pyo.Var(
-        time_steps, within=pyo.NonNegativeReals, bounds=(0, rated_power)
+        time_steps, within=pyo.NonNegativeReals, bounds=(0, max_power)
     )
     model_part.hydrogen_out = pyo.Var(time_steps, within=pyo.NonNegativeReals)
     model_part.electrolyser_operating_cost = pyo.Var(
@@ -695,7 +692,7 @@ def create_electrolyser(
 
         @model_part.Constraint(time_steps)
         def max_power_constraint(b, t):
-            return b.power_in[t] <= b.rated_power * b.operational_status[t]
+            return b.power_in[t] <= b.max_power * b.operational_status[t]
 
     # Efficiency constraint
     @model_part.Constraint(time_steps)
@@ -764,7 +761,7 @@ def create_dri_plant(
     specific_natural_gas_consumption: float,
     specific_electricity_consumption: float,
     specific_iron_ore_consumption: float,
-    rated_power: float,
+    max_power: float,
     min_power: float,
     fuel_type: str,
     ramp_up: float | None = None,
@@ -783,7 +780,7 @@ def create_dri_plant(
         specific_natural_gas_consumption (float): The specific natural gas consumption of the DRI plant (in MWh per ton of DRI).
         specific_electricity_consumption (float): The specific electricity consumption of the DRI plant (in MWh per ton of DRI).
         specific_iron_ore_consumption (float): The specific iron ore consumption of the DRI plant (in ton per ton of DRI).
-        rated_power (float): The rated power capacity of the DRI plant (in MW).
+        max_power (float): The rated power capacity of the DRI plant (in MW).
         min_power (float): The minimum power required for operation (in MW).
         fuel_type (str): The type of fuel used by the DRI plant ("hydrogen", "natural_gas", "both").
         ramp_up (float | None): The maximum rate at which the DRI plant can increase its power output (in MW/hr).
@@ -794,9 +791,9 @@ def create_dri_plant(
     Returns:
         pyo.Block: The DRI plant block.
     """
-    # Set default ramp limits to rated_power if not provided
-    ramp_up = rated_power if ramp_up is None else ramp_up
-    ramp_down = rated_power if ramp_down is None else ramp_down
+    # Set default ramp limits to max_power if not provided
+    ramp_up = max_power if ramp_up is None else ramp_up
+    ramp_down = max_power if ramp_down is None else ramp_down
 
     # Define block
     model_part = pyo.Block()
@@ -814,7 +811,7 @@ def create_dri_plant(
     model_part.specific_iron_ore_consumption = pyo.Param(
         initialize=specific_iron_ore_consumption
     )
-    model_part.rated_power = pyo.Param(initialize=rated_power)
+    model_part.max_power = pyo.Param(initialize=max_power)
     model_part.min_power = pyo.Param(initialize=min_power)
     model_part.ramp_up = pyo.Param(initialize=ramp_up)
     model_part.ramp_down = pyo.Param(initialize=ramp_down)
@@ -823,7 +820,7 @@ def create_dri_plant(
 
     # Define variables
     model_part.power_dri = pyo.Var(
-        time_steps, within=pyo.NonNegativeReals, bounds=(0, rated_power)
+        time_steps, within=pyo.NonNegativeReals, bounds=(0, max_power)
     )
     model_part.iron_ore_in = pyo.Var(time_steps, within=pyo.NonNegativeReals)
     model_part.natural_gas_in = pyo.Var(time_steps, within=pyo.NonNegativeReals)
@@ -842,7 +839,7 @@ def create_dri_plant(
 
         @model_part.Constraint(time_steps)
         def max_power_constraint(b, t):
-            return b.power_dri[t] <= b.rated_power * b.operational_status[t]
+            return b.power_dri[t] <= b.max_power * b.operational_status[t]
 
     # Fuel consumption constraint
     @model_part.Constraint(time_steps)
@@ -924,7 +921,7 @@ def create_dri_plant(
 def create_electric_arc_furnace(
     model: pyo.ConcreteModel,
     time_steps: list[int],
-    rated_power: float,
+    max_power: float,
     min_power: float,
     specific_electricity_consumption: float,
     specific_dri_demand: float,
@@ -941,7 +938,7 @@ def create_electric_arc_furnace(
     Args:
         model (pyomo.ConcreteModel): The Pyomo model where the EAF will be added.
         time_steps (list[int]): The list of time steps for the model.
-        rated_power (float): The rated power capacity of the electric arc furnace (in MW).
+        max_power (float): The rated power capacity of the electric arc furnace (in MW).
         min_power (float): The minimum power requirement of the electric arc furnace (in MW).
         specific_electricity_consumption (float): The specific electricity consumption of the electric arc furnace (in MWh per ton of steel produced).
         specific_dri_demand (float): The specific demand for Direct Reduced Iron (DRI) in the electric arc furnace (in tons per ton of steel produced).
@@ -954,15 +951,15 @@ def create_electric_arc_furnace(
     Returns:
         pyo.Block: The EAF block.
     """
-    # Set default ramp limits to rated_power if not provided
-    ramp_up = rated_power if ramp_up is None else ramp_up
-    ramp_down = rated_power if ramp_down is None else ramp_down
+    # Set default ramp limits to max_power if not provided
+    ramp_up = max_power if ramp_up is None else ramp_up
+    ramp_down = max_power if ramp_down is None else ramp_down
 
     # Define block
     model_part = pyo.Block()
 
     # Define parameters
-    model_part.rated_power = pyo.Param(initialize=rated_power)
+    model_part.max_power = pyo.Param(initialize=max_power)
     model_part.min_power = pyo.Param(initialize=min_power)
     model_part.specific_electricity_consumption = pyo.Param(
         initialize=specific_electricity_consumption
@@ -976,7 +973,7 @@ def create_electric_arc_furnace(
 
     # Define variables
     model_part.power_eaf = pyo.Var(
-        time_steps, within=pyo.NonNegativeReals, bounds=(0, rated_power)
+        time_steps, within=pyo.NonNegativeReals, bounds=(0, max_power)
     )
     model_part.dri_input = pyo.Var(time_steps, within=pyo.NonNegativeReals)
     model_part.steel_output = pyo.Var(time_steps, within=pyo.NonNegativeReals)
@@ -995,7 +992,7 @@ def create_electric_arc_furnace(
 
         @model_part.Constraint(time_steps)
         def max_power_constraint(b, t):
-            return b.power_eaf[t] <= b.rated_power * b.operational_status[t]
+            return b.power_eaf[t] <= b.max_power * b.operational_status[t]
 
     # Steel output based on DRI input
     @model_part.Constraint(time_steps)

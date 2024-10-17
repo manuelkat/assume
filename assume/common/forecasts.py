@@ -138,7 +138,7 @@ class CsvForecaster(Forecaster):
         if column not in self.forecasts.columns:
             if "availability" in column:
                 return pd.Series(1, self.index)
-            return pd.Series(0.0, self.index)
+            return None
 
         return self.forecasts[column]
 

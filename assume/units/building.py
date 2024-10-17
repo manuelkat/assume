@@ -2,9 +2,7 @@
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
-import ast
 import logging
-from distutils.util import strtobool
 
 import pandas as pd
 import pyomo.environ as pyo
@@ -46,16 +44,30 @@ class Building(SupportsMinMax, DSMFlex):
     """
     The Building class represents a building unit in the energy system.
 
+    This class models the energy consumption, production, and storage capabilities of a building, allowing for
+    optimization of energy flows. The building can include various components such as heat pumps, electric boilers,
+    thermal storage, battery storage, photovoltaic (PV) systems, and electric vehicles (EVs). The optimization
+    objective can be configured to minimize expenses, maximize revenue, or achieve other custom goals.
+
+    Supported Components:
+    - Heat Pump: Uses electricity to provide heating with a coefficient of performance (COP).
+    - Electric Boiler: Provides heating either using electricity or natural gas.
+    - Thermal Storage: Stores thermal energy to provide flexibility in heating demand.
+    - Battery Storage: Stores electrical energy for later use, supporting both charging and discharging operations.
+    - Photovoltaic (PV) System: Generates electricity from solar energy, which can be used on-site or sold to the grid.
+    - Electric Vehicle (EV) Charging: Represents the charging of electric vehicles, contributing to electricity demand.
+
     Args:
         id (str): The unique identifier of the unit.
         unit_operator (str): The operator of the unit.
+        technology (str): The technology of the unit, typically "building".
         bidding_strategies (dict): The bidding strategies of the unit.
-        technology (str): The technology of the unit.
-        node (str): The node of the unit.
-        index (pd.DatetimeIndex): The index for the data of the unit.
-        location (tuple[float, float]): The location of the unit.
-        components (dict[str, dict]): The components of the unit such as heat pump, electric boiler, and thermal storage.
-        objective (str): The objective of the unit, e.g. minimize expenses ("minimize_expenses").
+        index (pd.DatetimeIndex): The index for the time series data of the unit.
+        components (dict[str, dict]): The components of the unit such as heat pump, electric boiler, thermal storage, etc.
+        node (str, optional): The node of the unit in the energy network. Defaults to "node0".
+        location (tuple[float, float], optional): The geographical coordinates (latitude, longitude) of the unit. Defaults to (0.0, 0.0).
+        flexibility_measure (str, optional): The flexibility measure used for the unit, e.g., maximum load shift. Defaults to "max_load_shift".
+        objective (str, optional): The objective of the unit, e.g., minimize expenses ("minimize_expenses"). Defaults to "minimize_expenses".
     """
 
     def __init__(
@@ -63,20 +75,18 @@ class Building(SupportsMinMax, DSMFlex):
         id: str,
         unit_operator: str,
         bidding_strategies: dict,
-        technology: str = "building",
+        index: pd.DatetimeIndex,
+        components: dict[str, dict],
         node: str = "node0",
-        index: pd.DatetimeIndex = None,
         location: tuple[float, float] = (0.0, 0.0),
-        components: dict[str, dict] = None,
         flexibility_measure: str = "max_load_shift",
-        demand: float = 0,
-        objective: str = None,
+        objective: str = "minimize_expenses",
         **kwargs,
     ):
         super().__init__(
             id=id,
             unit_operator=unit_operator,
-            technology=technology,
+            technology="building",
             bidding_strategies=bidding_strategies,
             index=index,
             node=node,
@@ -84,70 +94,28 @@ class Building(SupportsMinMax, DSMFlex):
             **kwargs,
         )
 
-        self.electricity_price = self.forecaster["price_EOM"]
-        self.natural_gas_price = self.forecaster["fuel_price_natural gas"]
-        self.heat_demand = self.forecaster["heat_demand"]
-        self.ev_load_profile = self.forecaster["ev_load_profile"]
-        self.battery_load_profile = self.forecaster["battery_load_profile"]
-        self.additional_electricity_load = self.forecaster[f"{self.id}_load_profile"]
-        self.pv_power_profile = self.forecaster[f"{self.id}_pv_power_profile"]
-        self.demand = demand
+        # Retrieve prices
+        forecaster = self.forecaster
+        self.electricity_price_buy = forecaster["price_electricity_buy"]
+        self.electricity_price_sell = forecaster["price_electricity_sell"]
+        self.natural_gas_price = forecaster["fuel_price_natural_gas"]
+
+        # Retrieve load profiles
+        self.electricity_demand = forecaster[f"{self.id}_load_profile"]
+        self.heat_demand = forecaster[f"{self.id}_heat_demand"]
+        self.ev_charging_profile = forecaster[f"{self.id}_ev_load_profile"]
+        self.ev_availability_profile = forecaster[f"{self.id}_ev_availability"]
+        self.pv_power_profile = forecaster[f"{self.id}_pv_power_profile"]
+        self.pv_availability_profile = forecaster[f"{self.id}_pv_availability_profile"]
+
         self.flexibility_measure = flexibility_measure
         self.objective = objective
 
-        self.has_heatpump = "heatpump" in components
-        self.has_boiler = "boiler" in components
-        self.has_thermal_storage = "thermal_storage" in components
-        self.has_ev = "ev" in components
-        self.has_battery_storage = "battery_storage" in components
-        self.has_pv = "pv_plant" in components
-
-        # Check fuel type of boiler
-        if self.has_boiler:
-            if "fuel_type" in components["boiler"]:
-                self.is_boiler_electric = (
-                    True if components["boiler"]["fuel_type"] == "electric" else False
-                )
-
-        # Create availability DataFrame for EVs
-        # Parse the availability periods
-        if self.has_ev:
-            if "availability_periods" in components["ev"]:
-                try:
-                    # Convert the string to a list of tuples
-                    components["ev"]["availability_periods"] = ast.literal_eval(
-                        components["ev"]["availability_periods"]
-                    )
-                    components["ev"]["availability_df"] = self.create_availability_df(
-                        components["ev"]["availability_periods"]
-                    )
-                except Exception as e:
-                    raise ValueError(
-                        f"Error processing availability periods for EV: {e}"
-                    )
-            else:
-                raise KeyError(
-                    "Missing 'availability_periods' in EV components configuration."
-                )
-
-        # Parse the availability of the PV plant
-        if self.has_pv:
-            pv_availability = self.forecaster["availability_Solar"]
-            if pv_availability is not None:
-                components["pv_plant"]["availability"] = pv_availability
-            else:
-                raise KeyError(
-                    "Missing 'availability' of PV plants in availability file."
-                )
-
-        if self.has_battery_storage:
-            sells_energy_input = components["battery_storage"].get(
-                "sells_energy_to_market"
-            )
-            self.sells_battery_energy_to_market = bool(strtobool(sells_energy_input))
+        self.components = self.check_components(components)
 
         # Main Model part
         self.model = pyo.ConcreteModel()
+
         self.define_sets()
         self.define_parameters()
         self.define_variables()
@@ -155,8 +123,6 @@ class Building(SupportsMinMax, DSMFlex):
         self.initialize_components(components)
         self.define_constraints()
         self.define_objective()
-
-        self.initialize_process_sequence()
 
         solvers = check_available_solvers(*SOLVERS)
         if len(solvers) < 1:
@@ -166,67 +132,71 @@ class Building(SupportsMinMax, DSMFlex):
         self.opt_power_requirement = None
         self.variable_cost_series = None
 
-    def create_availability_df(self, availability_periods):
+    def check_components(self, components: dict[str, dict]):
         """
-        Create an availability DataFrame based on the provided availability periods.
+        Checks and sets the building components based on the provided configuration.
 
         Args:
-            availability_periods (list of tuples): List of (start, end) tuples for availability periods.
-
-        Returns:
-            pd.Series: A series with 1 for available time steps and 0 otherwise.
+            components (dict[str, dict]): The components configuration for the building.
         """
-        availability_series = pd.Series(0, index=self.index)
+        # Component existence checks
+        self.has_heatpump = "heatpump" in components
+        self.has_boiler = "boiler" in components
+        self.has_thermal_storage = "thermal_storage" in components
+        self.has_ev = "ev" in components
+        self.has_battery_storage = "battery_storage" in components
+        self.has_pv = "pv_plant" in components
 
-        for start, end in availability_periods:
-            availability_series[start:end] = 1
+        # Check fuel type of boiler
+        self.is_boiler_electric = (
+            self.has_boiler
+            and components.get("boiler", {}).get("fuel_type") == "electric"
+        )
 
-        return availability_series
+        # Availability checks and profile assignments
+        if self.has_ev:
+            if self.ev_availability_profile is None:
+                raise KeyError(
+                    f"Missing 'availability' of the EV for building {self.id}."
+                )
+            components["ev"]["availability_profile"] = self.ev_availability_profile
+            if self.ev_charging_profile is not None:
+                components["ev"]["charging_profile"] = self.ev_charging_profile
 
-    def initialize_components(self, components: dict[str, dict]):
+        if self.has_pv:
+            if self.pv_availability_profile is None or self.pv_power_profile is None:
+                raise KeyError(
+                    f"Missing 'availability' or 'power profile' of the PV for building {self.id}."
+                )
+            if (
+                self.pv_power_profile is not None
+                and self.pv_availability_profile is not None
+            ):
+                raise ValueError(
+                    f"Both 'availability' and 'power profile' of the PV are provided for building {self.id}. Only one is allowed."
+                )
+            if self.pv_power_profile is not None:
+                components["pv_plant"]["power_profile"] = self.pv_power_profile
+            if self.pv_availability_profile is not None:
+                components["pv_plant"]["availability_profile"] = (
+                    self.pv_availability_profile
+                )
+
+        return components
+
+    def initialize_components(self):
         """
         Initializes the components of the building.
 
-        Args:
-            components (dict[str, dict]): The components of the building.
         """
-        self.model.dsm_blocks = pyo.Block(list(components.keys()))
-        for technology, component_data in components.items():
+        self.model.dsm_blocks = pyo.Block(list(self.components.keys()))
+        for technology, component_data in self.components.items():
             if technology in building_components:
                 factory_method = building_components[technology]
                 self.model.dsm_blocks[technology].transfer_attributes_from(
                     factory_method(
                         self.model, time_steps=self.model.time_steps, **component_data
                     )
-                )
-
-    def initialize_process_sequence(self):
-        """
-        Initializes the process sequence and constraints for the building.
-        """
-        if self.has_heatpump or self.has_boiler or self.has_thermal_storage:
-
-            @self.model.Constraint(self.model.time_steps)
-            def heat_flow_constraint(m, t):
-                """
-                Ensures the heat flow from the heat pump or electric boiler to the thermal storage or directly to the demand.
-                """
-                return (
-                    self.model.dsm_blocks["heatpump"].heat_out[t]
-                    if self.has_heatpump
-                    else 0
-                ) + (
-                    self.model.dsm_blocks["boiler"].heat_out[t]
-                    if self.has_boiler
-                    else 0
-                ) + (
-                    self.model.dsm_blocks["thermal_storage"].discharge_thermal[t]
-                    if self.has_thermal_storage
-                    else 0
-                ) == self.model.heat_demand[t] + (
-                    self.model.dsm_blocks["thermal_storage"].charge_thermal[t]
-                    if self.has_thermal_storage
-                    else 0
                 )
 
     def define_sets(self) -> None:
@@ -253,196 +223,143 @@ class Building(SupportsMinMax, DSMFlex):
             self.model.time_steps,
             initialize={t: value for t, value in enumerate(self.heat_demand)},
         )
-        self.model.ev_load_profile = pyo.Param(
+        self.model.electricity_demand = pyo.Param(
             self.model.time_steps,
-            initialize={t: value for t, value in enumerate(self.ev_load_profile)},
-        )
-        self.model.additional_electricity_load = pyo.Param(
-            self.model.time_steps,
-            initialize={
-                t: value for t, value in enumerate(self.additional_electricity_load)
-            },
-        )
-        self.model.battery_load_profile = pyo.Param(
-            self.model.time_steps,
-            initialize={t: value for t, value in enumerate(self.battery_load_profile)},
+            initialize={t: value for t, value in enumerate(self.electricity_demand)},
         )
 
     def define_variables(self):
         """
         Defines the variables for the Pyomo model.
         """
-        self.P_from_grid = pyo.Var(self.model.time_steps, within=pyo.NonNegativeReals)
-        self.P_to_grid = pyo.Var(self.model.time_steps, within=pyo.NonNegativeReals)
+        self.model.P_from_grid = pyo.Var(
+            self.model.time_steps, within=pyo.NonNegativeReals
+        )
+        self.model.P_to_grid = pyo.Var(
+            self.model.time_steps, within=pyo.NonNegativeReals
+        )
 
         self.model.cost = pyo.Var(self.model.time_steps, within=pyo.NonNegativeReals)
         self.model.revenue = pyo.Var(self.model.time_steps, within=pyo.NonNegativeReals)
 
-        if self.has_heatpump:
-            self.model.P_heatpump = pyo.Var(
-                self.model.time_steps, within=pyo.NonNegativeReals
-            )
-
-        if self.has_boiler and self.is_boiler_electric:
-            self.model.P_boiler = pyo.Var(
-                self.model.time_steps, within=pyo.NonNegativeReals
-            )
-
-        if self.has_ev:
-            self.model.P_ev_charge = pyo.Var(
-                self.model.time_steps, within=pyo.NonNegativeReals
-            )
-
-        if self.has_pv:
-            self.model.P_pv = pyo.Var(
-                self.model.time_steps, within=pyo.NonNegativeReals
-            )
-
-        if self.has_battery_storage:
-            self.model.P_battery_charge = pyo.Var(
-                self.model.time_steps, within=pyo.NonNegativeReals
-            )
-            self.model.P_battery_discharge = pyo.Var(
-                self.model.time_steps, within=pyo.NonNegativeReals
-            )
-
     def define_constraints(self):
         @self.model.Constraint(self.model.time_steps)
-        def total_power_input_constraint(m, t):
+        def energy_balance_constraint(m, t):
             """
-            Ensures the total power input is the sum of power inputs of all components subtracted by the self
-            produced/stored energy.
+            Ensures the total energy balance, considering all electric power flows in and out of the system.
             """
-            return (m.total_power_input[t] * self.model.consumer_indicator[t]) == (
-                self.model.energy_hp_from_grid[t] if self.has_heatpump else 0
-            ) + (
-                self.model.energy_boiler_from_grid[t]
-                if self.has_boiler and self.is_boiler_electric
-                else 0
-            ) + (
-                self.model.dsm_blocks["boiler"].power_in[t]
-                if self.has_boiler and not self.is_boiler_electric
-                else 0
-            ) + (self.model.charge_ev_from_grid[t] if self.has_ev else 0) + (
-                self.model.charge_battery_from_grid[t]
+            # Energy produced from different sources
+            pv_power = m.pv_power[t] if self.has_pv else 0
+            battery_discharge = (
+                m.dsm_blocks["battery_storage"].discharge[t]
                 if self.has_battery_storage
-                else 0
-            ) + self.model.additional_load_from_grid[t]
-
-        @self.model.Constraint(self.model.time_steps)
-        def total_power_output_constraint(m, t):
-            """
-            Ensures the total power output is the sum of power outputs of all components.
-            """
-            return (
-                m.total_power_output[t] * (1 - self.model.consumer_indicator[t])
-            ) == (self.model.energy_sell_pv[t] if self.has_pv else 0) + (
-                self.model.discharge_battery_sell[t]
-                if self.has_battery_storage and self.sells_battery_energy_to_market
                 else 0
             )
+            p_from_grid = m.P_from_grid[t]
 
-        @self.model.Constraint(self.model.time_steps)
-        def total_power_self_usage_constraint(m, t):
-            """
-            Ensures the total power output is the sum of power outputs of all components.
-            """
-            return m.total_power_self_usage[t] == (
-                self.model.energy_self_consumption_pv[t] if self.has_pv else 0
-            ) + (
-                self.model.discharge_battery_self_consumption[t]
+            # Energy demand components
+            electricity_demand = m.electricity_demand[t]
+            heatpump_demand = (
+                m.dsm_blocks["heatpump"].power_in[t] if self.has_heatpump else 0
+            )
+            boiler_demand = (
+                m.dsm_blocks["boiler"].power_in[t]
+                if self.has_boiler and self.is_boiler_electric
+                else 0
+            )
+            battery_charge = (
+                m.dsm_blocks["battery_storage"].charge[t]
                 if self.has_battery_storage
                 else 0
+            )
+            ev_demand = m.dsm_blocks["ev"].charge[t] if self.has_ev else 0
+            p_to_grid = m.P_to_grid[t]
+
+            # Energy balance equation
+            return (pv_power + battery_discharge + p_from_grid) == (
+                electricity_demand
+                + heatpump_demand
+                + boiler_demand
+                + battery_charge
+                + ev_demand
+                + p_to_grid
             )
 
         @self.model.Constraint(self.model.time_steps)
         def variable_revenue_constraint(m, t):
             """
-            Calculates the variable cost per time step.
+            Calculates the variable revenue per time step from selling electricity to the grid.
             """
-            return self.model.variable_revenue[t] == (
-                self.model.dsm_blocks["pv_plant"].operating_revenue_pv[t]
-                if self.has_pv
-                else 0
-            ) + (
-                self.model.dsm_blocks["battery_storage"].operating_revenue_battery[t]
-                if self.has_battery_storage
-                else 0
-            )
+            return m.revenue[t] == m.P_to_grid[t] * self.electricity_price_sell[t]
 
         @self.model.Constraint(self.model.time_steps)
         def variable_cost_constraint(m, t):
             """
-            Calculates the variable cost per time step.
+            Calculates the variable cost per time step from buying electricity from the grid.
             """
-            return (
-                self.model.variable_cost[t]
-                == (
-                    self.model.dsm_blocks["heatpump"].operating_cost_hp[t]
-                    if self.has_heatpump
+            return m.cost[t] == m.P_from_grid[t] * self.electricity_price_buy[t]
+
+        if self.has_heatpump or self.has_boiler or self.has_thermal_storage:
+
+            @self.model.Constraint(self.model.time_steps)
+            def heat_flow_constraint(m, t):
+                """
+                Ensures the heat flow from the heat pump, electric boiler, and thermal storage
+                satisfies the heat demand.
+                """
+                heatpump_output = (
+                    m.dsm_blocks["heatpump"].heat_out[t] if self.has_heatpump else 0
+                )
+                boiler_output = (
+                    m.dsm_blocks["boiler"].heat_out[t] if self.has_boiler else 0
+                )
+                thermal_storage_charge = (
+                    m.dsm_blocks["thermal_storage"].charge[t]
+                    if self.has_thermal_storage
                     else 0
                 )
-                + (
-                    self.model.dsm_blocks["boiler"].operating_cost_boiler[t]
-                    if self.has_boiler
+                thermal_storage_discharge = (
+                    m.dsm_blocks["thermal_storage"].discharge[t]
+                    if self.has_thermal_storage
                     else 0
                 )
-                + (
-                    self.model.dsm_blocks["ev"].operating_cost_ev[t]
-                    if self.has_ev
-                    else 0
+
+                return (
+                    heatpump_output + boiler_output + thermal_storage_charge
+                    == m.heat_demand[t] + thermal_storage_discharge
                 )
-                + (
-                    self.model.dsm_blocks["battery_storage"].operating_cost_battery[t]
-                    if self.has_battery_storage
-                    else 0
-                )
-                + self.model.additional_load_from_grid[t]
-                * self.model.electricity_price[t]
-            )
 
     def define_objective(self):
         """
         Defines the objective for the optimization model.
         """
-        if self.objective == "minimize_expenses":
 
-            @self.model.Objective(sense=pyo.minimize)
-            def obj_rule(m):
-                """
-                Minimizes the total variable cost over all time steps.
-                """
-                total_variable_cost = sum(
-                    self.model.variable_cost[t] - self.model.variable_revenue[t]
-                    for t in self.model.time_steps
-                )
-                return total_variable_cost
-
-        elif self.objective == "maximize_revenue":
-
-            @self.model.Objective(sense=pyo.maximize)
-            def obj_rule(m):
-                """
-                Maximizes the total variable revenue over all time steps.
-                """
-                total_variable_revenue = sum(
-                    self.model.variable_revenue[t] - self.model.variable_cost[t]
-                    for t in self.model.time_steps
-                )
-                return total_variable_revenue
-        else:
-            raise ValueError(f"Unknown objective: {self.objective}")
+        @self.model.Objective(sense=pyo.minimize)
+        def obj_rule(m):
+            """
+            Minimizes the net expenses over all time steps.
+            """
+            net_expenses = sum(m.cost[t] - m.revenue[t] for t in self.model.time_steps)
+            return net_expenses
 
     def calculate_optimal_operation_if_needed(self):
-        if self.opt_power_requirement is None and self.objective in [
-            "minimize_expenses",
-            "maximize_revenue",
-        ]:
+        """
+        Checks if an optimal operation needs to be calculated based on the power requirements and the defined objective.
+        If the power requirement has not been calculated and the objective is "minimize_expenses", it proceeds to calculate
+        the optimal operation.
+        Raises an error if the objective is not supported.
+        """
+        if self.opt_power_requirement is None and self.objective == "minimize_expenses":
             self.calculate_optimal_operation()
+        elif self.objective != "minimize_expenses":
+            raise NotImplementedError(
+                f"Objective {self.objective} is not implemented for building {self.id}."
+            )
 
     def calculate_optimal_operation(self):
         """
-        Determines the optimal operation of the building.
+        Determines the optimal operation of the building based on the defined model and objective.
+        Solves the model instance, processes the results, and updates power requirements and cost series.
         """
         # create an instance of the model
         instance = self.model.create_instance()
@@ -456,52 +373,55 @@ class Building(SupportsMinMax, DSMFlex):
             logger.debug("The model was solved optimally.")
 
             # Display the Objective Function Value
-            objective_value = instance.obj_rule()
+            objective_value = pyo.value(instance.obj_rule)
             logger.debug(f"The value of the objective function is {objective_value}.")
         elif results.solver.termination_condition == TerminationCondition.infeasible:
             logger.debug("The model is infeasible.")
         else:
-            logger.debug("Solver Status: ", results.solver.status)
+            logger.debug(f"Solver Status: {results.solver.status}")
             logger.debug(
-                "Termination Condition: ", results.solver.termination_condition
+                f"Termination Condition: {results.solver.termination_condition}"
             )
 
-        power_input = instance.total_power_input.get_values()
-        power_output = instance.total_power_output.get_values()
+        # Extract power input, output, and calculate the needed power
+        power_input = instance.P_from_grid.get_values()
+        power_output = instance.P_to_grid.get_values()
         needed_power = {
-            key: power_input[key] - power_output[key] for key in power_input.keys()
+            key: power_input[key] - power_output.get(key, 0)
+            for key in power_input.keys()
         }
-        self.opt_power_requirement = pd.Series(data=needed_power)
-        self.opt_power_requirement.index = self.index
+        self.opt_power_requirement = pd.Series(data=needed_power, index=self.index)
 
-        # Variable cost series
-        variable_costs = instance.variable_cost.get_values()
-        variable_revenues = instance.variable_revenue.get_values()
-        var_costs = {
-            key: abs(variable_costs[key] - variable_revenues[key])
+        # Variable cost and revenue series
+        variable_costs = instance.cost.get_values()
+        variable_revenues = instance.revenue.get_values()
+        net_costs = {
+            key: variable_costs[key] - variable_revenues.get(key, 0)
             for key in variable_costs.keys()
         }
-        self.variable_cost_series = pd.Series(data=var_costs)
-        self.variable_cost_series.index = self.index
+        self.variable_cost_series = pd.Series(data=net_costs, index=self.index)
 
         self.write_additional_outputs(instance)
 
-    def write_additional_outputs(self, instance):
-        if self.has_battery_storage:
-            soc = pd.Series(
-                data=instance.dsm_blocks["battery_storage"].soc.get_values(),
-                dtype=float,
+    def calculate_marginal_cost(self, start: pd.Timestamp, power: float) -> float:
+        """
+        Calculate the marginal cost of the unit based on the provided time and power.
+
+        Args:
+            start (pandas.Timestamp): The start time of the dispatch.
+            power (float): The power output of the unit.
+
+        Returns:
+            float: the marginal cost of the unit for the given power.
+        """
+        # Initialize marginal cost
+        marginal_cost = 0
+
+        if self.opt_power_requirement[start] > 0:
+            marginal_cost = (
+                self.variable_cost_series[start] / self.opt_power_requirement[start]
             )
-            soc.index = self.index
-            self.outputs["soc"] = soc
-        if self.has_ev:
-            ev_soc = pd.Series(
-                data=instance.dsm_blocks["ev"].ev_battery_soc.get_values(),
-                index=self.index,
-                dtype=object,
-            )
-            ev_soc.index = self.index
-            self.outputs["ev_soc"] = ev_soc
+        return marginal_cost
 
     def set_dispatch_plan(
         self,
@@ -544,25 +464,22 @@ class Building(SupportsMinMax, DSMFlex):
             orderbook=orderbook,
         )
 
-    def calculate_marginal_cost(self, start: pd.Timestamp, power: float) -> float:
-        """
-        Calculate the marginal cost of the unit based on the provided time and power.
-
-        Args:
-            start (pandas.Timestamp): The start time of the dispatch.
-            power (float): The power output of the unit.
-
-        Returns:
-            float: the marginal cost of the unit for the given power.
-        """
-        # Initialize marginal cost
-        marginal_cost = 0
-
-        if self.opt_power_requirement[start] > 0:
-            marginal_cost = (
-                self.variable_cost_series[start] / self.opt_power_requirement[start]
+    def write_additional_outputs(self, instance):
+        if self.has_battery_storage:
+            soc = pd.Series(
+                data=instance.dsm_blocks["battery_storage"].soc.get_values(),
+                dtype=float,
             )
-        return marginal_cost
+            soc.index = self.index
+            self.outputs["soc"] = soc
+        if self.has_ev:
+            ev_soc = pd.Series(
+                data=instance.dsm_blocks["ev"].ev_battery_soc.get_values(),
+                index=self.index,
+                dtype=object,
+            )
+            ev_soc.index = self.index
+            self.outputs["ev_soc"] = ev_soc
 
     def as_dict(self) -> dict:
         """

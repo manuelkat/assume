@@ -20,7 +20,7 @@ from assume.common.utils import get_products_index
 from assume.units.dsm_load_shift import DSMFlex
 from assume.units.dst_components import (
     create_dri_plant,
-    create_electric_arc_furnance,
+    create_electric_arc_furnace,
     create_electrolyser,
     create_generic_storage,
 )
@@ -35,7 +35,7 @@ dst_components = {
     "h2storage": create_generic_storage,
     "dri_plant": create_dri_plant,
     "dri_storage": create_generic_storage,
-    "eaf": create_electric_arc_furnance,
+    "eaf": create_electric_arc_furnace,
 }
 
 
