@@ -1,0 +1,432 @@
+name,carrier,bus,emission_factor,p_nom,p_min,efficiency,marginal_cost,startup costs,technology,status
+Unit_1,Natural gas,122,0.2,21.5,4.3,0.47,46.1,39.51,Combustion Engine,Market
+Unit_2,Natural gas,394,0.2,78.3,15.66,0.43,50.5,39.51,Gas turbine,Market
+Unit_3,Natural gas,12,0.2,148.4,29.68,0.36,60.7,39.51,Gas turbine,Market
+Unit_4,Natural gas,226,0.2,11,2.2,0.35,61.5,102.24,Steam turbine,Market
+Unit_5,Natural gas,378,0.2,248,49.6,0.31,66.2,39.51,Gas turbine,Market
+Unit_6,Hard coal,378,0.3,323,64.6,0.42,44.7,70.68,Steam turbine,Market
+Unit_7,Waste,275,0,12.5,2.5,0.33,17.8,0,Steam turbine,Market
+Unit_8,Natural gas,446,0.2,15,3,0.38,57.5,102.24,Steam turbine,Market
+Unit_9,Natural gas,223,0.2,10.3,2.06,0.4,54.3,102.24,Steam turbine,Market
+Unit_10,Natural gas,223,0.2,119.5,23.9,0.36,59.3,39.51,Gas turbine,Market
+Unit_11,Hard coal,114,0.3,18,3.6,0.34,55.9,70.68,Steam turbine,Market
+Unit_12,Natural gas,385,0.2,154.7,30.94,0.41,61.2,39.51,Gas turbine,Market
+Unit_13,Waste,316,0,14.7,2.94,0.33,17.8,0,Steam turbine,Market
+Unit_14,Natural gas,316,0.2,20.8,4.16,0.46,48.1,39.51,Combustion Engine,Market
+Unit_15,Natural gas,316,0.2,30.7,6.14,0.39,55.7,39.51,Gas turbine,Market
+Unit_16,Natural gas,316,0.2,49.9,9.98,0.36,59.1,102.24,Steam turbine,Market
+Unit_17,Waste,418,0,80.9,16.18,0.33,17.8,0,Steam turbine,Market
+Unit_18,Natural gas,254,0.2,11.3,2.26,0.4,55.1,39.51,Gas turbine,Market
+Unit_19,Natural gas,33,0.2,10,2,0.47,46.8,39.51,Combustion Engine,Market
+Unit_20,Natural gas,33,0.2,19,3.8,0.36,59.8,39.51,Gas turbine,Market
+Unit_21,Waste,335,0,9.3,1.86,0.33,17.8,0,Steam turbine,Market
+Unit_22,Natural gas,292,0.2,117.8,23.56,0.41,55.5,39.51,Gas turbine,Market
+Unit_23,Natural gas,302,0.2,29.3,5.86,0.4,54.5,102.24,Steam turbine,Market
+Unit_24,Natural gas,302,0.2,101.4,20.28,0.41,55.1,39.51,Gas turbine,Market
+Unit_25,Lignite,317,0.4,19.8,3.96,0.32,39.7,47.13,Steam turbine,Market
+Unit_26,Natural gas,317,0.2,4.5,0.9,0.35,61.4,102.24,Steam turbine,Market
+Unit_27,Oil,317,0.25,0.8,0.16,0.39,156.5,28,Combustion Engine,Market
+Unit_28,Lignite,123,0.4,2827,565.4,0.29,37.3,47.13,Steam turbine,Market
+Unit_29,Hard coal,166,0.3,720,144,0.39,48.6,70.68,Steam turbine,Market
+Unit_30,Natural gas,347,0.2,459.1,91.82,0.36,58.1,102.24,Steam turbine,Market
+Unit_31,Natural gas,44,0.2,25.6,5.12,0.47,47,39.51,Combustion Engine,Market
+Unit_32,Natural gas,47,0.2,20.2,4.04,0.47,47.1,39.51,Combustion Engine,Market
+Unit_33,Natural gas,48,0.2,189.5,37.9,0.43,50.8,39.51,Gas turbine,Market
+Unit_34,Natural gas,430,0.2,264,52.8,0.32,61.3,39.51,Gas turbine,Market
+Unit_35,Natural gas,435,0.2,164,32.8,0.36,59.5,102.24,Steam turbine,Market
+Unit_36,Natural gas,47,0.2,116,23.2,0.38,56.9,102.24,Steam turbine,Market
+Unit_37,Natural gas,47,0.2,328,65.6,0.37,58.2,39.51,Gas turbine,Market
+Unit_38,Hard coal,347,0.3,89,17.8,0.41,46.3,70.68,Steam turbine,Market
+Unit_39,Oil,347,0.25,235,47,0.31,194.8,28,Gas turbine,Market
+Unit_40,Hard coal,365,0.3,688,137.6,0.4,48.6,70.68,Steam turbine,Market
+Unit_41,Waste,365,0,36,7.2,0.33,17.8,0,Steam turbine,Market
+Unit_42,Natural gas,432,0.2,122,24.4,0.43,50.9,39.51,Gas turbine,Market
+Unit_43,Natural gas,432,0.2,21.7,4.34,0.38,57.4,102.24,Steam turbine,Market
+Unit_44,Waste,432,0,48.9,9.78,0.33,17.8,0,Steam turbine,Market
+Unit_45,Natural gas,257,0.2,378.4,75.68,0.44,50,39.51,Gas turbine,Market
+Unit_46,Natural gas,400,0.2,52.7,10.54,0.39,53.3,39.51,Gas turbine,Market
+Unit_47,Natural gas,219,0.2,106.5,21.3,0.32,65.9,39.51,Gas turbine,Market
+Unit_48,Natural gas,219,0.2,48.5,9.7,0.35,62.3,102.24,Steam turbine,Market
+Unit_49,Natural gas,263,0.2,2,0.4,0.46,47.1,39.51,Combustion Engine,Market
+Unit_50,Natural gas,263,0.2,156.9,31.38,0.38,59.1,39.51,Gas turbine,Market
+Unit_51,Natural gas,418,0.2,553.7,110.74,0.37,56.5,39.51,Gas turbine,Market
+Unit_52,Waste,263,0,10,2,0.33,17.8,0,Steam turbine,Market
+Unit_53,Waste,399,0,12.6,2.52,0.33,17.8,0,Steam turbine,Market
+Unit_54,Natural gas,141,0.2,43.4,8.68,0.32,67.8,39.51,Gas turbine,Market
+Unit_55,Natural gas,201,0.2,6.4,1.28,0.39,55.7,39.51,Gas turbine,Market
+Unit_56,Natural gas,118,0.2,73.5,14.7,0.4,54.5,102.24,Steam turbine,Market
+Unit_57,Natural gas,118,0.2,20.5,4.1,0.38,57.9,39.51,Gas turbine,Market
+Unit_58,Waste,118,0,12.1,2.42,0.33,17.8,0,Steam turbine,Market
+Unit_59,Lignite,418,0.4,8803.7,1760.74,0.36,33.2,47.13,Steam turbine,Market
+Unit_60,Natural gas,43,0.2,156.8,31.36,0.37,59,39.51,Gas turbine,Market
+Unit_61,Natural gas,43,0.2,56,11.2,0.38,57.4,102.24,Steam turbine,Market
+Unit_62,Natural gas,295,0.2,68.4,13.68,0.44,50,39.51,Gas turbine,Market
+Unit_63,Natural gas,295,0.2,98.1,19.62,0.64,34.3,113.98,Combined cycle,Market
+Unit_64,Hard coal,295,0.3,44.5,8.9,0.4,47.6,70.68,Steam turbine,Market
+Unit_65,Natural gas,295,0.2,20,4,0.35,61.4,102.24,Steam turbine,Market
+Unit_66,Natural gas,416,0.2,344.2,68.84,0.36,57,39.51,Gas turbine,Market
+Unit_67,Natural gas,416,0.2,205.9,41.18,0.46,48,39.51,Combustion Engine,Market
+Unit_68,Natural gas,67,0.2,459.3,91.86,0.36,56.4,39.51,Gas turbine,Market
+Unit_69,Waste,62,0,65.1,13.02,0.33,17.8,0,Steam turbine,Market
+Unit_70,Waste,67,0,32,6.4,0.33,17.8,0,Steam turbine,Market
+Unit_71,Natural gas,62,0.2,106,21.2,0.47,46.1,39.51,Combustion Engine,Market
+Unit_72,Hard coal,62,0.3,119,23.8,0.41,46.6,70.68,Steam turbine,Market
+Unit_73,Oil,67,0.25,86,17.2,0.32,192.1,28,Gas turbine,Market
+Unit_74,Waste,358,0,14,2.8,0.33,17.8,0,Steam turbine,Market
+Unit_75,Natural gas,111,0.2,10,2,0.38,57.9,39.51,Gas turbine,Market
+Unit_76,Natural gas,22,0.2,17.1,3.42,0.35,57.2,39.51,Gas turbine,Market
+Unit_77,Waste,49,0,37.5,7.5,0.33,17.8,0,Steam turbine,Market
+Unit_78,Natural gas,331,0.2,185.1,37.02,0.35,59.7,102.24,Steam turbine,Market
+Unit_79,Natural gas,331,0.2,137,27.4,0.38,56.8,39.51,Gas turbine,Market
+Unit_80,Waste,331,0,12.8,2.56,0.33,17.8,0,Steam turbine,Market
+Unit_81,Natural gas,140,0.2,10,2,0.36,60.2,39.51,Gas turbine,Market
+Unit_82,Natural gas,234,0.2,87.5,17.5,0.47,46.1,39.51,Combustion Engine,Market
+Unit_83,Natural gas,418,0.2,200.5,40.1,0.47,46.4,39.51,Combustion Engine,Market
+Unit_84,Waste,334,0,10.6,2.12,0.33,17.8,0,Steam turbine,Market
+Unit_85,Oil,430,0.25,17.1,3.42,0.44,139.6,28,Combustion Engine,Market
+Unit_86,Natural gas,418,0.2,109,21.8,0.38,56.9,102.24,Steam turbine,Market
+Unit_87,Natural gas,213,0.2,3,0.6,0.46,47.3,39.51,Combustion Engine,Market
+Unit_88,Natural gas,213,0.2,10,2,0.38,57.5,39.51,Gas turbine,Market
+Unit_89,Waste,213,0,11.4,2.28,0.33,17.8,0,Steam turbine,Market
+Unit_90,Hard coal,164,0.3,1052,210.4,0.47,40.2,70.68,Steam turbine,Market
+Unit_91,Natural gas,131,0.2,194,38.8,0.39,56.4,102.24,Steam turbine,Market
+Unit_92,Natural gas,131,0.2,368,73.6,0.38,57.1,39.51,Gas turbine,Market
+Unit_93,Natural gas,444,0.2,58.7,11.74,0.43,50.2,39.51,Gas turbine,Market
+Unit_94,Natural gas,444,0.2,26.6,5.32,0.41,53.2,102.24,Steam turbine,Market
+Unit_95,Oil,190,0.25,15,3,0.39,157.5,201.58,Steam turbine,Market
+Unit_96,Natural gas,416,0.2,123.8,24.76,0.38,56.2,102.24,Steam turbine,Market
+Unit_97,Natural gas,175,0.2,20.9,4.18,0.4,54.8,102.24,Steam turbine,Market
+Unit_98,Natural gas,188,0.2,190.6,38.12,0.32,59.9,39.51,Gas turbine,Market
+Unit_99,Natural gas,188,0.2,84,16.8,0.39,55.7,102.24,Steam turbine,Market
+Unit_100,Natural gas,175,0.2,31.5,6.3,0.47,46.1,39.51,Combustion Engine,Market
+Unit_101,Hard coal,191,0.3,1095,219,0.46,44.1,70.68,Steam turbine,Market
+Unit_102,Natural gas,200,0.2,8.9,1.78,0.34,63.5,102.24,Steam turbine,Market
+Unit_103,Natural gas,146,0.2,4,0.8,0.46,47.1,39.51,Combustion Engine,Market
+Unit_104,Natural gas,146,0.2,68.8,13.76,0.35,61.3,102.24,Steam turbine,Market
+Unit_105,Oil,146,0.25,4.1,0.82,0.43,137.3,28,Combustion Engine,Market
+Unit_106,Natural gas,146,0.2,8.6,1.72,0.41,53.1,39.51,Gas turbine,Market
+Unit_107,Natural gas,455,0.2,21,4.2,0.41,53,39.51,Gas turbine,Market
+Unit_108,Oil,148,0.25,86.2,17.24,0.31,197,28,Gas turbine,Market
+Unit_109,Natural gas,116,0.2,836,167.2,0.38,60.9,39.51,Gas turbine,Market
+Unit_110,Natural gas,424,0.2,12.8,2.56,0.46,47.2,39.51,Combustion Engine,Market
+Unit_111,Natural gas,319,0.2,8.6,1.72,0.34,61.8,102.24,Steam turbine,Market
+Unit_112,Natural gas,81,0.2,61.6,12.32,0.27,80.6,39.51,Gas turbine,Market
+Unit_113,Waste,81,0,32,6.4,0.33,17.8,0,Steam turbine,Market
+Unit_114,Natural gas,61,0.2,321,64.2,0.33,66.3,39.51,Gas turbine,Market
+Unit_115,Natural gas,335,0.2,75.2,15.04,0.42,51.6,39.51,Gas turbine,Market
+Unit_116,Natural gas,270,0.2,485,97,0.31,68.9,39.51,Gas turbine,Market
+Unit_117,Natural gas,32,0.2,44.5,8.9,0.38,54.9,102.24,Steam turbine,Market
+Unit_118,Natural gas,32,0.2,79,15.8,0.38,55.8,39.51,Gas turbine,Market
+Unit_119,Natural gas,390,0.2,786.3,157.26,0.41,58.3,102.24,Steam turbine,Market
+Unit_120,Natural gas,390,0.2,72.4,14.48,0.39,58.6,39.51,Gas turbine,Market
+Unit_121,Waste,321,0,14,2.8,0.33,17.8,0,Steam turbine,Market
+Unit_122,Waste,127,0,27,5.4,0.33,17.8,0,Steam turbine,Market
+Unit_123,Lignite,127,0.4,1961,392.2,0.33,37.3,47.13,Steam turbine,Market
+Unit_124,Natural gas,127,0.2,400,80,0.39,55.5,102.24,Steam turbine,Market
+Unit_125,Waste,108,0,38,7.6,0.33,17.8,0,Steam turbine,Market
+Unit_126,Natural gas,486,0.2,11.4,2.28,0.37,57.7,102.24,Steam turbine,Market
+Unit_127,Natural gas,156,0.2,20.6,4.12,0.36,57.2,102.24,Steam turbine,Market
+Unit_128,Natural gas,495,0.2,93.4,18.68,0.4,55.7,102.24,Steam turbine,Market
+Unit_129,Hard coal,495,0.3,65.8,13.16,0.4,47.2,70.68,Steam turbine,Market
+Unit_130,Natural gas,495,0.2,110.1,22.02,0.42,51.1,39.51,Gas turbine,Market
+Unit_131,Waste,240,0,71,14.2,0.33,17.8,0,Steam turbine,Market
+Unit_132,Natural gas,240,0.2,94.5,18.9,0.34,58.2,102.24,Steam turbine,Market
+Unit_133,Natural gas,240,0.2,337.2,67.44,0.43,52.7,39.51,Gas turbine,Market
+Unit_134,Natural gas,182,0.2,872.1,174.42,0.39,57.7,39.51,Gas turbine,Market
+Unit_135,Hard coal,182,0.3,123,24.6,0.41,46.3,70.68,Steam turbine,Market
+Unit_136,Natural gas,182,0.2,178.8,35.76,0.4,55.1,102.24,Steam turbine,Market
+Unit_137,Waste,492,0,72.5,14.5,0.33,17.8,0,Steam turbine,Market
+Unit_138,Lignite,325,0.4,4016.6,803.32,0.4,33.5,47.13,Steam turbine,Market
+Unit_139,Natural gas,325,0.2,104.3,20.86,0.47,46.8,39.51,Combustion Engine,Market
+Unit_140,Lignite,430,0.4,176,35.2,0.32,39.4,47.13,Steam turbine,Market
+Unit_141,Natural gas,358,0.2,8.6,1.72,0.46,47.5,39.51,Combustion Engine,Market
+Unit_142,Natural gas,358,0.2,17.3,3.46,0.41,53.8,39.51,Gas turbine,Market
+Unit_143,Natural gas,322,0.2,39.2,7.84,0.41,56.6,102.24,Steam turbine,Market
+Unit_144,Natural gas,322,0.2,44,8.8,0.38,57.3,39.51,Gas turbine,Market
+Unit_145,Natural gas,322,0.2,2,0.4,0.46,47.2,39.51,Combustion Engine,Market
+Unit_146,Natural gas,304,0.2,21,4.2,0.37,58.5,102.24,Steam turbine,Market
+Unit_147,Natural gas,304,0.2,27.6,5.52,0.41,56.1,39.51,Gas turbine,Market
+Unit_148,Oil,304,0.25,25,5,0.46,133.1,28,Combustion Engine,Market
+Unit_149,Natural gas,139,0.2,27.8,5.56,0.41,52.9,102.24,Steam turbine,Market
+Unit_150,Natural gas,139,0.2,105.8,21.16,0.44,49.7,39.51,Gas turbine,Market
+Unit_151,Hard coal,139,0.3,760,152,0.36,50.6,70.68,Steam turbine,Market
+Unit_152,Natural gas,274,0.2,17.6,3.52,0.47,46.8,39.51,Combustion Engine,Market
+Unit_153,Waste,440,0,17,3.4,0.33,17.8,0,Steam turbine,Market
+Unit_154,Waste,377,0,11,2.2,0.33,17.8,0,Steam turbine,Market
+Unit_155,Natural gas,258,0.2,18.8,3.76,0.38,57.9,39.51,Gas turbine,Market
+Unit_156,Natural gas,40,0.2,12.8,2.56,0.47,46.7,39.51,Combustion Engine,Market
+Unit_157,Natural gas,40,0.2,14.7,2.94,0.37,58.6,39.51,Gas turbine,Market
+Unit_158,Natural gas,405,0.2,22.8,4.56,0.36,56.4,102.24,Steam turbine,Market
+Unit_159,Natural gas,405,0.2,31.3,6.26,0.42,58.7,39.51,Gas turbine,Market
+Unit_160,Natural gas,285,0.2,48.4,9.68,0.42,56.1,39.51,Gas turbine,Market
+Unit_161,Oil,362,0.25,136.8,27.36,0.36,166.3,28,Gas turbine,Market
+Unit_162,Hard coal,246,0.3,522,104.4,0.41,45.9,70.68,Steam turbine,Market
+Unit_163,Waste,405,0,25,5,0.33,17.8,0,Steam turbine,Market
+Unit_164,Natural gas,157,0.2,6.4,1.28,0.38,57.4,102.24,Steam turbine,Market
+Unit_165,Natural gas,157,0.2,5,1,0.47,47.2,39.51,Combustion Engine,Market
+Unit_166,Natural gas,157,0.2,15.6,3.12,0.37,59.4,39.51,Gas turbine,Market
+Unit_167,Natural gas,205,0.2,664,132.8,0.33,61.5,39.51,Gas turbine,Market
+Unit_168,Natural gas,434,0.2,171.2,34.24,0.43,50.8,39.51,Gas turbine,Market
+Unit_169,Natural gas,325,0.2,98.2,19.64,0.38,54.9,102.24,Steam turbine,Market
+Unit_170,Natural gas,325,0.2,724.8,144.96,0.37,56.5,39.51,Gas turbine,Market
+Unit_171,Natural gas,183,0.2,2,0.4,0.4,55.1,102.24,Steam turbine,Market
+Unit_172,Natural gas,183,0.2,21.6,4.32,0.41,53.2,39.51,Gas turbine,Market
+Unit_173,Natural gas,183,0.2,10.2,2.04,0.46,47.3,39.51,Combustion Engine,Market
+Unit_174,Natural gas,21,0.2,127,25.4,0.4,54.1,39.51,Gas turbine,Market
+Unit_175,Hard coal,21,0.3,154,30.8,0.41,45.6,70.68,Steam turbine,Market
+Unit_176,Waste,183,0,23.9,4.78,0.33,17.8,0,Steam turbine,Market
+Unit_177,Waste,210,0,32.4,6.48,0.33,17.8,0,Steam turbine,Market
+Unit_178,Natural gas,249,0.2,14.6,2.92,0.46,47.3,39.51,Combustion Engine,Market
+Unit_179,Waste,249,0,19.6,3.92,0.33,17.8,0,Steam turbine,Market
+Unit_180,Natural gas,136,0.2,852,170.4,0.4,54.7,39.51,Gas turbine,Market
+Unit_181,Waste,380,0,27.2,5.44,0.33,17.8,0,Steam turbine,Market
+Unit_182,Hard coal,380,0.3,272,54.4,0.41,46.6,70.68,Steam turbine,Market
+Unit_183,Natural gas,380,0.2,230,46,0.37,55.4,39.51,Gas turbine,Market
+Unit_184,Natural gas,422,0.2,13.3,2.66,0.38,56.8,39.51,Gas turbine,Market
+Unit_185,Natural gas,394,0.2,20,4,0.46,48.1,39.51,Combustion Engine,Market
+Unit_186,Natural gas,310,0.2,6.5,1.3,0.39,56,102.24,Steam turbine,Market
+Unit_187,Hard coal,310,0.3,778,155.6,0.4,47.6,70.68,Steam turbine,Market
+Unit_188,Natural gas,41,0.2,2,0.4,0.46,47.1,39.51,Combustion Engine,Market
+Unit_189,Oil,416,0.25,378.7,75.74,0.34,162.9,201.58,Steam turbine,Market
+Unit_190,Natural gas,205,0.2,6.1,1.22,0.45,48.3,39.51,Combustion Engine,Market
+Unit_191,Natural gas,31,0.2,129.4,25.88,0.4,55.5,39.51,Gas turbine,Market
+Unit_192,Natural gas,31,0.2,133.8,26.76,0.35,59.9,102.24,Steam turbine,Market
+Unit_193,Natural gas,142,0.2,657,131.4,0.43,50.2,39.51,Gas turbine,Market
+Unit_194,Hard coal,142,0.3,460,92,0.41,46.6,70.68,Steam turbine,Market
+Unit_195,Waste,457,0,65.6,13.12,0.33,17.8,0,Steam turbine,Market
+Unit_196,Natural gas,342,0.2,22.1,4.42,0.34,62.6,102.24,Steam turbine,Market
+Unit_197,Natural gas,299,0.2,29.3,5.86,0.39,57.1,102.24,Steam turbine,Market
+Unit_198,Lignite,238,0.4,47.9,9.58,0.39,32.6,47.13,Steam turbine,Market
+Unit_199,Natural gas,475,0.2,10.4,2.08,0.38,59.2,102.24,Steam turbine,Market
+Unit_200,Natural gas,475,0.2,11.7,2.34,0.42,55.6,39.51,Gas turbine,Market
+Unit_201,Waste,325,0,108.4,21.68,0.33,17.8,0,Steam turbine,Market
+Unit_202,Natural gas,1,0.2,901.5,180.3,0.4,56,39.51,Gas turbine,Market
+Unit_203,Lignite,1,0.4,98,19.6,0.39,32.8,47.13,Steam turbine,Market
+Unit_204,Natural gas,287,0.2,16.7,3.34,0.37,55.5,39.51,Gas turbine,Market
+Unit_205,Natural gas,254,0.2,9.3,1.86,0.35,61.5,102.24,Steam turbine,Market
+Unit_206,Natural gas,351,0.2,10,2,0.38,57.9,39.51,Gas turbine,Market
+Unit_207,Waste,351,0,25.6,5.12,0.33,17.8,0,Steam turbine,Market
+Unit_208,Oil,155,0.25,1.6,0.32,0.45,135.2,28,Combustion Engine,Market
+Unit_209,Waste,155,0,14.1,2.82,0.33,17.8,0,Steam turbine,Market
+Unit_210,Natural gas,121,0.2,14,2.8,0.47,47,39.51,Combustion Engine,Market
+Unit_211,Natural gas,121,0.2,22.9,4.58,0.39,55.8,102.24,Steam turbine,Market
+Unit_212,Natural gas,225,0.2,70.9,14.18,0.28,69,102.24,Steam turbine,Market
+Unit_213,Natural gas,137,0.2,11.4,2.28,0.36,60.1,102.24,Steam turbine,Market
+Unit_214,Waste,468,0,16,3.2,0.33,17.8,0,Steam turbine,Market
+Unit_215,Hard coal,52,0.3,1351,270.2,0.4,44.4,70.68,Steam turbine,Market
+Unit_216,Oil,424,0.25,95,19,0.38,159.7,201.58,Steam turbine,Market
+Unit_217,Natural gas,52,0.2,33,6.6,0.37,59,102.24,Steam turbine,Market
+Unit_218,Waste,302,0,22.7,4.54,0.33,17.8,0,Steam turbine,Market
+Unit_219,Lignite,302,0.4,33.5,6.7,0.38,33.4,47.13,Steam turbine,Market
+Unit_220,Natural gas,349,0.2,54.7,10.94,0.37,59.7,102.24,Steam turbine,Market
+Unit_221,Natural gas,463,0.2,23.1,4.62,0.47,47.6,39.51,Combustion Engine,Market
+Unit_222,Natural gas,401,0.2,21.4,4.28,0.39,54,39.51,Gas turbine,Market
+Unit_223,Natural gas,84,0.2,190,38,0.47,46.8,39.51,Combustion Engine,Market
+Unit_224,Oil,219,0.25,19,3.8,0.31,195.3,28,Gas turbine,Market
+Unit_225,Waste,364,0,82.7,16.54,0.33,17.8,0,Steam turbine,Market
+Unit_226,Natural gas,162,0.2,29.6,5.92,0.43,50.2,39.51,Gas turbine,Market
+Unit_227,Natural gas,150,0.2,31.1,6.22,0.47,46.5,39.51,Combustion Engine,Market
+Unit_228,Natural gas,162,0.2,123.7,24.74,0.4,55.4,102.24,Steam turbine,Market
+Unit_229,Lignite,162,0.4,75.3,15.06,0.43,29.9,47.13,Steam turbine,Market
+Unit_230,Natural gas,364,0.2,174.5,34.9,0.39,58.5,102.24,Steam turbine,Market
+Unit_231,Natural gas,364,0.2,743.9,148.78,0.39,57.4,39.51,Gas turbine,Market
+Unit_232,Oil,465,0.25,92,18.4,0.38,159.5,204.71,Combined cycle,Market
+Unit_233,Natural gas,351,0.2,25,5,0.35,62.7,102.24,Steam turbine,Market
+Unit_234,Natural gas,88,0.2,14,2.8,0.44,50,39.51,Combustion Engine,Market
+Unit_235,Natural gas,88,0.2,25.7,5.14,0.35,62.7,102.24,Steam turbine,Market
+Unit_236,Hard coal,185,0.3,54.2,10.84,0.41,52,70.68,Steam turbine,Market
+Unit_237,Natural gas,185,0.2,74.5,14.9,0.35,61.8,102.24,Steam turbine,Market
+Unit_238,Waste,185,0,20.9,4.18,0.33,17.8,0,Steam turbine,Market
+Unit_239,Natural gas,301,0.2,16,3.2,0.38,57.1,39.51,Gas turbine,Market
+Unit_240,Natural gas,386,0.2,8.9,1.78,0.36,59.6,102.24,Steam turbine,Market
+Unit_241,Hard coal,386,0.3,4.1,0.82,0.35,54.2,70.68,Steam turbine,Market
+Unit_242,Natural gas,4,0.2,487,97.4,0.31,69.1,39.51,Gas turbine,Market
+Unit_243,Natural gas,68,0.2,4,0.8,0.46,47.3,39.51,Combustion Engine,Market
+Unit_244,Natural gas,68,0.2,9,1.8,0.42,52.5,39.51,Gas turbine,Market
+Unit_245,Natural gas,386,0.2,19.4,3.88,0.35,62,39.51,Gas turbine,Market
+Unit_246,Oil,418,0.25,92.5,18.5,0.38,158.8,201.58,Steam turbine,Market
+Unit_247,Hard coal,364,0.3,75.5,15.1,0.36,50.1,70.68,Steam turbine,Market
+Unit_248,Natural gas,92,0.2,864.1,172.82,0.37,54.8,39.51,Gas turbine,Market
+Unit_249,Natural gas,92,0.2,720,144,0.38,57.5,102.24,Steam turbine,Market
+Unit_250,Natural gas,92,0.2,359,71.8,0.44,49.4,113.98,Combined cycle,Market
+Unit_251,Natural gas,18,0.2,433.5,86.7,0.41,52.1,39.51,Gas turbine,Market
+Unit_252,Natural gas,215,0.2,7.5,1.5,0.45,48.3,39.51,Combustion Engine,Market
+Unit_253,Natural gas,215,0.2,963.8,192.76,0.39,57.7,39.51,Gas turbine,Market
+Unit_254,Oil,215,0.25,9.8,1.96,0.43,142.7,28,Combustion Engine,Market
+Unit_255,Waste,215,0,88.1,17.62,0.33,17.8,0,Steam turbine,Market
+Unit_256,Hard coal,248,0.3,746,149.2,0.46,41.5,70.68,Steam turbine,Market
+Unit_257,Waste,357,0,27.2,5.44,0.33,17.8,0,Steam turbine,Market
+Unit_258,Waste,182,0,20,4,0.33,17.8,0,Steam turbine,Market
+Unit_259,Natural gas,182,0.2,99,19.8,0.47,46.5,39.51,Combustion Engine,Market
+Unit_260,Natural gas,70,0.2,34.6,6.92,0.37,58.7,102.24,Steam turbine,Market
+Unit_261,Natural gas,229,0.2,21.9,4.38,0.36,53.2,39.51,Combustion Engine,Market
+Unit_262,Natural gas,229,0.2,45.4,9.08,0.35,58.2,102.24,Steam turbine,Market
+Unit_263,Hard coal,229,0.3,1958,391.6,0.44,44.5,70.68,Steam turbine,Market
+Unit_264,Natural gas,274,0.2,157.2,31.44,0.36,54.9,102.24,Steam turbine,Market
+Unit_265,Natural gas,274,0.2,346.2,69.24,0.31,56.6,39.51,Gas turbine,Market
+Unit_266,Natural gas,275,0.2,45.2,9.04,0.4,54.2,102.24,Steam turbine,Market
+Unit_267,Natural gas,275,0.2,17.5,3.5,0.42,52.2,39.51,Gas turbine,Market
+Unit_268,Natural gas,184,0.2,19.5,3.9,0.36,59,102.24,Steam turbine,Market
+Unit_269,Natural gas,171,0.2,5.4,1.08,0.47,46.5,39.51,Combustion Engine,Market
+Unit_270,Natural gas,354,0.2,27.1,5.42,0.47,46.7,39.51,Combustion Engine,Market
+Unit_271,Natural gas,354,0.2,488.4,97.68,0.33,57.9,39.51,Gas turbine,Market
+Unit_272,Natural gas,354,0.2,207.3,41.46,0.39,57.8,102.24,Steam turbine,Market
+Unit_273,Oil,18,0.25,10.5,2.1,0.43,140.9,28,Combustion Engine,Market
+Unit_274,Natural gas,18,0.2,37.6,7.52,0.46,47.5,39.51,Combustion Engine,Market
+Unit_275,Natural gas,447,0.2,26.5,5.3,0.38,56.9,102.24,Steam turbine,Market
+Unit_276,Natural gas,447,0.2,46.9,9.38,0.37,58.2,39.51,Gas turbine,Market
+Unit_277,Oil,83,0.25,9.2,1.84,0.42,134.7,28,Combustion Engine,Market
+Unit_278,Hard coal,83,0.3,44,8.8,0.39,49,70.68,Steam turbine,Market
+Unit_279,Waste,83,0,26.9,5.38,0.33,17.8,0,Steam turbine,Market
+Unit_280,Waste,211,0,11.6,2.32,0.33,17.8,0,Steam turbine,Market
+Unit_281,Natural gas,116,0.2,9.5,1.9,0.35,61.4,102.24,Steam turbine,Market
+Unit_282,Natural gas,233,0.2,30.9,6.18,0.47,46.4,39.51,Combustion Engine,Market
+Unit_283,Natural gas,60,0.2,17.1,3.42,0.41,52.8,39.51,Gas turbine,Market
+Unit_284,Natural gas,7,0.2,26,5.2,0.37,58,102.24,Steam turbine,Market
+Unit_285,Natural gas,18,0.2,93.9,18.78,0.4,57.9,102.24,Steam turbine,Market
+Unit_286,Waste,18,0,18.8,3.76,0.33,17.8,0,Steam turbine,Market
+Unit_287,Natural gas,170,0.2,30.3,6.06,0.47,50.3,39.51,Combustion Engine,Market
+Unit_288,Waste,170,0,61.5,12.3,0.33,17.8,0,Steam turbine,Market
+Unit_289,Oil,174,0.25,24,4.8,0.33,182.7,201.58,Steam turbine,Market
+Unit_290,Hard coal,288,0.3,18.5,3.7,0.4,47.1,70.68,Steam turbine,Market
+Unit_291,Natural gas,215,0.2,12.1,2.42,0.36,59.6,102.24,Steam turbine,Market
+Unit_292,Hard coal,432,0.3,54,10.8,0.4,46.8,70.68,Steam turbine,Market
+Unit_293,Oil,416,0.25,87,17.4,0.31,197,28,Gas turbine,Market
+Unit_294,Natural gas,265,0.2,14.5,2.9,0.37,59.4,39.51,Gas turbine,Market
+Unit_295,Lignite,265,0.4,19,3.8,0.32,37.6,47.13,Steam turbine,Market
+Unit_296,Oil,398,0.25,90,18,0.39,155.3,28,Gas turbine,Market
+Unit_297,Hard coal,376,0.3,875,175,0.4,47.1,70.68,Steam turbine,Market
+Unit_298,Oil,487,0.25,11.4,2.28,0.41,146.6,28,Combustion Engine,Market
+Unit_299,Natural gas,58,0.2,52.9,10.58,0.47,46.5,39.51,Combustion Engine,Market
+Unit_300,Natural gas,332,0.2,117.3,23.46,0.41,53.8,39.51,Gas turbine,Market
+Unit_301,Natural gas,365,0.2,81.8,16.36,0.37,58.6,39.51,Gas turbine,Market
+Unit_302,Waste,43,0,60.3,12.06,0.33,17.8,0,Steam turbine,Market
+Unit_303,Natural gas,356,0.2,12.3,2.46,0.43,50.5,39.51,Gas turbine,Market
+Unit_304,Natural gas,225,0.2,12.8,2.56,0.47,46.8,39.51,Combustion Engine,Market
+Unit_305,Natural gas,266,0.2,19.6,3.92,0.38,54.4,39.51,Gas turbine,Market
+Unit_306,Natural gas,373,0.2,13.4,2.68,0.46,47.6,39.51,Combustion Engine,Market
+Unit_307,Natural gas,320,0.2,10,2,0.46,47.8,39.51,Combustion Engine,Market
+Unit_308,Natural gas,468,0.2,54,10.8,0.37,58.6,39.51,Gas turbine,Market
+Unit_309,Hard coal,468,0.3,83.1,16.62,0.39,46.1,70.68,Steam turbine,Market
+Unit_310,Waste,266,0,9,1.8,0.33,17.8,0,Steam turbine,Market
+Unit_311,Natural gas,266,0.2,30.4,6.08,0.46,46.9,39.51,Combustion Engine,Market
+Unit_312,Hard coal,217,0.3,514,102.8,0.42,45.4,70.68,Steam turbine,Market
+Unit_313,Natural gas,217,0.2,108,21.6,0.37,58.6,39.51,Gas turbine,Market
+Unit_314,Waste,217,0,18.5,3.7,0.33,17.8,0,Steam turbine,Market
+Unit_315,Natural gas,70,0.2,168.4,33.68,0.38,54.3,39.51,Gas turbine,Market
+Unit_316,Waste,360,0,16,3.2,0.33,17.8,0,Steam turbine,Market
+Unit_317,Natural gas,99,0.2,87,17.4,0.4,56.6,102.24,Steam turbine,Market
+Unit_318,Natural gas,99,0.2,52.5,10.5,0.47,46.3,39.51,Combustion Engine,Market
+Unit_319,Natural gas,99,0.2,78.6,15.72,0.39,54.3,39.51,Gas turbine,Market
+Unit_320,Natural gas,445,0.2,15,3,0.36,57.2,102.24,Steam turbine,Market
+Unit_321,Oil,425,0.25,7.5,1.5,0.46,132,28,Combustion Engine,Market
+Unit_322,Natural gas,16,0.2,23.2,4.64,0.37,59.4,39.51,Gas turbine,Market
+Unit_323,Natural gas,425,0.2,11.5,2.3,0.36,60.1,102.24,Steam turbine,Market
+Unit_324,Natural gas,484,0.2,38.9,7.78,0.36,57.5,102.24,Steam turbine,Market
+Unit_325,Natural gas,484,0.2,44.3,8.86,0.42,52.5,39.51,Gas turbine,Market
+Unit_326,Waste,338,0,50,10,0.33,17.8,0,Steam turbine,Market
+Unit_327,Waste,416,0,28.9,5.78,0.33,17.8,0,Steam turbine,Market
+Unit_328,Hard coal,383,0.3,24.4,4.88,0.41,46.3,70.68,Steam turbine,Market
+Unit_329,Oil,383,0.25,7.8,1.56,0.43,140.2,28,Combustion Engine,Market
+Unit_330,Natural gas,102,0.2,29,5.8,0.38,57.4,102.24,Steam turbine,Market
+Unit_331,Natural gas,102,0.2,63.9,12.78,0.44,50.1,39.51,Gas turbine,Market
+Unit_332,Natural gas,399,0.2,39.7,7.94,0.41,58.8,39.51,Gas turbine,Market
+Unit_333,Natural gas,399,0.2,95,19,0.35,61.7,102.24,Steam turbine,Market
+Unit_334,Natural gas,211,0.2,19.6,3.92,0.42,52.2,39.51,Gas turbine,Market
+Unit_335,Natural gas,414,0.2,165.8,33.16,0.41,52.8,39.51,Gas turbine,Market
+Unit_336,Natural gas,414,0.2,27,5.4,0.36,57.5,102.24,Steam turbine,Market
+Unit_337,Waste,21,0,11.4,2.28,0.33,17.8,0,Steam turbine,Market
+Unit_338,Waste,292,0,24,4.8,0.33,17.8,0,Steam turbine,Market
+Unit_339,Natural gas,39,0.2,13.2,2.64,0.47,46.8,39.51,Combustion Engine,Market
+Unit_340,Natural gas,409,0.2,29.1,5.82,0.47,46.8,39.51,Combustion Engine,Market
+Unit_341,Hard coal,409,0.3,109.5,21.9,0.39,46.1,70.68,Steam turbine,Market
+Unit_342,Oil,409,0.25,70,14,0.31,193.7,28,Gas turbine,Market
+Unit_343,Natural gas,237,0.2,10.4,2.08,0.41,52.8,39.51,Gas turbine,Market
+Unit_344,Natural gas,260,0.2,13.1,2.62,0.46,47.5,39.51,Combustion Engine,Market
+Unit_345,Hard coal,29,0.3,34.9,6.98,0.35,53.2,70.68,Steam turbine,Market
+Unit_346,Waste,354,0,40,8,0.33,17.8,0,Steam turbine,Market
+Unit_347,Hard coal,354,0.3,333,66.6,0.41,46.1,70.68,Steam turbine,Market
+Unit_348,Natural gas,161,0.2,35.9,7.18,0.35,58.6,102.24,Steam turbine,Market
+Unit_349,Natural gas,161,0.2,25.1,5.02,0.35,56.7,39.51,Gas turbine,Market
+Unit_350,Natural gas,353,0.2,300,60,0.41,53.1,102.24,Steam turbine,Market
+Unit_351,Hard coal,325,0.3,390,78,0.41,47.4,70.68,Steam turbine,Market
+Unit_352,Oil,325,0.25,34.9,6.98,0.33,181.7,28,Gas turbine,Market
+Unit_353,Oil,305,0.25,136,27.2,0.33,183.1,28,Gas turbine,Market
+Unit_354,Natural gas,201,0.2,6.4,1.28,0.47,46.7,39.51,Combustion Engine,Market
+Unit_355,Oil,247,0.25,10,2,0.41,147.5,28,Combustion Engine,Market
+Unit_356,Natural gas,247,0.2,20,4,0.35,61.8,39.51,Gas turbine,Market
+Unit_357,Natural gas,278,0.2,14.2,2.84,0.38,57.4,102.24,Steam turbine,Market
+Unit_358,Natural gas,278,0.2,10.5,2.1,0.37,57.1,39.51,Gas turbine,Market
+Unit_359,Oil,28,0.25,51,10.2,0.31,197,28,Gas turbine,Market
+Unit_360,Hard coal,28,0.3,253,50.6,0.41,45.6,70.68,Steam turbine,Market
+Unit_361,Waste,221,0,23.3,4.66,0.33,17.8,0,Steam turbine,Market
+Unit_362,Natural gas,430,0.2,3.3,0.66,0.36,60.4,102.24,Steam turbine,Market
+Unit_363,Oil,204,0.25,98,19.6,0.32,192.1,28,Gas turbine,Market
+Unit_364,Oil,204,0.25,98,19.6,0.36,169.5,201.58,Steam turbine,Market
+Unit_365,Natural gas,166,0.2,1065,213,0.36,61,102.24,Steam turbine,Market
+Unit_366,Natural gas,166,0.2,323,64.6,0.31,64,39.51,Gas turbine,Market
+Unit_367,Natural gas,464,0.2,51.9,10.38,0.37,58.6,39.51,Gas turbine,Market
+Unit_368,Oil,464,0.25,151,30.2,0.34,168.2,201.58,Steam turbine,Market
+Unit_369,Hard coal,34,0.3,1581,316.2,0.46,45.2,70.68,Steam turbine,Market
+Unit_370,Waste,258,0,28,5.6,0.33,17.8,0,Steam turbine,Market
+Unit_371,Natural gas,258,0.2,12.8,2.56,0.36,60.6,102.24,Steam turbine,Market
+Unit_372,Hard coal,18,0.3,399,79.8,0.43,46,70.68,Steam turbine,Market
+Unit_373,Natural gas,69,0.2,12.8,2.56,0.36,60.6,39.51,Gas turbine,Market
+Unit_374,Natural gas,69,0.2,18.8,3.76,0.37,56.3,102.24,Steam turbine,Market
+Unit_375,Natural gas,223,0.2,13.2,2.64,0.46,47.5,39.51,Combustion Engine,Market
+Unit_376,Oil,223,0.25,1.4,0.28,0.47,129.7,28,Combustion Engine,Market
+Unit_377,Natural gas,1,0.2,7.5,1.5,0.38,56.9,102.24,Steam turbine,Market
+Unit_378,Natural gas,126,0.2,40.2,8.04,0.34,60.9,102.24,Steam turbine,Market
+Unit_379,Waste,130,0,49.4,9.88,0.33,17.8,0,Steam turbine,Market
+Unit_380,Natural gas,126,0.2,2.6,0.52,0.47,46.9,39.51,Combustion Engine,Market
+Unit_381,Natural gas,126,0.2,55.2,11.04,0.39,55.4,39.51,Gas turbine,Market
+Unit_382,Natural gas,382,0.2,68,13.6,0.38,57.4,102.24,Steam turbine,Market
+Unit_383,Natural gas,382,0.2,81,16.2,0.39,54.7,39.51,Gas turbine,Market
+Unit_384,Waste,382,0,20.7,4.14,0.33,17.8,0,Steam turbine,Market
+Unit_385,Natural gas,238,0.2,23.4,4.68,0.39,54.9,102.24,Steam turbine,Market
+Unit_386,Waste,294,0,12.1,2.42,0.33,17.8,0,Steam turbine,Market
+Unit_387,Natural gas,37,0.2,47.6,9.52,0.4,57.3,102.24,Steam turbine,Market
+Unit_388,Natural gas,37,0.2,28.1,5.62,0.42,55.8,39.51,Gas turbine,Market
+Unit_389,Hard coal,352,0.3,472,94.4,0.4,47.6,70.68,Steam turbine,Market
+Unit_390,Oil,352,0.25,49,9.8,0.34,183.4,28,Gas turbine,Market
+Unit_391,Natural gas,156,0.2,14.7,2.94,0.37,58.5,39.51,Gas turbine,Market
+Unit_392,Natural gas,404,0.2,16.4,3.28,0.46,47.1,39.51,Combustion Engine,Market
+Unit_393,Uranium,367,0,1402,280.4,0.33,5.5,27.58,Steam turbine,Market
+Unit_394,Natural gas,150,0.2,15.8,3.16,0.55,39.8,113.98,Combined cycle,Market
+Unit_395,Natural gas,394,0.2,15,3,0.34,63.5,102.24,Steam turbine,Market
+Unit_396,Natural gas,380,0.2,110,22,0.36,60.8,102.24,Steam turbine,Market
+Unit_397,Hard coal,67,0.3,303,60.6,0.38,49.1,70.68,Steam turbine,Market
+Unit_398,Hard coal,183,0.3,1600,320,0.46,41.1,70.68,Steam turbine,Market
+Unit_399,Hard coal,136,0.3,763.7,152.74,0.46,41.3,70.68,Steam turbine,Market
+Unit_400,Hard coal,287,0.3,794,158.8,0.4,47.6,70.68,Steam turbine,Market
+Unit_401,Lignite,483,0.4,67,13.4,0.26,47.9,47.13,Steam turbine,Market
+Unit_402,Uranium,26,0,1410,282,0.33,5.5,27.58,Steam turbine,Market
+Unit_403,Natural gas,131,0.2,560,112,0.55,40.1,113.98,Combined cycle,Market
+Unit_404,Lignite,119,0.4,6,1.2,0.37,34.5,47.13,Steam turbine,Market
+Unit_405,Uranium,416,0,1360,272,0.33,5.5,27.58,Steam turbine,Market
+Unit_406,Natural gas,438,0.2,4.4,0.88,0.38,57.1,39.51,Gas turbine,Market
+Unit_407,Uranium,396,0,1288,257.6,0.33,5.5,27.58,Steam turbine,Market
+Unit_408,Natural gas,350,0.2,19,3.8,0.36,59.5,39.51,Gas turbine,Market
+Unit_409,Natural gas,363,0.2,11.9,2.38,0.39,55.8,102.24,Steam turbine,Market
+Unit_410,Natural gas,363,0.2,14,2.8,0.41,52.8,39.51,Gas turbine,Market
+Unit_411,Lignite,156,0.4,8.3,1.66,0.36,35.3,47.13,Steam turbine,Market
+Unit_412,Natural gas,58,0.2,24.7,4.94,0.33,65.4,39.51,Gas turbine,Market
+Unit_413,Natural gas,58,0.2,16,3.2,0.36,59.7,102.24,Steam turbine,Market
+Unit_414,Hard coal,58,0.3,26.9,5.38,0.41,46.3,70.68,Steam turbine,Market
+Unit_415,Waste,225,0,15,3,0.33,17.8,0,Steam turbine,Market
+Unit_416,Natural gas,294,0.2,13.2,2.64,0.37,58.6,39.51,Gas turbine,Market
+Unit_417,Natural gas,44,0.2,4.5,0.9,0.37,58.6,39.51,Gas turbine,Market
+Unit_418,Lignite,234,0.4,150.5,30.1,0.38,33.4,47.13,Steam turbine,Market
+Unit_419,Oil,266,0.25,92.8,18.56,0.33,181.7,28,Gas turbine,Market
+Unit_420,Uranium,330,0,1410,282,0.33,5.5,27.58,Steam turbine,Market
+Unit_421,Oil,52,0.25,13.2,2.64,0.42,146.1,28,Combustion Engine,Market
+Unit_422,Natural gas,357,0.2,19.6,3.92,0.36,59.8,39.51,Gas turbine,Market
+Unit_423,Uranium,202,0,1336,267.2,0.33,5.5,27.58,Steam turbine,Market
+Unit_424,Uranium,306,0,1310,262,0.33,5.5,27.58,Steam turbine,Market
+Unit_425,Oil,126,0.25,58.8,11.76,0.4,151.3,28,Gas turbine,Market
+Unit_426,Hard coal,385,0.3,27.4,5.48,0.35,51.3,70.68,Steam turbine,Market
+Unit_427,Oil,34,0.25,56,11.2,0.32,190.6,28,Gas turbine,Market
+Unit_428,Hard coal,61,0.3,350,70,0.36,52,70.68,Steam turbine,Market
+Unit_429,Hard coal,299,0.3,690,138,0.38,49.1,70.68,Steam turbine,Market
+Unit_430,Hard coal,274,0.3,257.9,51.58,0.39,57.3,70.68,Steam turbine,Market
+Unit_431,Hard coal,233,0.3,12.6,2.52,0.41,45.9,70.68,Steam turbine,Market

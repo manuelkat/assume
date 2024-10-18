@@ -1,0 +1,906 @@
+name,carrier,bus,emission_factor,p_nom,p_min,efficiency,marginal_cost,startup costs,technology,status
+Unit_453,Biomass,495,0,159.1,31.82,1,0,0,Steam turbine,Market
+Unit_454,Biomass,84,0,25.9,5.18,1,0,0,Steam turbine,Market
+Unit_455,Biomass,412,0,26.9,5.38,1,0,0,Steam turbine,Market
+Unit_456,Biomass,83,0,0.1,0.02,1,0,0,Steam turbine,Market
+Unit_457,Biomass,22,0,38.8,7.76,1,0,0,Steam turbine,Market
+Unit_458,Biomass,8,0,28.3,5.66,1,0,0,Steam turbine,Market
+Unit_459,Biomass,333,0,116.4,23.28,1,0,0,Steam turbine,Market
+Unit_460,Biomass,28,0,13.8,2.76,1,0,0,Steam turbine,Market
+Unit_461,Biomass,24,0,83,16.6,1,0,0,Steam turbine,Market
+Unit_462,Biomass,23,0,34.5,6.9,1,0,0,Steam turbine,Market
+Unit_463,Biomass,402,0,18.6,3.72,1,0,0,Steam turbine,Market
+Unit_464,Biomass,21,0,16.6,3.32,1,0,0,Steam turbine,Market
+Unit_465,Biomass,183,0,64.4,12.88,1,0,0,Steam turbine,Market
+Unit_466,Biomass,295,0,5.8,1.16,1,0,0,Steam turbine,Market
+Unit_467,Biomass,482,0,1.1,0.22,1,0,0,Steam turbine,Market
+Unit_468,Biomass,16,0,101.8,20.36,1,0,0,Steam turbine,Market
+Unit_469,Biomass,426,0,16.6,3.32,1,0,0,Steam turbine,Market
+Unit_470,Biomass,49,0,17.7,3.54,1,0,0,Steam turbine,Market
+Unit_471,Biomass,259,0,18.3,3.66,1,0,0,Steam turbine,Market
+Unit_472,Biomass,301,0,19.1,3.82,1,0,0,Steam turbine,Market
+Unit_473,Biomass,425,0,9.1,1.82,1,0,0,Steam turbine,Market
+Unit_474,Biomass,258,0,57.5,11.5,1,0,0,Steam turbine,Market
+Unit_475,Biomass,380,0,121.8,24.36,1,0,0,Steam turbine,Market
+Unit_476,Biomass,300,0,140.3,28.06,1,0,0,Steam turbine,Market
+Unit_477,Biomass,210,0,29.3,5.86,1,0,0,Steam turbine,Market
+Unit_478,Biomass,226,0,58.2,11.64,1,0,0,Steam turbine,Market
+Unit_479,Biomass,481,0,7.2,1.44,1,0,0,Steam turbine,Market
+Unit_480,Biomass,296,0,63.4,12.68,1,0,0,Steam turbine,Market
+Unit_481,Biomass,376,0,15.5,3.1,1,0,0,Steam turbine,Market
+Unit_482,Biomass,299,0,70.5,14.1,1,0,0,Steam turbine,Market
+Unit_483,Biomass,369,0,51,10.2,1,0,0,Steam turbine,Market
+Unit_484,Biomass,102,0,176.4,35.28,1,0,0,Steam turbine,Market
+Unit_485,Biomass,9,0,38.3,7.66,1,0,0,Steam turbine,Market
+Unit_486,Biomass,62,0,13.6,2.72,1,0,0,Steam turbine,Market
+Unit_487,Biomass,201,0,134.4,26.88,1,0,0,Steam turbine,Market
+Unit_488,Biomass,30,0,23.6,4.72,1,0,0,Steam turbine,Market
+Unit_489,Biomass,29,0,41.8,8.36,1,0,0,Steam turbine,Market
+Unit_490,Biomass,474,0,29.6,5.92,1,0,0,Steam turbine,Market
+Unit_491,Biomass,59,0,73.8,14.76,1,0,0,Steam turbine,Market
+Unit_492,Biomass,270,0,75,15,1,0,0,Steam turbine,Market
+Unit_493,Biomass,159,0,23.7,4.74,1,0,0,Steam turbine,Market
+Unit_494,Biomass,265,0,3,0.6,1,0,0,Steam turbine,Market
+Unit_495,Biomass,34,0,1.2,0.24,1,0,0,Steam turbine,Market
+Unit_496,Biomass,285,0,119.5,23.9,1,0,0,Steam turbine,Market
+Unit_497,Biomass,93,0,174.4,34.88,1,0,0,Steam turbine,Market
+Unit_498,Biomass,36,0,19.6,3.92,1,0,0,Steam turbine,Market
+Unit_499,Biomass,85,0,158,31.6,1,0,0,Steam turbine,Market
+Unit_500,Biomass,221,0,7.8,1.56,1,0,0,Steam turbine,Market
+Unit_501,Biomass,95,0,76.5,15.3,1,0,0,Steam turbine,Market
+Unit_502,Biomass,60,0,17.3,3.46,1,0,0,Steam turbine,Market
+Unit_503,Biomass,160,0,8,1.6,1,0,0,Steam turbine,Market
+Unit_504,Biomass,455,0,94.4,18.88,1,0,0,Steam turbine,Market
+Unit_505,Biomass,200,0,8.5,1.7,1,0,0,Steam turbine,Market
+Unit_506,Biomass,169,0,5,1,1,0,0,Steam turbine,Market
+Unit_507,Biomass,176,0,0.5,0.1,1,0,0,Steam turbine,Market
+Unit_508,Biomass,153,0,19.1,3.82,1,0,0,Steam turbine,Market
+Unit_509,Biomass,170,0,10.6,2.12,1,0,0,Steam turbine,Market
+Unit_510,Biomass,130,0,3.9,0.78,1,0,0,Steam turbine,Market
+Unit_511,Biomass,126,0,2.8,0.56,1,0,0,Steam turbine,Market
+Unit_512,Biomass,137,0,41.3,8.26,1,0,0,Steam turbine,Market
+Unit_513,Biomass,132,0,4.3,0.86,1,0,0,Steam turbine,Market
+Unit_514,Biomass,151,0,9,1.8,1,0,0,Steam turbine,Market
+Unit_515,Biomass,197,0,15.4,3.08,1,0,0,Steam turbine,Market
+Unit_516,Biomass,118,0,0.2,0.04,1,0,0,Steam turbine,Market
+Unit_517,Biomass,154,0,12.4,2.48,1,0,0,Steam turbine,Market
+Unit_518,Biomass,122,0,13.4,2.68,1,0,0,Steam turbine,Market
+Unit_519,Biomass,119,0,11.9,2.38,1,0,0,Steam turbine,Market
+Unit_520,Biomass,134,0,4,0.8,1,0,0,Steam turbine,Market
+Unit_521,Biomass,453,0,12.9,2.58,1,0,0,Steam turbine,Market
+Unit_522,Biomass,431,0,12.3,2.46,1,0,0,Steam turbine,Market
+Unit_523,Biomass,204,0,6.7,1.34,1,0,0,Steam turbine,Market
+Unit_524,Biomass,149,0,3.9,0.78,1,0,0,Steam turbine,Market
+Unit_525,Biomass,104,0,5.8,1.16,1,0,0,Steam turbine,Market
+Unit_526,Biomass,113,0,3.6,0.72,1,0,0,Steam turbine,Market
+Unit_527,Biomass,374,0,8.3,1.66,1,0,0,Steam turbine,Market
+Unit_528,Biomass,90,0,19.9,3.98,1,0,0,Steam turbine,Market
+Unit_529,Biomass,142,0,24.6,4.92,1,0,0,Steam turbine,Market
+Unit_530,Biomass,289,0,54.8,10.96,1,0,0,Steam turbine,Market
+Unit_531,Biomass,472,0,26.4,5.28,1,0,0,Steam turbine,Market
+Unit_532,Biomass,219,0,47.2,9.44,1,0,0,Steam turbine,Market
+Unit_533,Biomass,157,0,44,8.8,1,0,0,Steam turbine,Market
+Unit_534,Biomass,490,0,28.8,5.76,1,0,0,Steam turbine,Market
+Unit_535,Biomass,386,0,51.3,10.26,1,0,0,Steam turbine,Market
+Unit_536,Biomass,209,0,28.3,5.66,1,0,0,Steam turbine,Market
+Unit_537,Biomass,411,0,24.4,4.88,1,0,0,Steam turbine,Market
+Unit_538,Biomass,144,0,5.8,1.16,1,0,0,Steam turbine,Market
+Unit_539,Biomass,363,0,4.5,0.9,1,0,0,Steam turbine,Market
+Unit_540,Biomass,147,0,16.9,3.38,1,0,0,Steam turbine,Market
+Unit_541,Biomass,470,0,2.3,0.46,1,0,0,Steam turbine,Market
+Unit_542,Biomass,109,0,4.3,0.86,1,0,0,Steam turbine,Market
+Unit_543,Biomass,114,0,36.5,7.3,1,0,0,Steam turbine,Market
+Unit_544,Biomass,178,0,6.6,1.32,1,0,0,Steam turbine,Market
+Unit_545,Biomass,110,0,33.9,6.78,1,0,0,Steam turbine,Market
+Unit_546,Biomass,166,0,45.2,9.04,1,0,0,Steam turbine,Market
+Unit_547,Biomass,213,0,7.1,1.42,1,0,0,Steam turbine,Market
+Unit_548,Biomass,492,0,20.5,4.1,1,0,0,Steam turbine,Market
+Unit_549,Biomass,494,0,0.8,0.16,1,0,0,Steam turbine,Market
+Unit_550,Biomass,70,0,42.4,8.48,1,0,0,Steam turbine,Market
+Unit_551,Biomass,228,0,5.3,1.06,1,0,0,Steam turbine,Market
+Unit_552,Biomass,68,0,6.8,1.36,1,0,0,Steam turbine,Market
+Unit_553,Biomass,241,0,30.7,6.14,1,0,0,Steam turbine,Market
+Unit_554,Biomass,245,0,17.9,3.58,1,0,0,Steam turbine,Market
+Unit_555,Biomass,339,0,3.5,0.7,1,0,0,Steam turbine,Market
+Unit_556,Biomass,242,0,8.1,1.62,1,0,0,Steam turbine,Market
+Unit_557,Biomass,397,0,10.8,2.16,1,0,0,Steam turbine,Market
+Unit_558,Biomass,284,0,18.6,3.72,1,0,0,Steam turbine,Market
+Unit_559,Biomass,283,0,3.3,0.66,1,0,0,Steam turbine,Market
+Unit_560,Biomass,51,0,36.2,7.24,1,0,0,Steam turbine,Market
+Unit_561,Biomass,302,0,14.5,2.9,1,0,0,Steam turbine,Market
+Unit_562,Biomass,304,0,18.3,3.66,1,0,0,Steam turbine,Market
+Unit_563,Biomass,31,0,7.6,1.52,1,0,0,Steam turbine,Market
+Unit_564,Biomass,286,0,17.7,3.54,1,0,0,Steam turbine,Market
+Unit_565,Biomass,77,0,27.8,5.56,1,0,0,Steam turbine,Market
+Unit_566,Biomass,276,0,1.6,0.32,1,0,0,Steam turbine,Market
+Unit_567,Biomass,152,0,2.9,0.58,1,0,0,Steam turbine,Market
+Unit_568,Biomass,120,0,29.5,5.9,1,0,0,Steam turbine,Market
+Unit_569,Biomass,254,0,8.4,1.68,1,0,0,Steam turbine,Market
+Unit_570,Biomass,211,0,14.9,2.98,1,0,0,Steam turbine,Market
+Unit_571,Biomass,255,0,19.9,3.98,1,0,0,Steam turbine,Market
+Unit_572,Biomass,128,0,8.9,1.78,1,0,0,Steam turbine,Market
+Unit_573,Biomass,275,0,9.6,1.92,1,0,0,Steam turbine,Market
+Unit_574,Biomass,238,0,13.4,2.68,1,0,0,Steam turbine,Market
+Unit_575,Biomass,100,0,25.9,5.18,1,0,0,Steam turbine,Market
+Unit_576,Biomass,223,0,3,0.6,1,0,0,Steam turbine,Market
+Unit_577,Biomass,229,0,64.4,12.88,1,0,0,Steam turbine,Market
+Unit_578,Biomass,224,0,3.9,0.78,1,0,0,Steam turbine,Market
+Unit_579,Biomass,225,0,17.1,3.42,1,0,0,Steam turbine,Market
+Unit_580,Biomass,54,0,0.4,0.08,1,0,0,Steam turbine,Market
+Unit_581,Biomass,69,0,0.8,0.16,1,0,0,Steam turbine,Market
+Unit_582,Biomass,257,0,1.3,0.26,1,0,0,Steam turbine,Market
+Unit_583,Biomass,409,0,3.3,0.66,1,0,0,Steam turbine,Market
+Unit_584,Biomass,260,0,29.4,5.88,1,0,0,Steam turbine,Market
+Unit_585,Biomass,320,0,40,8,1,0,0,Steam turbine,Market
+Unit_586,Biomass,377,0,13.8,2.76,1,0,0,Steam turbine,Market
+Unit_587,Biomass,216,0,30.7,6.14,1,0,0,Steam turbine,Market
+Unit_588,Biomass,379,0,17.9,3.58,1,0,0,Steam turbine,Market
+Unit_589,Biomass,310,0,17.6,3.52,1,0,0,Steam turbine,Market
+Unit_590,Biomass,311,0,91.3,18.26,1,0,0,Steam turbine,Market
+Unit_591,Biomass,389,0,38.6,7.72,1,0,0,Steam turbine,Market
+Unit_592,Biomass,394,0,38.4,7.68,1,0,0,Steam turbine,Market
+Unit_593,Biomass,312,0,32.8,6.56,1,0,0,Steam turbine,Market
+Unit_594,Biomass,438,0,13.2,2.64,1,0,0,Steam turbine,Market
+Unit_595,Biomass,366,0,7.6,1.52,1,0,0,Steam turbine,Market
+Unit_596,Biomass,422,0,22.1,4.42,1,0,0,Steam turbine,Market
+Unit_597,Biomass,381,0,31.7,6.34,1,0,0,Steam turbine,Market
+Unit_598,Biomass,58,0,19,3.8,1,0,0,Steam turbine,Market
+Unit_599,Biomass,322,0,16.4,3.28,1,0,0,Steam turbine,Market
+Unit_600,Biomass,53,0,7.5,1.5,1,0,0,Steam turbine,Market
+Unit_601,Biomass,288,0,19.6,3.92,1,0,0,Steam turbine,Market
+Unit_602,Biomass,189,0,45.6,9.12,1,0,0,Steam turbine,Market
+Unit_603,Biomass,436,0,32.8,6.56,1,0,0,Steam turbine,Market
+Unit_604,Biomass,406,0,30,6,1,0,0,Steam turbine,Market
+Unit_605,Biomass,405,0,1.7,0.34,1,0,0,Steam turbine,Market
+Unit_606,Biomass,235,0,18.2,3.64,1,0,0,Steam turbine,Market
+Unit_607,Biomass,190,0,22.5,4.5,1,0,0,Steam turbine,Market
+Unit_608,Biomass,233,0,180.4,36.08,1,0,0,Steam turbine,Market
+Unit_609,Biomass,395,0,67.9,13.58,1,0,0,Steam turbine,Market
+Unit_610,Biomass,264,0,47.4,9.48,1,0,0,Steam turbine,Market
+Unit_611,Biomass,351,0,56.3,11.26,1,0,0,Steam turbine,Market
+Unit_612,Biomass,354,0,20.9,4.18,1,0,0,Steam turbine,Market
+Unit_613,Biomass,266,0,54.7,10.94,1,0,0,Steam turbine,Market
+Unit_614,Biomass,331,0,85.3,17.06,1,0,0,Steam turbine,Market
+Unit_615,Biomass,19,0,36,7.2,1,0,0,Steam turbine,Market
+Unit_616,Biomass,13,0,22.8,4.56,1,0,0,Steam turbine,Market
+Unit_617,Biomass,15,0,70.3,14.06,1,0,0,Steam turbine,Market
+Unit_618,Biomass,352,0,46.1,9.22,1,0,0,Steam turbine,Market
+Unit_619,Biomass,433,0,9.4,1.88,1,0,0,Steam turbine,Market
+Unit_620,Biomass,315,0,43.3,8.66,1,0,0,Steam turbine,Market
+Unit_621,Biomass,337,0,91.2,18.24,1,0,0,Steam turbine,Market
+Unit_622,Biomass,330,0,45.8,9.16,1,0,0,Steam turbine,Market
+Unit_623,Biomass,417,0,36.2,7.24,1,0,0,Steam turbine,Market
+Unit_624,Biomass,332,0,12.7,2.54,1,0,0,Steam turbine,Market
+Unit_625,Biomass,418,0,6.4,1.28,1,0,0,Steam turbine,Market
+Unit_626,Biomass,349,0,24.8,4.96,1,0,0,Steam turbine,Market
+Unit_627,Biomass,329,0,63,12.6,1,0,0,Steam turbine,Market
+Unit_628,Biomass,338,0,60.9,12.18,1,0,0,Steam turbine,Market
+Unit_629,Biomass,373,0,71,14.2,1,0,0,Steam turbine,Market
+Unit_630,Biomass,66,0,67.6,13.52,1,0,0,Steam turbine,Market
+Unit_631,Biomass,350,0,53.1,10.62,1,0,0,Steam turbine,Market
+Unit_632,Biomass,335,0,43.5,8.7,1,0,0,Steam turbine,Market
+Unit_633,Biomass,336,0,71.5,14.3,1,0,0,Steam turbine,Market
+Unit_634,Biomass,334,0,28.6,5.72,1,0,0,Steam turbine,Market
+Unit_635,Biomass,390,0,41.2,8.24,1,0,0,Steam turbine,Market
+Unit_636,Biomass,384,0,238.2,47.64,1,0,0,Steam turbine,Market
+Unit_637,Biomass,385,0,12.9,2.58,1,0,0,Steam turbine,Market
+Unit_638,Biomass,383,0,15.3,3.06,1,0,0,Steam turbine,Market
+Unit_639,Biomass,308,0,25.4,5.08,1,0,0,Steam turbine,Market
+Unit_640,Biomass,316,0,51.1,10.22,1,0,0,Steam turbine,Market
+Unit_641,Biomass,483,0,37.4,7.48,1,0,0,Steam turbine,Market
+Unit_642,Biomass,247,0,10.9,2.18,1,0,0,Steam turbine,Market
+Unit_643,Biomass,485,0,42,8.4,1,0,0,Steam turbine,Market
+Unit_644,Biomass,410,0,54.3,10.86,1,0,0,Steam turbine,Market
+Unit_645,Biomass,396,0,26.9,5.38,1,0,0,Steam turbine,Market
+Unit_646,Biomass,232,0,22.1,4.42,1,0,0,Steam turbine,Market
+Unit_647,Biomass,262,0,1.1,0.22,1,0,0,Steam turbine,Market
+Unit_648,Biomass,318,0,95,19,1,0,0,Steam turbine,Market
+Unit_649,Biomass,99,0,5.3,1.06,1,0,0,Steam turbine,Market
+Unit_650,Biomass,371,0,5.8,1.16,1,0,0,Steam turbine,Market
+Unit_651,Biomass,372,0,4.7,0.94,1,0,0,Steam turbine,Market
+Unit_652,Biomass,348,0,43,8.6,1,0,0,Steam turbine,Market
+Unit_653,Biomass,43,0,35.3,7.06,1,0,0,Steam turbine,Market
+Unit_654,Biomass,428,0,17.8,3.56,1,0,0,Steam turbine,Market
+Unit_655,Biomass,81,0,58.5,11.7,1,0,0,Steam turbine,Market
+Unit_656,Biomass,10,0,33.8,6.76,1,0,0,Steam turbine,Market
+Unit_657,Biomass,12,0,66.8,13.36,1,0,0,Steam turbine,Market
+Unit_658,Biomass,74,0,47.6,9.52,1,0,0,Steam turbine,Market
+Unit_659,Biomass,280,0,52.2,10.44,1,0,0,Steam turbine,Market
+Unit_660,Biomass,11,0,17.8,3.56,1,0,0,Steam turbine,Market
+Unit_661,Biomass,41,0,43.6,8.72,1,0,0,Steam turbine,Market
+Unit_662,Biomass,45,0,67.4,13.48,1,0,0,Steam turbine,Market
+Unit_663,Biomass,179,0,31.5,6.3,1,0,0,Steam turbine,Market
+Unit_664,Biomass,217,0,5.7,1.14,1,0,0,Steam turbine,Market
+Unit_665,Biomass,40,0,74.8,14.96,1,0,0,Steam turbine,Market
+Unit_666,Biomass,42,0,49.3,9.86,1,0,0,Steam turbine,Market
+Unit_667,Biomass,177,0,22.5,4.5,1,0,0,Steam turbine,Market
+Unit_668,Biomass,18,0,65.1,13.02,1,0,0,Steam turbine,Market
+Unit_669,Biomass,344,0,50,10,1,0,0,Steam turbine,Market
+Unit_670,Biomass,345,0,13.1,2.62,1,0,0,Steam turbine,Market
+Unit_671,Biomass,323,0,30,6,1,0,0,Steam turbine,Market
+Unit_672,Biomass,326,0,26.1,5.22,1,0,0,Steam turbine,Market
+Unit_673,Biomass,290,0,18.8,3.76,1,0,0,Steam turbine,Market
+Unit_674,Biomass,324,0,34.6,6.92,1,0,0,Steam turbine,Market
+Unit_675,Biomass,340,0,76.7,15.34,1,0,0,Steam turbine,Market
+Unit_676,Biomass,282,0,26.8,5.36,1,0,0,Steam turbine,Market
+Unit_677,Biomass,71,0,57.4,11.48,1,0,0,Steam turbine,Market
+Unit_678,Biomass,72,0,43.3,8.66,1,0,0,Steam turbine,Market
+Unit_679,Biomass,278,0,38.8,7.76,1,0,0,Steam turbine,Market
+Unit_680,Biomass,50,0,23.1,4.62,1,0,0,Steam turbine,Market
+Unit_681,Biomass,37,0,19.2,3.84,1,0,0,Steam turbine,Market
+Unit_682,Biomass,75,0,29.6,5.92,1,0,0,Steam turbine,Market
+Unit_683,Biomass,292,0,30,6,1,0,0,Steam turbine,Market
+Unit_684,Biomass,39,0,199.8,39.96,1,0,0,Steam turbine,Market
+Unit_685,Biomass,32,0,8.2,1.64,1,0,0,Steam turbine,Market
+Unit_686,Biomass,281,0,15.1,3.02,1,0,0,Steam turbine,Market
+Unit_687,Biomass,441,0,26.9,5.38,1,0,0,Steam turbine,Market
+Unit_688,Biomass,442,0,6.9,1.38,1,0,0,Steam turbine,Market
+Unit_689,Biomass,342,0,30.4,6.08,1,0,0,Steam turbine,Market
+Unit_690,Biomass,33,0,22.2,4.44,1,0,0,Steam turbine,Market
+Unit_691,Biomass,343,0,12.4,2.48,1,0,0,Steam turbine,Market
+Unit_692,Biomass,294,0,8.6,1.72,1,0,0,Steam turbine,Market
+Unit_693,Biomass,293,0,7.3,1.46,1,0,0,Steam turbine,Market
+Unit_694,Biomass,78,0,87.7,17.54,1,0,0,Steam turbine,Market
+Unit_695,hydro,84,0,2.5,0,1,0,0,hydro,Market
+Unit_696,hydro,8,0,2.2,0,1,0,0,hydro,Market
+Unit_697,hydro,24,0,0.2,0,1,0,0,hydro,Market
+Unit_698,hydro,495,0,0.1,0,1,0,0,hydro,Market
+Unit_699,hydro,295,0,0.1,0,1,0,0,hydro,Market
+Unit_700,hydro,482,0,0.1,0,1,0,0,hydro,Market
+Unit_701,hydro,16,0,0.1,0,1,0,0,hydro,Market
+Unit_702,hydro,426,0,2.3,0,1,0,0,hydro,Market
+Unit_703,hydro,259,0,47.1,0,1,0,0,hydro,Market
+Unit_704,hydro,425,0,0.1,0,1,0,0,hydro,Market
+Unit_705,hydro,258,0,5.7,0,1,0,0,hydro,Market
+Unit_706,hydro,380,0,1,0,1,0,0,hydro,Market
+Unit_707,hydro,210,0,0.7,0,1,0,0,hydro,Market
+Unit_708,hydro,226,0,0.8,0,1,0,0,hydro,Market
+Unit_709,hydro,296,0,1.4,0,1,0,0,hydro,Market
+Unit_710,hydro,299,0,0.2,0,1,0,0,hydro,Market
+Unit_711,hydro,9,0,0.1,0,1,0,0,hydro,Market
+Unit_712,hydro,474,0,4,0,1,0,0,hydro,Market
+Unit_713,hydro,159,0,0.2,0,1,0,0,hydro,Market
+Unit_714,hydro,95,0,0.1,0,1,0,0,hydro,Market
+Unit_715,hydro,62,0,10,0,1,0,0,hydro,Market
+Unit_716,hydro,200,0,0.6,0,1,0,0,hydro,Market
+Unit_717,hydro,169,0,13.6,0,1,0,0,hydro,Market
+Unit_718,hydro,170,0,10,0,1,0,0,hydro,Market
+Unit_719,hydro,130,0,1.4,0,1,0,0,hydro,Market
+Unit_720,hydro,126,0,0.6,0,1,0,0,hydro,Market
+Unit_721,hydro,132,0,0.1,0,1,0,0,hydro,Market
+Unit_722,hydro,364,0,0.5,0,1,0,0,hydro,Market
+Unit_723,hydro,122,0,1.4,0,1,0,0,hydro,Market
+Unit_724,hydro,119,0,27.6,0,1,0,0,hydro,Market
+Unit_725,hydro,453,0,1.4,0,1,0,0,hydro,Market
+Unit_726,hydro,204,0,18.3,0,1,0,0,hydro,Market
+Unit_727,hydro,149,0,1,0,1,0,0,hydro,Market
+Unit_728,hydro,374,0,0.1,0,1,0,0,hydro,Market
+Unit_729,hydro,85,0,0.4,0,1,0,0,hydro,Market
+Unit_730,hydro,90,0,0.2,0,1,0,0,hydro,Market
+Unit_731,hydro,289,0,0.2,0,1,0,0,hydro,Market
+Unit_732,hydro,472,0,0.1,0,1,0,0,hydro,Market
+Unit_733,hydro,219,0,0.2,0,1,0,0,hydro,Market
+Unit_734,hydro,490,0,1.4,0,1,0,0,hydro,Market
+Unit_735,hydro,386,0,0.5,0,1,0,0,hydro,Market
+Unit_736,hydro,209,0,3.1,0,1,0,0,hydro,Market
+Unit_737,hydro,411,0,1.7,0,1,0,0,hydro,Market
+Unit_738,hydro,144,0,1.3,0,1,0,0,hydro,Market
+Unit_739,hydro,363,0,2.3,0,1,0,0,hydro,Market
+Unit_740,hydro,147,0,4.2,0,1,0,0,hydro,Market
+Unit_741,hydro,470,0,1.2,0,1,0,0,hydro,Market
+Unit_742,hydro,109,0,8.5,0,1,0,0,hydro,Market
+Unit_743,hydro,114,0,17.9,0,1,0,0,hydro,Market
+Unit_744,hydro,178,0,18.8,0,1,0,0,hydro,Market
+Unit_745,hydro,110,0,10.1,0,1,0,0,hydro,Market
+Unit_746,hydro,166,0,4.3,0,1,0,0,hydro,Market
+Unit_747,hydro,492,0,7.2,0,1,0,0,hydro,Market
+Unit_748,hydro,70,0,7.4,0,1,0,0,hydro,Market
+Unit_749,hydro,228,0,7.1,0,1,0,0,hydro,Market
+Unit_750,hydro,241,0,0.1,0,1,0,0,hydro,Market
+Unit_751,hydro,245,0,4.3,0,1,0,0,hydro,Market
+Unit_752,hydro,339,0,0.1,0,1,0,0,hydro,Market
+Unit_753,hydro,397,0,1.6,0,1,0,0,hydro,Market
+Unit_754,hydro,284,0,1,0,1,0,0,hydro,Market
+Unit_755,hydro,283,0,3.7,0,1,0,0,hydro,Market
+Unit_756,hydro,242,0,13.1,0,1,0,0,hydro,Market
+Unit_757,hydro,51,0,2.8,0,1,0,0,hydro,Market
+Unit_758,hydro,302,0,0.7,0,1,0,0,hydro,Market
+Unit_759,hydro,304,0,2.1,0,1,0,0,hydro,Market
+Unit_760,hydro,31,0,2.8,0,1,0,0,hydro,Market
+Unit_761,hydro,286,0,1.9,0,1,0,0,hydro,Market
+Unit_762,hydro,77,0,18.4,0,1,0,0,hydro,Market
+Unit_763,hydro,276,0,16.4,0,1,0,0,hydro,Market
+Unit_764,hydro,120,0,1.9,0,1,0,0,hydro,Market
+Unit_765,hydro,254,0,1.3,0,1,0,0,hydro,Market
+Unit_766,hydro,211,0,0.9,0,1,0,0,hydro,Market
+Unit_767,hydro,255,0,103.1,0,1,0,0,hydro,Market
+Unit_768,hydro,128,0,20.3,0,1,0,0,hydro,Market
+Unit_769,hydro,275,0,1.6,0,1,0,0,hydro,Market
+Unit_770,hydro,238,0,72.8,0,1,0,0,hydro,Market
+Unit_771,hydro,100,0,1.3,0,1,0,0,hydro,Market
+Unit_772,hydro,224,0,0.3,0,1,0,0,hydro,Market
+Unit_773,hydro,223,0,0.4,0,1,0,0,hydro,Market
+Unit_774,hydro,225,0,0.5,0,1,0,0,hydro,Market
+Unit_775,hydro,409,0,9.1,0,1,0,0,hydro,Market
+Unit_776,hydro,260,0,5.8,0,1,0,0,hydro,Market
+Unit_777,hydro,320,0,13.3,0,1,0,0,hydro,Market
+Unit_778,hydro,377,0,3.6,0,1,0,0,hydro,Market
+Unit_779,hydro,216,0,13.6,0,1,0,0,hydro,Market
+Unit_780,hydro,379,0,0.9,0,1,0,0,hydro,Market
+Unit_781,hydro,310,0,16.1,0,1,0,0,hydro,Market
+Unit_782,hydro,311,0,6.8,0,1,0,0,hydro,Market
+Unit_783,hydro,389,0,29.9,0,1,0,0,hydro,Market
+Unit_784,hydro,394,0,1.6,0,1,0,0,hydro,Market
+Unit_785,hydro,312,0,0.6,0,1,0,0,hydro,Market
+Unit_786,hydro,375,0,1.2,0,1,0,0,hydro,Market
+Unit_787,hydro,366,0,1.4,0,1,0,0,hydro,Market
+Unit_788,hydro,438,0,129.6,0,1,0,0,hydro,Market
+Unit_789,hydro,422,0,11.8,0,1,0,0,hydro,Market
+Unit_790,hydro,229,0,4.1,0,1,0,0,hydro,Market
+Unit_791,hydro,381,0,6.1,0,1,0,0,hydro,Market
+Unit_792,hydro,58,0,4.6,0,1,0,0,hydro,Market
+Unit_793,hydro,322,0,3.6,0,1,0,0,hydro,Market
+Unit_794,hydro,53,0,3.1,0,1,0,0,hydro,Market
+Unit_795,hydro,288,0,7,0,1,0,0,hydro,Market
+Unit_796,hydro,189,0,7.9,0,1,0,0,hydro,Market
+Unit_797,hydro,436,0,2.4,0,1,0,0,hydro,Market
+Unit_798,hydro,406,0,2.5,0,1,0,0,hydro,Market
+Unit_799,hydro,405,0,146.9,0,1,0,0,hydro,Market
+Unit_800,hydro,235,0,197.9,0,1,0,0,hydro,Market
+Unit_801,hydro,190,0,6.6,0,1,0,0,hydro,Market
+Unit_802,hydro,233,0,40.2,0,1,0,0,hydro,Market
+Unit_803,hydro,395,0,12.2,0,1,0,0,hydro,Market
+Unit_804,hydro,264,0,2.7,0,1,0,0,hydro,Market
+Unit_805,hydro,351,0,93,0,1,0,0,hydro,Market
+Unit_806,hydro,354,0,30.8,0,1,0,0,hydro,Market
+Unit_807,hydro,266,0,244.1,0,1,0,0,hydro,Market
+Unit_808,hydro,331,0,238.1,0,1,0,0,hydro,Market
+Unit_809,hydro,19,0,156.2,0,1,0,0,hydro,Market
+Unit_810,hydro,13,0,5.1,0,1,0,0,hydro,Market
+Unit_811,hydro,15,0,70,0,1,0,0,hydro,Market
+Unit_812,hydro,352,0,61.7,0,1,0,0,hydro,Market
+Unit_813,hydro,433,0,6.1,0,1,0,0,hydro,Market
+Unit_814,hydro,315,0,83.8,0,1,0,0,hydro,Market
+Unit_815,hydro,337,0,90.4,0,1,0,0,hydro,Market
+Unit_816,hydro,330,0,51.3,0,1,0,0,hydro,Market
+Unit_817,hydro,417,0,188.2,0,1,0,0,hydro,Market
+Unit_818,hydro,332,0,36.3,0,1,0,0,hydro,Market
+Unit_819,hydro,418,0,22.9,0,1,0,0,hydro,Market
+Unit_820,hydro,349,0,9.4,0,1,0,0,hydro,Market
+Unit_821,hydro,329,0,151.4,0,1,0,0,hydro,Market
+Unit_822,hydro,373,0,12.4,0,1,0,0,hydro,Market
+Unit_823,hydro,66,0,8.1,0,1,0,0,hydro,Market
+Unit_824,hydro,338,0,8.8,0,1,0,0,hydro,Market
+Unit_825,hydro,350,0,2.1,0,1,0,0,hydro,Market
+Unit_826,hydro,335,0,20.8,0,1,0,0,hydro,Market
+Unit_827,hydro,336,0,9.3,0,1,0,0,hydro,Market
+Unit_828,hydro,343,0,1.3,0,1,0,0,hydro,Market
+Unit_829,hydro,334,0,4.9,0,1,0,0,hydro,Market
+Unit_830,hydro,390,0,10.5,0,1,0,0,hydro,Market
+Unit_831,hydro,384,0,4.9,0,1,0,0,hydro,Market
+Unit_832,hydro,383,0,3.7,0,1,0,0,hydro,Market
+Unit_833,hydro,382,0,1.9,0,1,0,0,hydro,Market
+Unit_834,hydro,385,0,19.6,0,1,0,0,hydro,Market
+Unit_835,hydro,308,0,17,0,1,0,0,hydro,Market
+Unit_836,hydro,316,0,26.2,0,1,0,0,hydro,Market
+Unit_837,hydro,483,0,69.9,0,1,0,0,hydro,Market
+Unit_838,hydro,247,0,36.5,0,1,0,0,hydro,Market
+Unit_839,hydro,410,0,37.6,0,1,0,0,hydro,Market
+Unit_840,hydro,396,0,29.4,0,1,0,0,hydro,Market
+Unit_841,hydro,232,0,28.4,0,1,0,0,hydro,Market
+Unit_842,hydro,262,0,0.6,0,1,0,0,hydro,Market
+Unit_843,hydro,485,0,26.7,0,1,0,0,hydro,Market
+Unit_844,hydro,318,0,35.3,0,1,0,0,hydro,Market
+Unit_845,hydro,99,0,2.1,0,1,0,0,hydro,Market
+Unit_846,hydro,371,0,6.9,0,1,0,0,hydro,Market
+Unit_847,hydro,372,0,1.5,0,1,0,0,hydro,Market
+Unit_848,hydro,43,0,0.2,0,1,0,0,hydro,Market
+Unit_849,hydro,428,0,2.5,0,1,0,0,hydro,Market
+Unit_850,hydro,12,0,0.4,0,1,0,0,hydro,Market
+Unit_851,hydro,74,0,0.3,0,1,0,0,hydro,Market
+Unit_852,hydro,11,0,0.4,0,1,0,0,hydro,Market
+Unit_853,hydro,81,0,0.8,0,1,0,0,hydro,Market
+Unit_854,hydro,41,0,0.1,0,1,0,0,hydro,Market
+Unit_855,hydro,40,0,0.1,0,1,0,0,hydro,Market
+Unit_856,hydro,42,0,0.1,0,1,0,0,hydro,Market
+Unit_857,hydro,102,0,2.7,0,1,0,0,hydro,Market
+Unit_858,hydro,344,0,142.4,0,1,0,0,hydro,Market
+Unit_859,hydro,345,0,5,0,1,0,0,hydro,Market
+Unit_860,hydro,323,0,15.6,0,1,0,0,hydro,Market
+Unit_861,hydro,326,0,23.2,0,1,0,0,hydro,Market
+Unit_862,hydro,290,0,4.5,0,1,0,0,hydro,Market
+Unit_863,hydro,324,0,10.9,0,1,0,0,hydro,Market
+Unit_864,hydro,280,0,1.5,0,1,0,0,hydro,Market
+Unit_865,hydro,340,0,0.8,0,1,0,0,hydro,Market
+Unit_866,hydro,282,0,7.8,0,1,0,0,hydro,Market
+Unit_867,hydro,71,0,2.5,0,1,0,0,hydro,Market
+Unit_868,hydro,72,0,8.9,0,1,0,0,hydro,Market
+Unit_869,hydro,278,0,0.3,0,1,0,0,hydro,Market
+Unit_870,hydro,50,0,10.3,0,1,0,0,hydro,Market
+Unit_871,hydro,75,0,0.1,0,1,0,0,hydro,Market
+Unit_872,hydro,292,0,6,0,1,0,0,hydro,Market
+Unit_873,hydro,32,0,0.5,0,1,0,0,hydro,Market
+Unit_874,hydro,281,0,2.2,0,1,0,0,hydro,Market
+Unit_875,hydro,441,0,5.3,0,1,0,0,hydro,Market
+Unit_876,hydro,442,0,1.1,0,1,0,0,hydro,Market
+Unit_877,hydro,342,0,0.5,0,1,0,0,hydro,Market
+Unit_878,hydro,33,0,6.2,0,1,0,0,hydro,Market
+Unit_879,hydro,294,0,0.3,0,1,0,0,hydro,Market
+Unit_880,hydro,293,0,6.4,0,1,0,0,hydro,Market
+Unit_881,hydro,78,0,8.2,0,1,0,0,hydro,Market
+Unit_882,solar pv,495,0,391.8,0,1,0,0,solar pv,Market
+Unit_883,solar pv,84,0,51.6,0,1,0,0,solar pv,Market
+Unit_884,solar pv,412,0,120.1,0,1,0,0,solar pv,Market
+Unit_885,solar pv,83,0,14.8,0,1,0,0,solar pv,Market
+Unit_886,solar pv,22,0,233.5,0,1,0,0,solar pv,Market
+Unit_887,solar pv,8,0,65.8,0,1,0,0,solar pv,Market
+Unit_888,solar pv,333,0,340,0,1,0,0,solar pv,Market
+Unit_889,solar pv,28,0,44.9,0,1,0,0,solar pv,Market
+Unit_890,solar pv,24,0,232.8,0,1,0,0,solar pv,Market
+Unit_891,solar pv,23,0,80.6,0,1,0,0,solar pv,Market
+Unit_892,solar pv,402,0,176,0,1,0,0,solar pv,Market
+Unit_893,solar pv,21,0,44.1,0,1,0,0,solar pv,Market
+Unit_894,solar pv,183,0,102.1,0,1,0,0,solar pv,Market
+Unit_895,solar pv,295,0,28.3,0,1,0,0,solar pv,Market
+Unit_896,solar pv,482,0,31.8,0,1,0,0,solar pv,Market
+Unit_897,solar pv,16,0,274.4,0,1,0,0,solar pv,Market
+Unit_898,solar pv,426,0,52.3,0,1,0,0,solar pv,Market
+Unit_899,solar pv,49,0,35.3,0,1,0,0,solar pv,Market
+Unit_900,solar pv,259,0,79,0,1,0,0,solar pv,Market
+Unit_901,solar pv,301,0,47.6,0,1,0,0,solar pv,Market
+Unit_902,solar pv,425,0,50.8,0,1,0,0,solar pv,Market
+Unit_903,solar pv,258,0,289,0,1,0,0,solar pv,Market
+Unit_904,solar pv,380,0,235.1,0,1,0,0,solar pv,Market
+Unit_905,solar pv,300,0,423.3,0,1,0,0,solar pv,Market
+Unit_906,solar pv,210,0,49.4,0,1,0,0,solar pv,Market
+Unit_907,solar pv,226,0,73.7,0,1,0,0,solar pv,Market
+Unit_908,solar pv,481,0,31.7,0,1,0,0,solar pv,Market
+Unit_909,solar pv,296,0,122,0,1,0,0,solar pv,Market
+Unit_910,solar pv,376,0,95.2,0,1,0,0,solar pv,Market
+Unit_911,solar pv,299,0,65.6,0,1,0,0,solar pv,Market
+Unit_912,solar pv,369,0,105.2,0,1,0,0,solar pv,Market
+Unit_913,solar pv,102,0,538.2,0,1,0,0,solar pv,Market
+Unit_914,solar pv,9,0,49.5,0,1,0,0,solar pv,Market
+Unit_915,solar pv,62,0,98,0,1,0,0,solar pv,Market
+Unit_916,solar pv,201,0,105.2,0,1,0,0,solar pv,Market
+Unit_917,solar pv,30,0,77.4,0,1,0,0,solar pv,Market
+Unit_918,solar pv,29,0,62,0,1,0,0,solar pv,Market
+Unit_919,solar pv,474,0,51.8,0,1,0,0,solar pv,Market
+Unit_920,solar pv,59,0,150.4,0,1,0,0,solar pv,Market
+Unit_921,solar pv,270,0,166.6,0,1,0,0,solar pv,Market
+Unit_922,solar pv,159,0,110.5,0,1,0,0,solar pv,Market
+Unit_923,solar pv,265,0,26.4,0,1,0,0,solar pv,Market
+Unit_924,solar pv,34,0,14,0,1,0,0,solar pv,Market
+Unit_925,solar pv,285,0,270.3,0,1,0,0,solar pv,Market
+Unit_926,solar pv,93,0,491.7,0,1,0,0,solar pv,Market
+Unit_927,solar pv,36,0,129,0,1,0,0,solar pv,Market
+Unit_928,solar pv,85,0,632.2,0,1,0,0,solar pv,Market
+Unit_929,solar pv,221,0,70,0,1,0,0,solar pv,Market
+Unit_930,solar pv,95,0,311.1,0,1,0,0,solar pv,Market
+Unit_931,solar pv,60,0,139.6,0,1,0,0,solar pv,Market
+Unit_932,solar pv,160,0,8.8,0,1,0,0,solar pv,Market
+Unit_933,solar pv,455,0,29.9,0,1,0,0,solar pv,Market
+Unit_934,solar pv,200,0,29.2,0,1,0,0,solar pv,Market
+Unit_935,solar pv,169,0,31.7,0,1,0,0,solar pv,Market
+Unit_936,solar pv,176,0,32.2,0,1,0,0,solar pv,Market
+Unit_937,solar pv,153,0,177.3,0,1,0,0,solar pv,Market
+Unit_938,solar pv,170,0,26.8,0,1,0,0,solar pv,Market
+Unit_939,solar pv,130,0,74,0,1,0,0,solar pv,Market
+Unit_940,solar pv,126,0,22.6,0,1,0,0,solar pv,Market
+Unit_941,solar pv,137,0,282.1,0,1,0,0,solar pv,Market
+Unit_942,solar pv,132,0,67.7,0,1,0,0,solar pv,Market
+Unit_943,solar pv,151,0,86.9,0,1,0,0,solar pv,Market
+Unit_944,solar pv,197,0,171.8,0,1,0,0,solar pv,Market
+Unit_945,solar pv,118,0,19.8,0,1,0,0,solar pv,Market
+Unit_946,solar pv,154,0,63.7,0,1,0,0,solar pv,Market
+Unit_947,solar pv,364,0,15.5,0,1,0,0,solar pv,Market
+Unit_948,solar pv,122,0,94.6,0,1,0,0,solar pv,Market
+Unit_949,solar pv,119,0,102.4,0,1,0,0,solar pv,Market
+Unit_950,solar pv,134,0,111.2,0,1,0,0,solar pv,Market
+Unit_951,solar pv,453,0,129.5,0,1,0,0,solar pv,Market
+Unit_952,solar pv,431,0,124.5,0,1,0,0,solar pv,Market
+Unit_953,solar pv,204,0,146,0,1,0,0,solar pv,Market
+Unit_954,solar pv,149,0,141,0,1,0,0,solar pv,Market
+Unit_955,solar pv,104,0,32.3,0,1,0,0,solar pv,Market
+Unit_956,solar pv,113,0,18.1,0,1,0,0,solar pv,Market
+Unit_957,solar pv,374,0,67.7,0,1,0,0,solar pv,Market
+Unit_958,solar pv,90,0,221.5,0,1,0,0,solar pv,Market
+Unit_959,solar pv,142,0,144.7,0,1,0,0,solar pv,Market
+Unit_960,solar pv,289,0,352.1,0,1,0,0,solar pv,Market
+Unit_961,solar pv,472,0,220.6,0,1,0,0,solar pv,Market
+Unit_962,solar pv,219,0,132.5,0,1,0,0,solar pv,Market
+Unit_963,solar pv,157,0,208,0,1,0,0,solar pv,Market
+Unit_964,solar pv,490,0,200,0,1,0,0,solar pv,Market
+Unit_965,solar pv,386,0,149.8,0,1,0,0,solar pv,Market
+Unit_966,solar pv,209,0,187.4,0,1,0,0,solar pv,Market
+Unit_967,solar pv,411,0,277.5,0,1,0,0,solar pv,Market
+Unit_968,solar pv,144,0,32.4,0,1,0,0,solar pv,Market
+Unit_969,solar pv,363,0,53.2,0,1,0,0,solar pv,Market
+Unit_970,solar pv,147,0,16.9,0,1,0,0,solar pv,Market
+Unit_971,solar pv,470,0,48,0,1,0,0,solar pv,Market
+Unit_972,solar pv,109,0,42.7,0,1,0,0,solar pv,Market
+Unit_973,solar pv,114,0,162.7,0,1,0,0,solar pv,Market
+Unit_974,solar pv,178,0,92.8,0,1,0,0,solar pv,Market
+Unit_975,solar pv,110,0,230.1,0,1,0,0,solar pv,Market
+Unit_976,solar pv,166,0,106.8,0,1,0,0,solar pv,Market
+Unit_977,solar pv,213,0,13.3,0,1,0,0,solar pv,Market
+Unit_978,solar pv,492,0,37.3,0,1,0,0,solar pv,Market
+Unit_979,solar pv,494,0,9.5,0,1,0,0,solar pv,Market
+Unit_980,solar pv,70,0,251,0,1,0,0,solar pv,Market
+Unit_981,solar pv,228,0,111,0,1,0,0,solar pv,Market
+Unit_982,solar pv,68,0,148.4,0,1,0,0,solar pv,Market
+Unit_983,solar pv,241,0,77,0,1,0,0,solar pv,Market
+Unit_984,solar pv,245,0,140.4,0,1,0,0,solar pv,Market
+Unit_985,solar pv,339,0,39,0,1,0,0,solar pv,Market
+Unit_986,solar pv,242,0,183.3,0,1,0,0,solar pv,Market
+Unit_987,solar pv,397,0,108.2,0,1,0,0,solar pv,Market
+Unit_988,solar pv,284,0,212.4,0,1,0,0,solar pv,Market
+Unit_989,solar pv,283,0,108.5,0,1,0,0,solar pv,Market
+Unit_990,solar pv,51,0,283.9,0,1,0,0,solar pv,Market
+Unit_991,solar pv,302,0,29.6,0,1,0,0,solar pv,Market
+Unit_992,solar pv,304,0,329.4,0,1,0,0,solar pv,Market
+Unit_993,solar pv,31,0,90.6,0,1,0,0,solar pv,Market
+Unit_994,solar pv,286,0,181.3,0,1,0,0,solar pv,Market
+Unit_995,solar pv,77,0,145.8,0,1,0,0,solar pv,Market
+Unit_996,solar pv,276,0,14.1,0,1,0,0,solar pv,Market
+Unit_997,solar pv,152,0,53.2,0,1,0,0,solar pv,Market
+Unit_998,solar pv,120,0,180.6,0,1,0,0,solar pv,Market
+Unit_999,solar pv,254,0,278.1,0,1,0,0,solar pv,Market
+Unit_1000,solar pv,211,0,130.9,0,1,0,0,solar pv,Market
+Unit_1001,solar pv,255,0,305,0,1,0,0,solar pv,Market
+Unit_1002,solar pv,128,0,99.5,0,1,0,0,solar pv,Market
+Unit_1003,solar pv,275,0,59.2,0,1,0,0,solar pv,Market
+Unit_1004,solar pv,238,0,157,0,1,0,0,solar pv,Market
+Unit_1005,solar pv,100,0,202.5,0,1,0,0,solar pv,Market
+Unit_1006,solar pv,215,0,17.1,0,1,0,0,solar pv,Market
+Unit_1007,solar pv,225,0,272.6,0,1,0,0,solar pv,Market
+Unit_1008,solar pv,223,0,177.4,0,1,0,0,solar pv,Market
+Unit_1009,solar pv,229,0,70.1,0,1,0,0,solar pv,Market
+Unit_1010,solar pv,224,0,142.4,0,1,0,0,solar pv,Market
+Unit_1011,solar pv,54,0,12.9,0,1,0,0,solar pv,Market
+Unit_1012,solar pv,69,0,25.6,0,1,0,0,solar pv,Market
+Unit_1013,solar pv,257,0,78.5,0,1,0,0,solar pv,Market
+Unit_1014,solar pv,409,0,47.1,0,1,0,0,solar pv,Market
+Unit_1015,solar pv,260,0,318,0,1,0,0,solar pv,Market
+Unit_1016,solar pv,320,0,299.6,0,1,0,0,solar pv,Market
+Unit_1017,solar pv,377,0,106.1,0,1,0,0,solar pv,Market
+Unit_1018,solar pv,216,0,155.2,0,1,0,0,solar pv,Market
+Unit_1019,solar pv,379,0,132.8,0,1,0,0,solar pv,Market
+Unit_1020,solar pv,310,0,258.4,0,1,0,0,solar pv,Market
+Unit_1021,solar pv,311,0,465.9,0,1,0,0,solar pv,Market
+Unit_1022,solar pv,389,0,624.3,0,1,0,0,solar pv,Market
+Unit_1023,solar pv,394,0,127.3,0,1,0,0,solar pv,Market
+Unit_1024,solar pv,312,0,274.3,0,1,0,0,solar pv,Market
+Unit_1025,solar pv,438,0,150.3,0,1,0,0,solar pv,Market
+Unit_1026,solar pv,375,0,37.9,0,1,0,0,solar pv,Market
+Unit_1027,solar pv,366,0,227.3,0,1,0,0,solar pv,Market
+Unit_1028,solar pv,422,0,254.8,0,1,0,0,solar pv,Market
+Unit_1029,solar pv,381,0,166.7,0,1,0,0,solar pv,Market
+Unit_1030,solar pv,58,0,123.1,0,1,0,0,solar pv,Market
+Unit_1031,solar pv,322,0,195.4,0,1,0,0,solar pv,Market
+Unit_1032,solar pv,53,0,116.4,0,1,0,0,solar pv,Market
+Unit_1033,solar pv,288,0,296.4,0,1,0,0,solar pv,Market
+Unit_1034,solar pv,189,0,243.4,0,1,0,0,solar pv,Market
+Unit_1035,solar pv,436,0,127.2,0,1,0,0,solar pv,Market
+Unit_1036,solar pv,406,0,155.6,0,1,0,0,solar pv,Market
+Unit_1037,solar pv,405,0,73.2,0,1,0,0,solar pv,Market
+Unit_1038,solar pv,235,0,121.4,0,1,0,0,solar pv,Market
+Unit_1039,solar pv,190,0,230.3,0,1,0,0,solar pv,Market
+Unit_1040,solar pv,233,0,701.9,0,1,0,0,solar pv,Market
+Unit_1041,solar pv,395,0,445,0,1,0,0,solar pv,Market
+Unit_1042,solar pv,264,0,205.4,0,1,0,0,solar pv,Market
+Unit_1043,solar pv,351,0,535.9,0,1,0,0,solar pv,Market
+Unit_1044,solar pv,354,0,170.3,0,1,0,0,solar pv,Market
+Unit_1045,solar pv,266,0,260.4,0,1,0,0,solar pv,Market
+Unit_1046,solar pv,331,0,454.3,0,1,0,0,solar pv,Market
+Unit_1047,solar pv,19,0,373.3,0,1,0,0,solar pv,Market
+Unit_1048,solar pv,13,0,172,0,1,0,0,solar pv,Market
+Unit_1049,solar pv,15,0,235.4,0,1,0,0,solar pv,Market
+Unit_1050,solar pv,352,0,168.4,0,1,0,0,solar pv,Market
+Unit_1051,solar pv,433,0,34.7,0,1,0,0,solar pv,Market
+Unit_1052,solar pv,315,0,554.3,0,1,0,0,solar pv,Market
+Unit_1053,solar pv,337,0,948.6,0,1,0,0,solar pv,Market
+Unit_1054,solar pv,330,0,416.9,0,1,0,0,solar pv,Market
+Unit_1055,solar pv,417,0,455.4,0,1,0,0,solar pv,Market
+Unit_1056,solar pv,332,0,467.2,0,1,0,0,solar pv,Market
+Unit_1057,solar pv,418,0,118.4,0,1,0,0,solar pv,Market
+Unit_1058,solar pv,349,0,334,0,1,0,0,solar pv,Market
+Unit_1059,solar pv,329,0,349.7,0,1,0,0,solar pv,Market
+Unit_1060,solar pv,338,0,407.5,0,1,0,0,solar pv,Market
+Unit_1061,solar pv,373,0,523.7,0,1,0,0,solar pv,Market
+Unit_1062,solar pv,66,0,327.7,0,1,0,0,solar pv,Market
+Unit_1063,solar pv,350,0,368,0,1,0,0,solar pv,Market
+Unit_1064,solar pv,335,0,361.2,0,1,0,0,solar pv,Market
+Unit_1065,solar pv,336,0,471.6,0,1,0,0,solar pv,Market
+Unit_1066,solar pv,343,0,146.5,0,1,0,0,solar pv,Market
+Unit_1067,solar pv,334,0,316.5,0,1,0,0,solar pv,Market
+Unit_1068,solar pv,390,0,305.6,0,1,0,0,solar pv,Market
+Unit_1069,solar pv,384,0,1147.4,0,1,0,0,solar pv,Market
+Unit_1070,solar pv,385,0,176.6,0,1,0,0,solar pv,Market
+Unit_1071,solar pv,383,0,135.8,0,1,0,0,solar pv,Market
+Unit_1072,solar pv,382,0,23.5,0,1,0,0,solar pv,Market
+Unit_1073,solar pv,308,0,333.5,0,1,0,0,solar pv,Market
+Unit_1074,solar pv,316,0,262.3,0,1,0,0,solar pv,Market
+Unit_1075,solar pv,483,0,279.7,0,1,0,0,solar pv,Market
+Unit_1076,solar pv,247,0,177.6,0,1,0,0,solar pv,Market
+Unit_1077,solar pv,485,0,357.1,0,1,0,0,solar pv,Market
+Unit_1078,solar pv,410,0,205.2,0,1,0,0,solar pv,Market
+Unit_1079,solar pv,396,0,206.3,0,1,0,0,solar pv,Market
+Unit_1080,solar pv,232,0,138.7,0,1,0,0,solar pv,Market
+Unit_1081,solar pv,262,0,56.7,0,1,0,0,solar pv,Market
+Unit_1082,solar pv,318,0,294,0,1,0,0,solar pv,Market
+Unit_1083,solar pv,99,0,230.9,0,1,0,0,solar pv,Market
+Unit_1084,solar pv,371,0,89.2,0,1,0,0,solar pv,Market
+Unit_1085,solar pv,372,0,90.9,0,1,0,0,solar pv,Market
+Unit_1086,solar pv,348,0,115,0,1,0,0,solar pv,Market
+Unit_1087,solar pv,43,0,445.2,0,1,0,0,solar pv,Market
+Unit_1088,solar pv,428,0,460.8,0,1,0,0,solar pv,Market
+Unit_1089,solar pv,81,0,247.5,0,1,0,0,solar pv,Market
+Unit_1090,solar pv,10,0,287.1,0,1,0,0,solar pv,Market
+Unit_1091,solar pv,12,0,771.4,0,1,0,0,solar pv,Market
+Unit_1092,solar pv,74,0,668.8,0,1,0,0,solar pv,Market
+Unit_1093,solar pv,280,0,567.1,0,1,0,0,solar pv,Market
+Unit_1094,solar pv,11,0,197,0,1,0,0,solar pv,Market
+Unit_1095,solar pv,41,0,233.5,0,1,0,0,solar pv,Market
+Unit_1096,solar pv,45,0,171.8,0,1,0,0,solar pv,Market
+Unit_1097,solar pv,179,0,170.8,0,1,0,0,solar pv,Market
+Unit_1098,solar pv,217,0,23.6,0,1,0,0,solar pv,Market
+Unit_1099,solar pv,40,0,556.9,0,1,0,0,solar pv,Market
+Unit_1100,solar pv,42,0,300.5,0,1,0,0,solar pv,Market
+Unit_1101,solar pv,177,0,351.6,0,1,0,0,solar pv,Market
+Unit_1102,solar pv,18,0,412.3,0,1,0,0,solar pv,Market
+Unit_1103,solar pv,344,0,376.5,0,1,0,0,solar pv,Market
+Unit_1104,solar pv,345,0,89.1,0,1,0,0,solar pv,Market
+Unit_1105,solar pv,323,0,229.3,0,1,0,0,solar pv,Market
+Unit_1106,solar pv,326,0,109.1,0,1,0,0,solar pv,Market
+Unit_1107,solar pv,290,0,299.3,0,1,0,0,solar pv,Market
+Unit_1108,solar pv,324,0,227,0,1,0,0,solar pv,Market
+Unit_1109,solar pv,340,0,389.8,0,1,0,0,solar pv,Market
+Unit_1110,solar pv,282,0,306.8,0,1,0,0,solar pv,Market
+Unit_1111,solar pv,71,0,706.8,0,1,0,0,solar pv,Market
+Unit_1112,solar pv,72,0,558.4,0,1,0,0,solar pv,Market
+Unit_1113,solar pv,278,0,264.4,0,1,0,0,solar pv,Market
+Unit_1114,solar pv,50,0,210.7,0,1,0,0,solar pv,Market
+Unit_1115,solar pv,37,0,146.8,0,1,0,0,solar pv,Market
+Unit_1116,solar pv,75,0,313.7,0,1,0,0,solar pv,Market
+Unit_1117,solar pv,292,0,218.5,0,1,0,0,solar pv,Market
+Unit_1118,solar pv,39,0,224.2,0,1,0,0,solar pv,Market
+Unit_1119,solar pv,32,0,106.4,0,1,0,0,solar pv,Market
+Unit_1120,solar pv,281,0,141.9,0,1,0,0,solar pv,Market
+Unit_1121,solar pv,441,0,128.4,0,1,0,0,solar pv,Market
+Unit_1122,solar pv,294,0,63.4,0,1,0,0,solar pv,Market
+Unit_1123,solar pv,442,0,126.5,0,1,0,0,solar pv,Market
+Unit_1124,solar pv,342,0,306.7,0,1,0,0,solar pv,Market
+Unit_1125,solar pv,33,0,296.8,0,1,0,0,solar pv,Market
+Unit_1126,solar pv,293,0,45.6,0,1,0,0,solar pv,Market
+Unit_1127,solar pv,78,0,88.8,0,1,0,0,solar pv,Market
+Unit_1128,wind onshore,495,0,847.8,0,1,0,0,wind turbine,Market
+Unit_1129,wind onshore,84,0,44.5,0,1,0,0,wind turbine,Market
+Unit_1130,wind onshore,412,0,584.2,0,1,0,0,wind turbine,Market
+Unit_1131,wind onshore,22,0,1857.2,0,1,0,0,wind turbine,Market
+Unit_1132,wind onshore,8,0,97.5,0,1,0,0,wind turbine,Market
+Unit_1133,wind onshore,333,0,2119,0,1,0,0,wind turbine,Market
+Unit_1134,wind onshore,28,0,24.1,0,1,0,0,wind turbine,Market
+Unit_1135,wind onshore,24,0,382,0,1,0,0,wind turbine,Market
+Unit_1136,wind onshore,23,0,155.3,0,1,0,0,wind turbine,Market
+Unit_1137,wind onshore,402,0,587.9,0,1,0,0,wind turbine,Market
+Unit_1138,wind onshore,21,0,40,0,1,0,0,wind turbine,Market
+Unit_1139,wind onshore,183,0,251.6,0,1,0,0,wind turbine,Market
+Unit_1140,wind onshore,295,0,7.7,0,1,0,0,wind turbine,Market
+Unit_1141,wind onshore,482,0,101.6,0,1,0,0,wind turbine,Market
+Unit_1142,wind onshore,16,0,543.8,0,1,0,0,wind turbine,Market
+Unit_1143,wind onshore,426,0,26.4,0,1,0,0,wind turbine,Market
+Unit_1144,wind onshore,49,0,145.8,0,1,0,0,wind turbine,Market
+Unit_1145,wind onshore,259,0,50.3,0,1,0,0,wind turbine,Market
+Unit_1146,wind onshore,301,0,198.3,0,1,0,0,wind turbine,Market
+Unit_1147,wind onshore,425,0,133,0,1,0,0,wind turbine,Market
+Unit_1148,wind onshore,258,0,206.4,0,1,0,0,wind turbine,Market
+Unit_1149,wind onshore,380,0,774.1,0,1,0,0,wind turbine,Market
+Unit_1150,wind onshore,300,0,953.1,0,1,0,0,wind turbine,Market
+Unit_1151,wind onshore,210,0,158.4,0,1,0,0,wind turbine,Market
+Unit_1152,wind onshore,226,0,130.6,0,1,0,0,wind turbine,Market
+Unit_1153,wind onshore,481,0,46,0,1,0,0,wind turbine,Market
+Unit_1154,wind onshore,296,0,302.4,0,1,0,0,wind turbine,Market
+Unit_1155,wind onshore,376,0,39.9,0,1,0,0,wind turbine,Market
+Unit_1156,wind onshore,299,0,132,0,1,0,0,wind turbine,Market
+Unit_1157,wind onshore,369,0,773.6,0,1,0,0,wind turbine,Market
+Unit_1158,wind onshore,102,0,1015,0,1,0,0,wind turbine,Market
+Unit_1159,wind onshore,9,0,252.4,0,1,0,0,wind turbine,Market
+Unit_1160,wind onshore,62,0,252.6,0,1,0,0,wind turbine,Market
+Unit_1161,wind onshore,201,0,268.8,0,1,0,0,wind turbine,Market
+Unit_1162,wind onshore,30,0,414.9,0,1,0,0,wind turbine,Market
+Unit_1163,wind onshore,29,0,191.6,0,1,0,0,wind turbine,Market
+Unit_1164,wind onshore,474,0,166.4,0,1,0,0,wind turbine,Market
+Unit_1165,wind onshore,59,0,265.1,0,1,0,0,wind turbine,Market
+Unit_1166,wind onshore,270,0,1667.6,0,1,0,0,wind turbine,Market
+Unit_1167,wind onshore,159,0,93.2,0,1,0,0,wind turbine,Market
+Unit_1168,wind onshore,265,0,0.8,0,1,0,0,wind turbine,Market
+Unit_1169,wind onshore,34,0,55.1,0,1,0,0,wind turbine,Market
+Unit_1170,wind onshore,285,0,531.2,0,1,0,0,wind turbine,Market
+Unit_1171,wind onshore,93,0,1148.6,0,1,0,0,wind turbine,Market
+Unit_1172,wind onshore,36,0,345.2,0,1,0,0,wind turbine,Market
+Unit_1173,wind onshore,85,0,762.5,0,1,0,0,wind turbine,Market
+Unit_1174,wind onshore,221,0,207.2,0,1,0,0,wind turbine,Market
+Unit_1175,wind onshore,95,0,414,0,1,0,0,wind turbine,Market
+Unit_1176,wind onshore,60,0,404.6,0,1,0,0,wind turbine,Market
+Unit_1177,wind onshore,160,0,60.2,0,1,0,0,wind turbine,Market
+Unit_1178,wind onshore,200,0,2.7,0,1,0,0,wind turbine,Market
+Unit_1179,wind onshore,176,0,19.5,0,1,0,0,wind turbine,Market
+Unit_1180,wind onshore,153,0,55.5,0,1,0,0,wind turbine,Market
+Unit_1181,wind onshore,130,0,7.6,0,1,0,0,wind turbine,Market
+Unit_1182,wind onshore,126,0,10.5,0,1,0,0,wind turbine,Market
+Unit_1183,wind onshore,137,0,378.5,0,1,0,0,wind turbine,Market
+Unit_1184,wind onshore,132,0,3.4,0,1,0,0,wind turbine,Market
+Unit_1185,wind onshore,151,0,165,0,1,0,0,wind turbine,Market
+Unit_1186,wind onshore,197,0,119.6,0,1,0,0,wind turbine,Market
+Unit_1187,wind onshore,154,0,19.7,0,1,0,0,wind turbine,Market
+Unit_1188,wind onshore,122,0,256.4,0,1,0,0,wind turbine,Market
+Unit_1189,wind onshore,119,0,355.6,0,1,0,0,wind turbine,Market
+Unit_1190,wind onshore,134,0,91.2,0,1,0,0,wind turbine,Market
+Unit_1191,wind onshore,453,0,230.2,0,1,0,0,wind turbine,Market
+Unit_1192,wind onshore,431,0,176.7,0,1,0,0,wind turbine,Market
+Unit_1193,wind onshore,204,0,55.3,0,1,0,0,wind turbine,Market
+Unit_1194,wind onshore,149,0,3.8,0,1,0,0,wind turbine,Market
+Unit_1195,wind onshore,104,0,19.1,0,1,0,0,wind turbine,Market
+Unit_1196,wind onshore,113,0,5.5,0,1,0,0,wind turbine,Market
+Unit_1197,wind onshore,374,0,69.7,0,1,0,0,wind turbine,Market
+Unit_1198,wind onshore,90,0,153.4,0,1,0,0,wind turbine,Market
+Unit_1199,wind onshore,142,0,122.8,0,1,0,0,wind turbine,Market
+Unit_1200,wind onshore,289,0,515.5,0,1,0,0,wind turbine,Market
+Unit_1201,wind onshore,472,0,267.8,0,1,0,0,wind turbine,Market
+Unit_1202,wind onshore,219,0,50.6,0,1,0,0,wind turbine,Market
+Unit_1203,wind onshore,157,0,98,0,1,0,0,wind turbine,Market
+Unit_1204,wind onshore,490,0,434.7,0,1,0,0,wind turbine,Market
+Unit_1205,wind onshore,386,0,153.9,0,1,0,0,wind turbine,Market
+Unit_1206,wind onshore,209,0,56.2,0,1,0,0,wind turbine,Market
+Unit_1207,wind onshore,411,0,920,0,1,0,0,wind turbine,Market
+Unit_1208,wind onshore,363,0,16.4,0,1,0,0,wind turbine,Market
+Unit_1209,wind onshore,147,0,21.6,0,1,0,0,wind turbine,Market
+Unit_1210,wind onshore,470,0,36.2,0,1,0,0,wind turbine,Market
+Unit_1211,wind onshore,109,0,7.3,0,1,0,0,wind turbine,Market
+Unit_1212,wind onshore,114,0,68.9,0,1,0,0,wind turbine,Market
+Unit_1213,wind onshore,178,0,112.2,0,1,0,0,wind turbine,Market
+Unit_1214,wind onshore,110,0,238.8,0,1,0,0,wind turbine,Market
+Unit_1215,wind onshore,166,0,44.6,0,1,0,0,wind turbine,Market
+Unit_1216,wind onshore,228,0,52.2,0,1,0,0,wind turbine,Market
+Unit_1217,wind onshore,68,0,18.2,0,1,0,0,wind turbine,Market
+Unit_1218,wind onshore,241,0,2.6,0,1,0,0,wind turbine,Market
+Unit_1219,wind onshore,245,0,243.3,0,1,0,0,wind turbine,Market
+Unit_1220,wind onshore,339,0,44.3,0,1,0,0,wind turbine,Market
+Unit_1221,wind onshore,242,0,125.8,0,1,0,0,wind turbine,Market
+Unit_1222,wind onshore,397,0,35.1,0,1,0,0,wind turbine,Market
+Unit_1223,wind onshore,284,0,251.3,0,1,0,0,wind turbine,Market
+Unit_1224,wind onshore,283,0,122.2,0,1,0,0,wind turbine,Market
+Unit_1225,wind onshore,51,0,522,0,1,0,0,wind turbine,Market
+Unit_1226,wind onshore,302,0,8.7,0,1,0,0,wind turbine,Market
+Unit_1227,wind onshore,304,0,150.1,0,1,0,0,wind turbine,Market
+Unit_1228,wind onshore,31,0,97,0,1,0,0,wind turbine,Market
+Unit_1229,wind onshore,286,0,211.9,0,1,0,0,wind turbine,Market
+Unit_1230,wind onshore,77,0,234.1,0,1,0,0,wind turbine,Market
+Unit_1231,wind onshore,276,0,0.1,0,1,0,0,wind turbine,Market
+Unit_1232,wind onshore,152,0,16.9,0,1,0,0,wind turbine,Market
+Unit_1233,wind onshore,120,0,134,0,1,0,0,wind turbine,Market
+Unit_1234,wind onshore,254,0,1164.7,0,1,0,0,wind turbine,Market
+Unit_1235,wind onshore,211,0,162.5,0,1,0,0,wind turbine,Market
+Unit_1236,wind onshore,255,0,531.7,0,1,0,0,wind turbine,Market
+Unit_1237,wind onshore,128,0,45.9,0,1,0,0,wind turbine,Market
+Unit_1238,wind onshore,100,0,473.2,0,1,0,0,wind turbine,Market
+Unit_1239,wind onshore,238,0,132.8,0,1,0,0,wind turbine,Market
+Unit_1240,wind onshore,70,0,111,0,1,0,0,wind turbine,Market
+Unit_1241,wind onshore,225,0,335.1,0,1,0,0,wind turbine,Market
+Unit_1242,wind onshore,69,0,27.4,0,1,0,0,wind turbine,Market
+Unit_1243,wind onshore,257,0,383.3,0,1,0,0,wind turbine,Market
+Unit_1244,wind onshore,224,0,65.2,0,1,0,0,wind turbine,Market
+Unit_1245,wind onshore,223,0,103.1,0,1,0,0,wind turbine,Market
+Unit_1246,wind onshore,320,0,12.1,0,1,0,0,wind turbine,Market
+Unit_1247,wind onshore,377,0,105.3,0,1,0,0,wind turbine,Market
+Unit_1248,wind onshore,216,0,3.4,0,1,0,0,wind turbine,Market
+Unit_1249,wind onshore,379,0,24.7,0,1,0,0,wind turbine,Market
+Unit_1250,wind onshore,310,0,65.7,0,1,0,0,wind turbine,Market
+Unit_1251,wind onshore,311,0,332.7,0,1,0,0,wind turbine,Market
+Unit_1252,wind onshore,389,0,456.3,0,1,0,0,wind turbine,Market
+Unit_1253,wind onshore,394,0,79.3,0,1,0,0,wind turbine,Market
+Unit_1254,wind onshore,312,0,211.8,0,1,0,0,wind turbine,Market
+Unit_1255,wind onshore,375,0,1.8,0,1,0,0,wind turbine,Market
+Unit_1256,wind onshore,366,0,2.3,0,1,0,0,wind turbine,Market
+Unit_1257,wind onshore,381,0,89.8,0,1,0,0,wind turbine,Market
+Unit_1258,wind onshore,260,0,59.9,0,1,0,0,wind turbine,Market
+Unit_1259,wind onshore,322,0,27.7,0,1,0,0,wind turbine,Market
+Unit_1260,wind onshore,53,0,27.1,0,1,0,0,wind turbine,Market
+Unit_1261,wind onshore,288,0,98.1,0,1,0,0,wind turbine,Market
+Unit_1262,wind onshore,189,0,54.5,0,1,0,0,wind turbine,Market
+Unit_1263,wind onshore,436,0,13.9,0,1,0,0,wind turbine,Market
+Unit_1264,wind onshore,406,0,11.3,0,1,0,0,wind turbine,Market
+Unit_1265,wind onshore,405,0,30.6,0,1,0,0,wind turbine,Market
+Unit_1266,wind onshore,190,0,2.1,0,1,0,0,wind turbine,Market
+Unit_1267,wind onshore,233,0,65.3,0,1,0,0,wind turbine,Market
+Unit_1268,wind onshore,395,0,1.7,0,1,0,0,wind turbine,Market
+Unit_1269,wind onshore,264,0,26.9,0,1,0,0,wind turbine,Market
+Unit_1270,wind onshore,354,0,1.7,0,1,0,0,wind turbine,Market
+Unit_1271,wind onshore,13,0,23.5,0,1,0,0,wind turbine,Market
+Unit_1272,wind onshore,351,0,136.7,0,1,0,0,wind turbine,Market
+Unit_1273,wind onshore,15,0,0.1,0,1,0,0,wind turbine,Market
+Unit_1274,wind onshore,352,0,2.7,0,1,0,0,wind turbine,Market
+Unit_1275,wind onshore,19,0,21.5,0,1,0,0,wind turbine,Market
+Unit_1276,wind onshore,315,0,37.4,0,1,0,0,wind turbine,Market
+Unit_1277,wind onshore,331,0,4.7,0,1,0,0,wind turbine,Market
+Unit_1278,wind onshore,418,0,0.3,0,1,0,0,wind turbine,Market
+Unit_1279,wind onshore,349,0,4.8,0,1,0,0,wind turbine,Market
+Unit_1280,wind onshore,330,0,11.2,0,1,0,0,wind turbine,Market
+Unit_1281,wind onshore,417,0,0.7,0,1,0,0,wind turbine,Market
+Unit_1282,wind onshore,332,0,0.1,0,1,0,0,wind turbine,Market
+Unit_1283,wind onshore,329,0,0.7,0,1,0,0,wind turbine,Market
+Unit_1284,wind onshore,337,0,9.9,0,1,0,0,wind turbine,Market
+Unit_1285,wind onshore,373,0,32.1,0,1,0,0,wind turbine,Market
+Unit_1286,wind onshore,338,0,109.9,0,1,0,0,wind turbine,Market
+Unit_1287,wind onshore,350,0,183.7,0,1,0,0,wind turbine,Market
+Unit_1288,wind onshore,66,0,47.5,0,1,0,0,wind turbine,Market
+Unit_1289,wind onshore,335,0,141.2,0,1,0,0,wind turbine,Market
+Unit_1290,wind onshore,336,0,547.6,0,1,0,0,wind turbine,Market
+Unit_1291,wind onshore,334,0,64.9,0,1,0,0,wind turbine,Market
+Unit_1292,wind onshore,390,0,45.2,0,1,0,0,wind turbine,Market
+Unit_1293,wind onshore,384,0,444.8,0,1,0,0,wind turbine,Market
+Unit_1294,wind onshore,383,0,54,0,1,0,0,wind turbine,Market
+Unit_1295,wind onshore,308,0,125.4,0,1,0,0,wind turbine,Market
+Unit_1296,wind onshore,385,0,34.4,0,1,0,0,wind turbine,Market
+Unit_1297,wind onshore,316,0,31.6,0,1,0,0,wind turbine,Market
+Unit_1298,wind onshore,410,0,28.4,0,1,0,0,wind turbine,Market
+Unit_1299,wind onshore,396,0,8.3,0,1,0,0,wind turbine,Market
+Unit_1300,wind onshore,232,0,2.3,0,1,0,0,wind turbine,Market
+Unit_1301,wind onshore,483,0,55.8,0,1,0,0,wind turbine,Market
+Unit_1302,wind onshore,485,0,7.6,0,1,0,0,wind turbine,Market
+Unit_1303,wind onshore,318,0,11.6,0,1,0,0,wind turbine,Market
+Unit_1304,wind onshore,247,0,30,0,1,0,0,wind turbine,Market
+Unit_1305,wind onshore,99,0,265,0,1,0,0,wind turbine,Market
+Unit_1306,wind onshore,371,0,151,0,1,0,0,wind turbine,Market
+Unit_1307,wind onshore,372,0,35.6,0,1,0,0,wind turbine,Market
+Unit_1308,wind onshore,348,0,12,0,1,0,0,wind turbine,Market
+Unit_1309,wind onshore,428,0,239.5,0,1,0,0,wind turbine,Market
+Unit_1310,wind onshore,81,0,287.4,0,1,0,0,wind turbine,Market
+Unit_1311,wind onshore,10,0,525.7,0,1,0,0,wind turbine,Market
+Unit_1312,wind onshore,12,0,751,0,1,0,0,wind turbine,Market
+Unit_1313,wind onshore,74,0,969.5,0,1,0,0,wind turbine,Market
+Unit_1314,wind onshore,280,0,779.2,0,1,0,0,wind turbine,Market
+Unit_1315,wind onshore,43,0,673.3,0,1,0,0,wind turbine,Market
+Unit_1316,wind onshore,11,0,151.1,0,1,0,0,wind turbine,Market
+Unit_1317,wind onshore,41,0,969.6,0,1,0,0,wind turbine,Market
+Unit_1318,wind onshore,45,0,782.1,0,1,0,0,wind turbine,Market
+Unit_1319,wind onshore,179,0,1267.5,0,1,0,0,wind turbine,Market
+Unit_1320,wind onshore,217,0,11.4,0,1,0,0,wind turbine,Market
+Unit_1321,wind onshore,40,0,686.8,0,1,0,0,wind turbine,Market
+Unit_1322,wind onshore,42,0,670.4,0,1,0,0,wind turbine,Market
+Unit_1323,wind onshore,177,0,416.2,0,1,0,0,wind turbine,Market
+Unit_1324,wind onshore,18,0,693.5,0,1,0,0,wind turbine,Market
+Unit_1325,wind onshore,344,0,304.5,0,1,0,0,wind turbine,Market
+Unit_1326,wind onshore,345,0,32.8,0,1,0,0,wind turbine,Market
+Unit_1327,wind onshore,323,0,226.2,0,1,0,0,wind turbine,Market
+Unit_1328,wind onshore,326,0,48.3,0,1,0,0,wind turbine,Market
+Unit_1329,wind onshore,290,0,146.5,0,1,0,0,wind turbine,Market
+Unit_1330,wind onshore,324,0,202.8,0,1,0,0,wind turbine,Market
+Unit_1331,wind onshore,340,0,146.9,0,1,0,0,wind turbine,Market
+Unit_1332,wind onshore,282,0,103.4,0,1,0,0,wind turbine,Market
+Unit_1333,wind onshore,71,0,728.2,0,1,0,0,wind turbine,Market
+Unit_1334,wind onshore,72,0,751.9,0,1,0,0,wind turbine,Market
+Unit_1335,wind onshore,278,0,793.6,0,1,0,0,wind turbine,Market
+Unit_1336,wind onshore,50,0,255.6,0,1,0,0,wind turbine,Market
+Unit_1337,wind onshore,37,0,302.2,0,1,0,0,wind turbine,Market
+Unit_1338,wind onshore,75,0,365.1,0,1,0,0,wind turbine,Market
+Unit_1339,wind onshore,292,0,682.3,0,1,0,0,wind turbine,Market
+Unit_1340,wind onshore,39,0,872.1,0,1,0,0,wind turbine,Market
+Unit_1341,wind onshore,32,0,287.9,0,1,0,0,wind turbine,Market
+Unit_1342,wind onshore,281,0,50.1,0,1,0,0,wind turbine,Market
+Unit_1343,wind onshore,342,0,522.5,0,1,0,0,wind turbine,Market
+Unit_1344,wind onshore,33,0,278.7,0,1,0,0,wind turbine,Market
+Unit_1345,wind onshore,343,0,17.4,0,1,0,0,wind turbine,Market
+Unit_1346,wind onshore,294,0,7.7,0,1,0,0,wind turbine,Market
+Unit_1347,wind onshore,442,0,68.1,0,1,0,0,wind turbine,Market
+Unit_1348,wind onshore,293,0,9.8,0,1,0,0,wind turbine,Market
+Unit_1349,wind onshore,441,0,135.1,0,1,0,0,wind turbine,Market
+Unit_1350,wind onshore,78,0,59.4,0,1,0,0,wind turbine,Market
+Unit_1351,wind offshore,222,0,2448.4,0,1,0,0,wind turbine,Market
+Unit_1352,wind offshore,270,0,2540.4,0,1,0,0,wind turbine,Market
+Unit_1353,wind offshore,36,0,718.7,0,1,0,0,wind turbine,Market
+Unit_1354,wind offshore,18,0,744.1,0,1,0,0,wind turbine,Market
+Unit_1355,wind offshore,271,0,253.7,0,1,0,0,wind turbine,Market
+Unit_1356,wind offshore,333,0,599.1,0,1,0,0,wind turbine,Market
+Unit_1357,wind offshore,177,0,350.7,0,1,0,0,wind turbine,Market
